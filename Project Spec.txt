@@ -1,0 +1,45 @@
+Project CheckList
+---------------------------------
+
+1) A mood event - each event should include (is required unless stated as optional)
+	i) a mood
+	ii) current date and time
+	iii) Emotional state (?)
+	iv) Reason (optional)
+	v) Social situation
+	vi) Current location (optional)
+
+2) A mood history containing all past moods
+3) Each mood event should have "consistent" (and relevant) emojis, as well as color options
+4) View past events and its details, with the ability to edit them and delete them
+5) The reason for each mood event should have a comment with upto 20 char
+6) Include a picture for an event
+7) Social situation should have the following options,
+	i) alone
+	ii) one person
+	iii) two or more people
+	iv) a crowd of people
+8) A user should have their own profile, with a unique username
+9) The mood history should be sorted by date, with the list starting with the most recent and so on
+10) Have an option to filter mood history to show events with a particuler emotional state
+11) Have the ability to follow other users, by sending follow requests
+12) Have the ability to view and accept/decline follow requests from users
+13) The ability to view mood history of users who have accepted your follow request
+14) Have the option to see your moods with location attached on a map, with each mood showing emotional states
+15) Have the ability to view a map filled with all the following users' moods, with each mood showing the emotional states and the username
+
+-----------------------------------------------------------------------------------------------------------------------------------------------
+(Sub) Project 2 Checklist
+---------------------------------
+
+1) Product Backlog:
+	Form the initial partial user stories into a backlog of the product's requirements. For each user story, complete its rationale, its estimated size in story points, and risk level (i.e., low, medium, or high). These requirements will likely evolve and should be maintained up-to-date throughout the project. Make sure they are numbered for easy reference.
+
+2) User Interface Mockups and Storyboard Sequences:
+	Diagram the layout of your main user interface and major dialogs, with comments describing the important elements. Also, diagram storyboard sequences of using your application, with transitions between different states of the user interface, caused by the user manipulating the controls or providing input. Within the diagrams, reference the relevant requirements. Convincingly show all the requirements are covered.
+
+3) Object-Oriented Analysis:
+Document your initial object-oriented analysis using a UML class diagram (or diagrams), focusing on the most important anticipated classes, interfaces, and relationships. Add notes if the purpose of a class, interface, or relationship is likely not clear to an outsider. The diagram(s) will likely evolve.
+
+4)Glossary and Information Sources:
+	Define any special terminology in the application domain (i.e., not programming terms). Provide a list of useful informational references or links to related or competitive products. Enter this information in your team wiki. Please clearly state the open source license for your project.
