@@ -1,3 +1,10 @@
 <resources>
     <string name="app_name">Mood.io</string>
+    <string name="addEntryBtn">Add Event</string>
+    <string name="editEntryBtn">Edit Event</string>
+    <string name="cancel">Cancel</string>
+    <string name="moodEventIntro">How are you feeling?</string>
+    <string name="feelingTV">I am feeling</string>
+    <string name="reasonET">thoughts?</string>
+    <string name="socialStateTV">Are you by yourself?</string>
 </resources>

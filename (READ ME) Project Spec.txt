@@ -1,10 +1,10 @@
 Project CheckList
 ---------------------------------
 
-1) A mood event - each event should include (is required unless stated as optional)
+1) A mood event - each event should include (each part is required unless stated as optional)
 	i) a mood
 	ii) current date and time
-	iii) Emotional state (?)
+	iii) Emotional state (??)
 	iv) Reason (optional)
 	v) Social situation
 	vi) Current location (optional)
