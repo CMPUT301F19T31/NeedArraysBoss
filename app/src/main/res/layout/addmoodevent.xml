@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="350dp" android:layout_height="300dp" android:layout_gravity="center" android:background="#d1d9ff">
+    android:layout_width="300dp" android:layout_height="300dp" android:layout_gravity="center" android:background="#d1d9ff">
 
     <TextView
+        android:id="@+id/moodEventIntro"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/moodEventIntro"
-        android:text="@string/moodEventIntro"
-        android:textAppearance="@style/TextAppearance.AppCompat.Display1"
         android:background="#9fa8da"
-        android:padding="5dp"/>
+        android:padding="5dp"
+        android:text="@string/moodEventIntro"
+        android:textAppearance="@style/TextAppearance.AppCompat.Large" />
 
     <TextView
         android:layout_width="wrap_content"
@@ -24,6 +24,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/feelingSpinner"
+        android:entries="@array/feelings"
         android:layout_below="@id/moodEventIntro"
         android:layout_toRightOf="@id/feelingTV"
         android:layout_margin="5dp"/>
@@ -51,6 +52,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/socialStateSpinner"
+        android:entries="@array/socialStates"
         android:layout_below="@id/reasonET"
         android:layout_toRightOf="@id/socialStateTV"
         android:layout_margin="5dp"/>

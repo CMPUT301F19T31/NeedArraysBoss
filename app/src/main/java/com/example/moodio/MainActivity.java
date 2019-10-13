@@ -5,18 +5,26 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.app.Dialog;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ListView;
 import android.widget.Spinner;
-import android.widget.TextView;
+import android.widget.Toast;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import java.util.ArrayList;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
 
     Dialog dialog;
-    ArrayList<Mood> moodHistory;
+    private ArrayList<Mood> moodHistory;
+    private ArrayList<String> moodHistoryStr;
+    private ArrayAdapter<String> moodHistoryAdapter;
+    private String feeling = "", socialState = "";
+    ListView lv;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -24,39 +32,56 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         dialog = new Dialog(this);
+        moodHistory = new ArrayList<Mood>();
+        moodHistoryStr = new ArrayList<>();
+        moodHistoryAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, moodHistoryStr);
+        lv = findViewById(R.id.moodList);
+        lv.setAdapter(moodHistoryAdapter);
     }
 
     public void createMoodEvent(View view) {
-        dialog.setContentView(R.layout.addmoodevent);
+        dialog.setContentView(R.layout.addmoodevent); //opens the pop window
 
-        String[] feelingArray = {"", "happy", "excited", "hopeful", "satisfied", "sad", "angry", "frustrated", "confused", "hopeless", "lonely"};
-        String[] socialStateArray = {"", "alone", "with one person", "with two or more people", "with a crowd"};
+        Spinner feelingSpinner = (Spinner) dialog.findViewById(R.id.feelingSpinner);
+        feelingSpinner.setOnItemSelectedListener(this);
 
-        Spinner spinner = (Spinner) dialog.findViewById(R.id.feelingSpinner);
-        ArrayAdapter<String> feelingSpinner  = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, feelingArray);
-        feelingSpinner.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinner.setAdapter(feelingSpinner);
+        Spinner socialStateSpinner = (Spinner) dialog.findViewById(R.id.socialStateSpinner);
+        socialStateSpinner.setOnItemSelectedListener(this);
 
-        spinner = (Spinner) dialog.findViewById(R.id.socialStateSpinner);
-        ArrayAdapter<String> socialStateSpinner = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, socialStateArray);
-        socialStateSpinner.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinner.setAdapter(socialStateSpinner);
-
-        Button addEventBtn = findViewById(R.id.addEventBtn);
+        Button addEventBtn = dialog.findViewById(R.id.addMoodEvent);
         addEventBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 EditText et = dialog.findViewById(R.id.reasonET);
                 String reason = et.getText().toString();
+                SimpleDateFormat datetime = new SimpleDateFormat("(yyyy/MM/dd) 'at' HH:mm");
+                String datetimeStr = datetime.format(new Date());
 
-                Mood newMood = new Mood(reason);
+                if(!feeling.equals("") && !socialState.equals("")) {
+                    Mood newMood;
 
-                moodHistory.add(newMood);
-                dialog.dismiss();
+                    if (reason == null) {
+                        newMood = new Mood(feeling, socialState, datetimeStr);
+                    } else {
+                        newMood = new Mood(feeling, socialState, datetimeStr, reason);
+                    }
+                    moodHistory.add(newMood);
+                    moodHistoryStr.add(newMood.toString());
+
+                    feeling = "";
+                    socialState = "";
+                    dialog.dismiss();   //closes the pop up window
+                    moodHistoryAdapter.notifyDataSetChanged();
+
+                } else if (feeling.equals("")) {
+                    Toast.makeText(dialog.getContext(), "Please select how you feel", Toast.LENGTH_LONG).show();
+                } else if (socialState.equals("")) {
+                    Toast.makeText(dialog.getContext(), "Please select a social state", Toast.LENGTH_LONG).show();
+                }
             }
         });
 
-        Button clearEventBtn = findViewById(R.id.clearMoodEvent);
+        Button clearEventBtn = dialog.findViewById(R.id.clearMoodEvent);
         clearEventBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -65,5 +90,19 @@ public class MainActivity extends AppCompatActivity {
         });
 
         dialog.show();
+    }
+
+    @Override
+    public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+        if(adapterView.getId() == R.id.feelingSpinner)
+            feeling = adapterView.getItemAtPosition(i).toString();
+        else if(adapterView.getId() == R.id.socialStateSpinner)
+            socialState = adapterView.getItemAtPosition(i).toString();
+
+    }
+
+    @Override
+    public void onNothingSelected(AdapterView<?> adapterView) {
+
     }
 }

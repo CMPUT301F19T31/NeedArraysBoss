@@ -7,4 +7,28 @@
     <string name="feelingTV">I am feeling</string>
     <string name="reasonET">thoughts?</string>
     <string name="socialStateTV">Are you by yourself?</string>
+
+    private String[] feelingArray = {"", "happy", "excited", "hopeful", "satisfied", "sad", "angry", "frustrated", "confused", "hopeless", "lonely"};
+    private String[] socialStateArray = {"", "alone", "with one person", "with two or more people", "with a crowd"};
+    <string-array name="feelings" >
+        <item></item>
+        <item>happy</item>
+        <item>excited</item>
+        <item>hopeful</item>
+        <item>satisfied</item>
+        <item>sad</item>
+        <item>angry</item>
+        <item>frustrated</item>
+        <item>confused</item>
+        <item>hopeless</item>
+        <item>lonely</item>
+    </string-array>
+
+    <string-array name="socialStates" >
+        <item></item>
+        <item>alone</item>
+        <item>with one person</item>
+        <item>with two or more people</item>
+        <item>with a crowd</item>
+    </string-array>
 </resources>
