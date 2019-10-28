@@ -2,15 +2,17 @@
     <string name="app_name">Mood.io</string>
     <string name="addEntryBtn">Add Event</string>
     <string name="editEntryBtn">Edit Event</string>
+    <string name="deleteEntryBtn">Delete Event</string>
+    <string name="editMood">Edit your mood....</string>
     <string name="cancel">Cancel</string>
-    <string name="moodEventIntro">How are you feeling?</string>
-    <string name="feelingTV">I am feeling</string>
+    <string name="moodEventIntro">How are you feeling? </string>
+    <string name="feelingTV">I am feeling </string>
     <string name="reasonET">thoughts?</string>
+    <string name="reasonET2">(reason)</string>
+    <string name="because">because </string>
     <string name="socialStateTV">Are you by yourself?</string>
 
-    private String[] feelingArray = {"", "happy", "excited", "hopeful", "satisfied", "sad", "angry", "frustrated", "confused", "hopeless", "lonely"};
-    private String[] socialStateArray = {"", "alone", "with one person", "with two or more people", "with a crowd"};
-    <string-array name="feelings" >
+    <string-array name="feelings">
         <item></item>
         <item>happy</item>
         <item>excited</item>
@@ -20,11 +22,12 @@
         <item>angry</item>
         <item>frustrated</item>
         <item>confused</item>
+        <item>annoyed</item>
         <item>hopeless</item>
         <item>lonely</item>
     </string-array>
 
-    <string-array name="socialStates" >
+    <string-array name="socialStates">
         <item></item>
         <item>alone</item>
         <item>with one person</item>

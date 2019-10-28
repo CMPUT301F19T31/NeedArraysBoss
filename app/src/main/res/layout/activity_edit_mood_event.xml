@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".EditMoodEvent"
+    android:background="@color/black">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/editMoodTitle"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="16dp"
+        android:text="@string/editMood"
+        android:textAppearance="@style/TextAppearance.AppCompat.Display1"
+        android:textColor="@color/white"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="X"
+        android:textSize="20sp"
+        android:textColor="@color/white"
+        android:layout_alignParentRight="true"
+        android:layout_marginTop="26dp"
+        android:layout_marginRight="30dp"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/feelingTV2"
+        android:layout_below="@id/editMoodTitle"
+        android:text="@string/feelingTV"
+        android:layout_marginTop="16dp"
+        android:layout_marginLeft="16dp"
+        android:textColor="@color/white"
+        android:textSize="20sp"/>
+
+    <Spinner
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/editMoodFeelingSpinner"
+        android:entries="@array/feelings"
+        android:layout_below="@id/editMoodTitle"
+        android:layout_toRightOf="@id/feelingTV2"
+        android:layout_marginTop="16dp"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/reasonTV2"
+        android:text="@string/because"
+        android:textColor="@color/white"
+        android:textStyle="italic"
+        android:textSize="20sp"
+        android:layout_below="@id/feelingTV2"
+        android:layout_marginTop="16dp"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"/>
+
+    <androidx.emoji.widget.EmojiEditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/reasonET2"
+        android:hint="@string/reasonET2"
+        android:textColor="@color/white"
+        android:textColorHint="@color/white"
+        android:layout_below="@id/feelingTV2"
+        android:layout_toRightOf="@id/reasonTV2"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
+        android:layout_marginRight="16dp"
+        android:maxLength="20"/>
+
+    <Spinner
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/socialStateSpinner2"
+        android:layout_below="@id/reasonTV2"
+        android:layout_margin="16dp"
+        android:entries="@array/socialStates"/>
+
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true">
+
+        <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/deleteEntryBtn"
+            android:text="@string/deleteEntryBtn"
+            android:backgroundTint="@color/white"
+            app:icon="@drawable/ic_delete_black_24dp"
+            app:cornerRadius="4dp"
+            android:layout_margin="16dp"/>
+
+        <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/editEntryBtn"
+            android:text="@string/editEntryBtn"
+            app:icon="@drawable/ic_edit_black_24dp"
+            app:cornerRadius="4dp"
+            android:layout_margin="16dp"
+            android:layout_gravity="right"
+            android:backgroundTint="@color/white"/>
+
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>
+
+</RelativeLayout>

@@ -1,6 +1,13 @@
 package com.example.moodio;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.provider.FontRequest;
+import androidx.emoji.bundled.BundledEmojiCompatConfig;
+import androidx.emoji.text.EmojiCompat;
+import androidx.emoji.text.FontRequestEmojiCompatConfig;
+import androidx.emoji.widget.EmojiEditText;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.app.Dialog;
 import android.os.Bundle;
@@ -19,24 +26,32 @@ import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
 
-    Dialog dialog;
-    private ArrayList<Mood> moodHistory;
-    private ArrayList<String> moodHistoryStr;
-    private ArrayAdapter<String> moodHistoryAdapter;
+    private Dialog dialog;
     private String feeling = "", socialState = "";
-    ListView lv;
+
+    private RecyclerView rv;
+    private ArrayList<Mood> moodHistory;
+    private RecyclerView.Adapter moodHistoryAdapter;
+    private RecyclerView.LayoutManager moodHistoryLM;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        //set up emoji compatibility
+        EmojiCompat.Config config = new BundledEmojiCompatConfig(this);
+        EmojiCompat.init(config);
+
         setContentView(R.layout.activity_main);
 
         dialog = new Dialog(this);
         moodHistory = new ArrayList<Mood>();
-        moodHistoryStr = new ArrayList<>();
-        moodHistoryAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, moodHistoryStr);
-        lv = findViewById(R.id.moodList);
-        lv.setAdapter(moodHistoryAdapter);
+        rv = findViewById(R.id.moodList);
+        moodHistoryLM = new LinearLayoutManager(this);
+        moodHistoryAdapter = new MoodListAdapter(moodHistory);
+        rv.setLayoutManager(moodHistoryLM);
+        rv.setAdapter(moodHistoryAdapter);
+
     }
 
     public void createMoodEvent(View view) {
@@ -52,12 +67,12 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         addEventBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                EditText et = dialog.findViewById(R.id.reasonET);
+                EmojiEditText et = dialog.findViewById(R.id.reasonET);
                 String reason = et.getText().toString();
                 SimpleDateFormat datetime = new SimpleDateFormat("(yyyy/MM/dd) 'at' HH:mm");
                 String datetimeStr = datetime.format(new Date());
 
-                if(!feeling.equals("") && !socialState.equals("")) {
+                if(!feeling.equals("")) {
                     Mood newMood;
 
                     if (reason == null) {
@@ -65,8 +80,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                     } else {
                         newMood = new Mood(feeling, socialState, datetimeStr, reason);
                     }
-                    moodHistory.add(newMood);
-                    moodHistoryStr.add(newMood.toString());
+                    moodHistory.add(0, newMood); //inserts new mood at the beginning of list
 
                     feeling = "";
                     socialState = "";
@@ -75,8 +89,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
                 } else if (feeling.equals("")) {
                     Toast.makeText(dialog.getContext(), "Please select how you feel", Toast.LENGTH_LONG).show();
-                } else if (socialState.equals("")) {
-                    Toast.makeText(dialog.getContext(), "Please select a social state", Toast.LENGTH_LONG).show();
                 }
             }
         });
