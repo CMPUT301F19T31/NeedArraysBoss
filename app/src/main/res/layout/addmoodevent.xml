@@ -1,15 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="300dp" android:layout_height="300dp" android:layout_gravity="center" android:background="#d1d9ff">
+    android:layout_width="300dp" android:layout_height="300dp" android:layout_gravity="center" android:background="@color/appBackground">
 
     <TextView
         android:id="@+id/moodEventIntro"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="#9fa8da"
+        android:background="@color/appBackgroundAccent"
         android:padding="5dp"
         android:text="@string/moodEventIntro"
-        android:textAppearance="@style/TextAppearance.AppCompat.Large" />
+        android:textAppearance="@style/TextAppearance.AppCompat.Large"
+        android:textColor="@color/white"/>
 
     <TextView
         android:layout_width="wrap_content"
@@ -18,7 +19,8 @@
         android:text="@string/feelingTV"
         android:textSize="17sp"
         android:layout_below="@id/moodEventIntro"
-        android:padding="5dp"/>
+        android:padding="5dp"
+        android:textColor="@color/white"/>
 
     <Spinner
         android:layout_width="wrap_content"
@@ -27,13 +29,15 @@
         android:entries="@array/feelings"
         android:layout_below="@id/moodEventIntro"
         android:layout_toRightOf="@id/feelingTV"
-        android:layout_margin="5dp"/>
+        android:layout_margin="5dp" />
 
-    <EditText
+    <androidx.emoji.widget.EmojiEditText
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/reasonET"
+        android:textColor="@color/white"
         android:hint="@string/reasonET"
+        android:textColorHint="@color/white"
         android:layout_below="@id/feelingTV"
         android:layout_alignParentRight="true"
         android:layout_margin="5dp"
@@ -46,7 +50,8 @@
         android:text="@string/socialStateTV"
         android:textSize="17sp"
         android:layout_below="@id/reasonET"
-        android:padding="5dp"/>
+        android:padding="5dp"
+        android:textColor="@color/white"/>
 
     <Spinner
         android:layout_width="wrap_content"
@@ -60,25 +65,27 @@
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/addMoodEvent"
-        android:text="@string/addEntryBtn"
+        android:id="@+id/clearMoodEvent"
+        android:text="@string/cancel"
         android:background="@drawable/roundbutton"
         android:layout_alignParentBottom="true"
         android:layout_alignParentLeft="true"
         android:layout_marginLeft="16dp"
         android:layout_marginBottom="10dp"
-        android:backgroundTint="#9fa8da"/>
+        android:backgroundTint="@color/appBackgroundAccent"
+        android:textColor="@color/white"/>
 
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/clearMoodEvent"
-        android:text="@string/cancel"
+        android:id="@+id/addMoodEvent"
+        android:text="@string/addEntryBtn"
         android:background="@drawable/roundbutton"
         android:layout_alignParentBottom="true"
         android:layout_alignParentRight="true"
         android:layout_marginRight="16dp"
         android:layout_marginBottom="10dp"
-        android:backgroundTint="#9fa8da"/>
+        android:backgroundTint="@color/appBackgroundAccent"
+        android:textColor="@color/white"/>
 
 </RelativeLayout>

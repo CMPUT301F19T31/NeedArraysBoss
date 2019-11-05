@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 
 public class Mood {
 
+    private int img;
     private String feeling, socialState, reason, date_time;
 
     public Mood (String feeling, String socialState, String date_time, String reason) {
