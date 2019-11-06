@@ -18,7 +18,15 @@ public class MoodListAdapter extends RecyclerView.Adapter<MoodListAdapter.MoodVH
     private ArrayList<Mood> moodHistory;
     private HashMap<String, Integer> moodColors;
     private HashMap<String, String> moodEmojis;
+    private OnItemClickListener clickListener;
 
+    public interface OnItemClickListener {
+        void onItemClick(int index);
+    }
+
+    public void setOnClickListener (OnItemClickListener listener) {
+        clickListener = listener;
+    }
 
     public static class MoodVH extends RecyclerView.ViewHolder {
 
@@ -26,13 +34,24 @@ public class MoodListAdapter extends RecyclerView.Adapter<MoodListAdapter.MoodVH
         EmojiTextView feeling, reason;
         TextView socialState;
 
-        public MoodVH(@NonNull View itemView) {
+        public MoodVH(@NonNull View itemView, final OnItemClickListener listener) {
             super(itemView);
 
             rl = itemView.findViewById(R.id.relativeLayout);
             feeling = itemView.findViewById(R.id.feelingVH);
             reason = itemView.findViewById(R.id.reasonVH);
             socialState = itemView.findViewById(R.id.socialStateVH);
+
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if(listener != null) {
+                        int index = getAdapterPosition();
+                        if(index != RecyclerView.NO_POSITION)
+                            listener.onItemClick(index);
+                    }
+                }
+            });
         }
     }
 
@@ -73,7 +92,7 @@ public class MoodListAdapter extends RecyclerView.Adapter<MoodListAdapter.MoodVH
     @Override
     public MoodVH onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.moodcardview, parent, false);
-        MoodVH mvh = new MoodVH(v);
+        MoodVH mvh = new MoodVH(v, clickListener);
         return mvh;
     }
 
