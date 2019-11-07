@@ -11,89 +11,91 @@
         android:id="@+id/username"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
-        android:layout_marginStart="99dp"
-        android:layout_marginLeft="99dp"
-        android:layout_marginTop="107dp"
+        android:layout_above="@id/signuppassword"
         android:ems="10"
         android:hint="Username"
         android:inputType="textPersonName"
         android:textColor="@color/white"
-        android:textColorHint="@color/white"/>
+        android:textColorHint="@color/white"
+        android:layout_margin="8dp"
+        android:gravity="center"/>
 
     <EditText
         android:id="@+id/signuppassword"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="164dp"
+        android:layout_above="@id/confirmpword"
         android:ems="10"
         android:hint="Password"
         android:inputType="textPassword"
         android:textColor="@color/white"
-        android:textColorHint="@color/white"/>
+        android:textColorHint="@color/white"
+        android:layout_margin="8dp"
+        android:gravity="center"/>
 
     <EditText
         android:id="@+id/confirmpword"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="222dp"
+        android:layout_above="@id/signupemail"
         android:ems="10"
         android:hint="Re-enter Password"
         android:inputType="textPassword"
         android:textColor="@color/white"
-        android:textColorHint="@color/white"/>
+        android:textColorHint="@color/white"
+        android:layout_margin="8dp"
+        android:gravity="center"/>
 
     <EditText
         android:id="@+id/signupemail"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="280dp"
+        android:layout_centerInParent="true"
         android:ems="10"
         android:hint="E-mail"
         android:inputType="textEmailAddress"
         android:textColor="@color/white"
-        android:textColorHint="@color/white"/>
+        android:textColorHint="@color/white"
+        android:layout_margin="8dp"
+        android:gravity="center"/>
 
     <EditText
         android:id="@+id/phone"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@id/signupemail"
         android:ems="10"
         android:hint="Phone No."
         android:inputType="phone"
         android:textColor="@color/white"
-        android:textColorHint="@color/white"/>
+        android:textColorHint="@color/white"
+        android:layout_margin="8dp"
+        android:gravity="center"/>
 
     <Button
         android:id="@+id/signup"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
+        android:layout_below="@id/phone"
         android:layout_centerHorizontal="true"
-        android:layout_marginBottom="266dp"
         android:backgroundTint="@color/cardview_shadow_end_color"
         android:text="Sign Up"
         android:textColor="@color/white"
-        android:onClick="signUpUser"/>
+        android:onClick="signUpUser"
+        android:layout_margin="8dp"/>
 
     <TextView
         android:id="@+id/textView2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
-        android:layout_marginBottom="223dp"
+        android:layout_below="@id/signup"
         android:text="Already have an account? Sign In"
         android:textColor="@color/white"
-        android:onClick="cancel"/>
+        android:onClick="cancel"
+        android:layout_margin="24dp"/>
 </RelativeLayout>

@@ -135,7 +135,6 @@ public class HomeFragment extends Fragment implements AdapterView.OnItemSelected
                     }
                 });
     }
-
     public void signInUser() {
         mAuth.signInWithEmailAndPassword("ahnafon3@gmail.com", "123456")
                 .addOnCompleteListener(getActivity(), new OnCompleteListener<AuthResult>() {
