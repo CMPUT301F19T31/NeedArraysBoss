@@ -107,11 +107,10 @@ public class HomeFragment extends Fragment implements AdapterView.OnItemSelected
         FirebaseUser currentUser = mAuth.getCurrentUser();
 
         if(currentUser == null) { // not signed in
-            //start login/register activity
+            //start login activity
+            Intent intent = new Intent(getActivity().getApplicationContext(), Login.class);
+            startActivity(intent);
 
-            //temp code (start)
-            signInUser();
-            //temp code (end)
         } else {
             moodEventsDR = db.getReference("moodEvents");
             loadDataFromDB();
