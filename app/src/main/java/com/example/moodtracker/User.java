@@ -1,5 +1,4 @@
-package com.example.moodio;
-
+package com.example.moodtracker;
 import com.google.firebase.auth.FirebaseUser;
 
 public class User {

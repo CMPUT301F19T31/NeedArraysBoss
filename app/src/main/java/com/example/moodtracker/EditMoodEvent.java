@@ -1,4 +1,4 @@
-package com.example.moodio;
+package com.example.moodtracker;
 
 import android.os.Bundle;
 import android.view.View;

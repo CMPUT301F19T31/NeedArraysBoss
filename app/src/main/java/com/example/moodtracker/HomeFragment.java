@@ -1,4 +1,18 @@
-package com.example.moodio;
+package com.example.moodtracker;
+
+import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.TextView;
+
+import androidx.annotation.Nullable;
+import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProviders;
+
+import com.example.moodtracker.R;
 
 import android.app.Dialog;
 import android.content.Intent;
@@ -20,6 +34,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -34,7 +49,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
-public class MainActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
+public class HomeFragment extends Fragment implements AdapterView.OnItemSelectedListener {
 
     private Dialog dialog;
     private String feeling = "", socialState = "";
@@ -49,23 +64,33 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     private FirebaseAuth mAuth;
     private static final String TAG = "sample";
     private User user;
+    private FloatingActionButton actn_btn;
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+
+    public View onCreateView(@NonNull LayoutInflater inflater,
+                             ViewGroup container, Bundle savedInstanceState) {
+        View root = inflater.inflate(R.layout.fragment_home, container, false);
+        //final TextView textView = root.findViewById(R.id.text_home);
+        //textView.setText(s);
 
         //set up emoji compatibility
-        EmojiCompat.Config config = new BundledEmojiCompatConfig(this);
+        EmojiCompat.Config config = new BundledEmojiCompatConfig(getContext());
         EmojiCompat.init(config);
 
-        setContentView(R.layout.activity_main);
-
-        dialog = new Dialog(this);
+        dialog = new Dialog(getContext());
         moodHistory = new ArrayList<Mood>();
+        actn_btn = root.findViewById(R.id.addMoodEvent);
+
+        actn_btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                createMoodEvent(v);
+            }
+        });
 
         //initialize recyclerview
-        rv = findViewById(R.id.moodList);
-        moodHistoryLM = new LinearLayoutManager(this);
+        rv = root.findViewById(R.id.moodList);
+        moodHistoryLM = new LinearLayoutManager(getContext());
         moodHistoryAdapter = new MoodListAdapter(moodHistory);
         rv.setLayoutManager(moodHistoryLM);
         rv.setAdapter(moodHistoryAdapter);
@@ -73,16 +98,20 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         moodHistoryAdapter.setOnClickListener(new MoodListAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(int index) {
-                Intent intent = new Intent(getApplicationContext(), EditMoodEvent.class);
+                Intent intent = new Intent(getActivity().getApplicationContext(), EditMoodEvent.class);
                 intent.putExtra("index", index);
                 startActivity(intent);
             }
         });
 
+
+
         //initialize firebase
         mAuth = FirebaseAuth.getInstance();
         db = FirebaseDatabase.getInstance();
         moodEventsDR = null;
+
+        return root;
     }
 
     @Override
@@ -105,7 +134,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     public void createUser() {
         mAuth.createUserWithEmailAndPassword("ahnafon3@gmail.com", "123456")
-                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+                .addOnCompleteListener(getActivity(), new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
@@ -115,15 +144,16 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                         } else {
                             // If sign in fails, display a message to the user.
                             Log.w(TAG, "createUserWithEmail:failure", task.getException());
-                            Toast.makeText(getApplicationContext(), "Authentication failed.",
+                            Toast.makeText(getActivity().getApplicationContext(), "Authentication failed.",
                                     Toast.LENGTH_SHORT).show();
                         }
                     }
                 });
     }
+
     public void signInUser() {
         mAuth.signInWithEmailAndPassword("ahnafon3@gmail.com", "123456")
-                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+                .addOnCompleteListener(getActivity(), new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
@@ -134,7 +164,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                         } else {
                             // If sign in fails, display a message to the user.
                             Log.w(TAG, "signInWithEmail:failure", task.getException());
-                            Toast.makeText(getApplicationContext(), "Authentication failed.",
+                            Toast.makeText(getContext().getApplicationContext(), "Authentication failed.",
                                     Toast.LENGTH_SHORT).show();
                         }
                     }
@@ -174,7 +204,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     }
 
     public void createMoodEvent(View view) {
-        dialog.setContentView(R.layout.addmoodevent); //opens the pop window
+        dialog.setContentView(R.layout.add_mood_event); //opens the pop window
 
         Spinner feelingSpinner = (Spinner) dialog.findViewById(R.id.feelingSpinner);
         feelingSpinner.setOnItemSelectedListener(this);

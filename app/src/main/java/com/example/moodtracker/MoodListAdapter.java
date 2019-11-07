@@ -1,4 +1,4 @@
-package com.example.moodio;
+package com.example.moodtracker;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -97,7 +97,7 @@ public class MoodListAdapter extends RecyclerView.Adapter<MoodListAdapter.MoodVH
     @NonNull
     @Override
     public MoodVH onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.moodcardview, parent, false);
+        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.mood_card_view, parent, false);
         MoodVH mvh = new MoodVH(v, clickListener);
         return mvh;
     }
