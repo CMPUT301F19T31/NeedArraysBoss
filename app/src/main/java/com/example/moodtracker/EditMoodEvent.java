@@ -1,6 +1,7 @@
 package com.example.moodtracker;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Spinner;
@@ -12,6 +13,10 @@ import androidx.emoji.bundled.BundledEmojiCompatConfig;
 import androidx.emoji.text.EmojiCompat;
 import androidx.emoji.widget.EmojiEditText;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -28,6 +33,7 @@ public class EditMoodEvent extends AppCompatActivity implements AdapterView.OnIt
     private int index;      // holds the index of the event in the db that is being edited
     private String feeling = "", socialState = "";
 
+    private FirebaseAuth mAuth;
     private FirebaseDatabase db;
     private DatabaseReference dataRef;
     private Mood mood;
@@ -47,20 +53,37 @@ public class EditMoodEvent extends AppCompatActivity implements AdapterView.OnIt
 
         et = findViewById(R.id.reasonET2);
         feelingSpinner = findViewById(R.id.editMoodFeelingSpinner);
+        feelingSpinner.setOnItemSelectedListener(this);
         socialStateSpinner = findViewById(R.id.socialStateSpinner2);
+        socialStateSpinner.setOnItemSelectedListener(this);
         index = getIntent().getExtras().getInt("index");
         initializeArrays();
 
         //load data from DB
+        mAuth = FirebaseAuth.getInstance();
         db = FirebaseDatabase.getInstance();
-        dataRef = db.getReference("moodEvents");
-        loadDataFromDB();   // gets the mood clicked from the db
+        signIn();
 
-        //initialise spinners and edittexts
-        et.setText(mood.getReason());
-        feelingSpinner.setSelection(moods.indexOf(mood.getFeeling() + 1));
-        socialStateSpinner.setSelection(moods.indexOf(mood.getSocialState() + 1));
+    }
 
+    public void signIn() {
+        mAuth.signInWithEmailAndPassword("ahnafon3@gmail.com", "123456")
+                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<AuthResult> task) {
+                        if (task.isSuccessful()) {
+                            // Sign in success, update UI with the signed-in user's information
+                            Log.d("sample", "signInWithEmail:success");
+                            dataRef = db.getReference("moodEvents");
+                            loadDataFromDB();
+                        } else {
+                            // If sign in fails, display a message to the user.
+                            Log.w("sample", "signInWithEmail:failure", task.getException());
+                            Toast.makeText(getApplicationContext(), "Authentication failed.",
+                                    Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
     }
 
     public void loadDataFromDB() {
@@ -70,6 +93,11 @@ public class EditMoodEvent extends AppCompatActivity implements AdapterView.OnIt
                 GenericTypeIndicator<ArrayList<Mood>> temp = new GenericTypeIndicator<ArrayList<Mood>>() {};
                 moodHistory = dataSnapshot.getValue(temp);
                 mood = moodHistory.get(index);
+
+                //initialise spinners and edittexts
+                et.setText(mood.getReason());
+                feelingSpinner.setSelection(moods.indexOf(mood.getFeeling() + 1));
+                socialStateSpinner.setSelection(moods.indexOf(mood.getSocialState() + 1));
             }
 
             @Override
@@ -134,15 +162,16 @@ public class EditMoodEvent extends AppCompatActivity implements AdapterView.OnIt
     public void deleteMood(View v) {
         moodHistory.remove(index);
         dataRef.setValue(moodHistory);
+        finish();
     }
 
     public void cancel(View v) { finish(); }
 
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-        if(parent.getId() == R.id.feelingSpinner)
+        if(parent.getId() == R.id.editMoodFeelingSpinner)
             feeling = parent.getItemAtPosition(position).toString();
-        else if(parent.getId() == R.id.socialStateSpinner)
+        else if(parent.getId() == R.id.socialStateSpinner2)
             socialState = parent.getItemAtPosition(position).toString();
     }
 

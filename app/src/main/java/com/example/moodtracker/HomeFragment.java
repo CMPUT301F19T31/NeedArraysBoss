@@ -1,34 +1,22 @@
 package com.example.moodtracker;
 
-import android.os.Bundle;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.TextView;
-
-import androidx.annotation.Nullable;
-import androidx.annotation.NonNull;
-import androidx.fragment.app.Fragment;
-import androidx.lifecycle.Observer;
-import androidx.lifecycle.ViewModelProviders;
-
-import com.example.moodtracker.R;
-
 import android.app.Dialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.Spinner;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.emoji.bundled.BundledEmojiCompatConfig;
 import androidx.emoji.text.EmojiCompat;
 import androidx.emoji.widget.EmojiEditText;
+import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -103,8 +91,6 @@ public class HomeFragment extends Fragment implements AdapterView.OnItemSelected
                 startActivity(intent);
             }
         });
-
-
 
         //initialize firebase
         mAuth = FirebaseAuth.getInstance();
@@ -186,10 +172,18 @@ public class HomeFragment extends Fragment implements AdapterView.OnItemSelected
                 GenericTypeIndicator<ArrayList<Mood>> temp = new GenericTypeIndicator<ArrayList<Mood>>() {};
                 ArrayList<Mood> tempList = dataSnapshot.getValue(temp);
                 if (tempList != null) {
-                    moodHistory = new ArrayList<>(tempList);
-                    moodHistoryAdapter = new MoodListAdapter(moodHistory);
-                    rv.setAdapter(moodHistoryAdapter);
+                    moodHistory.clear();
+                    for(int i=0;i<tempList.size();i++)
+                    {
+                        moodHistory.add(tempList.get(i));
+                    }
+                    moodHistoryAdapter.notifyDataSetChanged();
+                    //moodHistory = new ArrayList<>(tempList);
+                    //moodHistoryAdapter = new MoodListAdapter(moodHistory);
+                    //rv.setAdapter(moodHistoryAdapter);
                     Log.d(TAG, "Read detected. Read successful");
+
+
                 } else {
                     moodEventsDR.setValue(moodHistory);
                     Log.d(TAG, "Read detected. moodEvents not found. File created.");
