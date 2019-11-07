@@ -1,9 +1,8 @@
-package com.example.moodio;
-
-import androidx.annotation.NonNull;
+package com.example.moodtracker;
 
 public class Mood {
 
+    private int img;
     private String feeling, socialState, reason, date_time;
 
     public Mood (String feeling, String socialState, String date_time, String reason) {
@@ -17,6 +16,9 @@ public class Mood {
         this.socialState = socialState;
         this.date_time = date_time;
         this.reason = "";
+    }
+    public Mood () {
+        //do nothing!
     }
 
     public String toString() {
