@@ -164,10 +164,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         });
     }
 
-    public void addDataToDB() {
-        moodEventsDR.setValue(moodHistory);
-    }
-
     public void createMoodEvent(View view) {
         dialog.setContentView(R.layout.addmoodevent); //opens the pop window
 
@@ -195,7 +191,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                         newMood = new Mood(feeling, socialState, datetimeStr, reason);
                     }
                     moodHistory.add(0, newMood); //inserts new mood at the beginning of list
-                    addDataToDB();
+                    moodEventsDR.setValue(moodHistory);
 
                     feeling = "";
                     socialState = "";

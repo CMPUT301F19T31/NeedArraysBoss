@@ -1,7 +1,6 @@
 package com.example.moodio;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Spinner;
@@ -13,20 +12,13 @@ import androidx.emoji.bundled.BundledEmojiCompatConfig;
 import androidx.emoji.text.EmojiCompat;
 import androidx.emoji.widget.EmojiEditText;
 
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 
 public class EditMoodEvent extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
 
@@ -68,23 +60,6 @@ public class EditMoodEvent extends AppCompatActivity implements AdapterView.OnIt
         feelingSpinner.setSelection(moods.indexOf(mood.getFeeling() + 1));
         socialStateSpinner.setSelection(moods.indexOf(mood.getSocialState() + 1));
 
-    }
-
-    public void addMoodToDB () {
-        final DocumentReference docRef = db.document("/users/user_ahnav/user_events/moodEvents");
-        moodHM.remove("event"+index);
-        moodHM.put("event"+index, mood);
-
-        docRef.set(moodHM).addOnCompleteListener(new OnCompleteListener<Void>() {
-            @Override
-            public void onComplete(@NonNull Task<Void> task) {
-                if(task.isSuccessful()) {
-                    Log.d("Sample", "Document save successful");
-                } else {
-                    Log.d("Sample", "Document save unsuccessful");
-                }
-            }
-        });
     }
 
     public void loadDataFromDB() {
@@ -145,7 +120,8 @@ public class EditMoodEvent extends AppCompatActivity implements AdapterView.OnIt
             }
 
             if(change) {
-                addMoodToDB();
+                moodHistory.set(index, mood);
+                dataRef.setValue(moodHistory);
                 finish();
             }
 
@@ -154,20 +130,8 @@ public class EditMoodEvent extends AppCompatActivity implements AdapterView.OnIt
     }
 
     public void deleteMood(View v) {
-        final DocumentReference docRef = db.document("/users/user_ahnav/user_events/moodEvents");
-        moodHM.remove("event"+index);
-
-        docRef.set(moodHM).addOnCompleteListener(new OnCompleteListener<Void>() {
-            @Override
-            public void onComplete(@NonNull Task<Void> task) {
-                if(task.isSuccessful()) {
-                    Log.d("Sample", "Document save successful");
-                    finish();
-                } else {
-                    Log.d("Sample", "Document save unsuccessful");
-                }
-            }
-        });
+        moodHistory.remove(index);
+        dataRef.setValue(moodHistory);
     }
 
     public void cancel(View v) { finish(); }
