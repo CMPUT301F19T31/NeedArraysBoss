@@ -22,6 +22,7 @@ public class SignUpActivity extends AppCompatActivity {
     Button SignUp;
     TextView TextSignUp;
     FirebaseAuth mFirebaseAuth;
+    String TAG = "";
     private FirebaseAuth.AuthStateListener mAuthStateListener;
 
     @Override
@@ -38,8 +39,18 @@ public class SignUpActivity extends AppCompatActivity {
         SignUp = findViewById(R.id.signup);
         TextSignUp = findViewById(R.id.textView2);
 
+        TextSignUp.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent signup = new Intent(SignUpActivity.this, Login.class);
+                startActivity(signup);
+            }
+        });
 
-        mAuthStateListener = new FirebaseAuth.AuthStateListener() {
+        mFirebaseAuth = FirebaseAuth.getInstance();
+
+
+        /*mAuthStateListener = new FirebaseAuth.AuthStateListener() {
 
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
@@ -54,7 +65,7 @@ public class SignUpActivity extends AppCompatActivity {
                     Toast.makeText(SignUpActivity.this, "Please Sign Up",Toast.LENGTH_SHORT).show();
                 }
             }
-        };
+        };*/
 
         SignUp.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -92,10 +103,12 @@ public class SignUpActivity extends AppCompatActivity {
                         @Override
                         public void onComplete(@NonNull Task<AuthResult> task) {
                             if(!task.isSuccessful()){
+
                                 Toast.makeText(SignUpActivity.this, "SignUp Unsuccessful. Please try again!", Toast.LENGTH_SHORT);
                             }
                             else {
                                 startActivity(new Intent(SignUpActivity.this,MainActivity.class));
+                                FirebaseUser user = mFirebaseAuth.getCurrentUser();
                             }
                         }
                     });
@@ -105,18 +118,12 @@ public class SignUpActivity extends AppCompatActivity {
                 }
             }
         });
-        TextSignUp.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent signup = new Intent(SignUpActivity.this, Login.class);
-                startActivity(signup);
-            }
-        });
+
     }
 
-    @Override
-    protected void onStart(){
-        super.onStart();
-        mFirebaseAuth.addAuthStateListener(mAuthStateListener);
-    }
+//    @Override
+//    protected void onStart(){
+//        super.onStart();
+//        mFirebaseAuth.addAuthStateListener(mAuthStateListener);
+//    }
 }
