@@ -27,12 +27,12 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.GenericTypeIndicator;
 import com.google.firebase.database.ValueEventListener;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 
 public class MainActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
 
@@ -82,7 +82,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         //initialize firebase
         mAuth = FirebaseAuth.getInstance();
         db = FirebaseDatabase.getInstance();
-        moodEventsDR = db.getReference("moodEvents");
+        moodEventsDR = null;
     }
 
     @Override
@@ -97,6 +97,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             //temp code (start)
             signInUser();
             //temp code (end)
+        } else {
+            moodEventsDR = db.getReference("moodEvents");
+            loadDataFromDB();
         }
     }
 
@@ -126,6 +129,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                         if (task.isSuccessful()) {
                             // Sign in success, update UI with the signed-in user's information
                             Log.d(TAG, "signInWithEmail:success");
+                            moodEventsDR = db.getReference("moodEvents");
                             loadDataFromDB();
                         } else {
                             // If sign in fails, display a message to the user.
@@ -144,12 +148,17 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     }
 
     public void loadDataFromDB() {
+        if(moodEventsDR == null) { return; }
+
         moodEventsDR.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                if (dataSnapshot.getValue(HashMap.class) != null) {
-                    moodHistory = dataSnapshot.getValue(ArrayList.class);
-                    moodHistoryAdapter.notifyDataSetChanged();
+                GenericTypeIndicator<ArrayList<Mood>> temp = new GenericTypeIndicator<ArrayList<Mood>>() {};
+                ArrayList<Mood> tempList = dataSnapshot.getValue(temp);
+                if (tempList != null) {
+                    moodHistory = new ArrayList<>(tempList);
+                    moodHistoryAdapter = new MoodListAdapter(moodHistory);
+                    rv.setAdapter(moodHistoryAdapter);
                     Log.d(TAG, "Read detected. Read successful");
                 } else {
                     moodEventsDR.setValue(moodHistory);
