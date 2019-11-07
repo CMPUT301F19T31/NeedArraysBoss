@@ -1,7 +1,5 @@
 package com.example.moodio;
 
-import androidx.annotation.NonNull;
-
 public class Mood {
 
     private int img;
@@ -18,6 +16,9 @@ public class Mood {
         this.socialState = socialState;
         this.date_time = date_time;
         this.reason = "";
+    }
+    public Mood () {
+        //do nothing!
     }
 
     public String toString() {

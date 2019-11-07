@@ -57,7 +57,9 @@ public class MoodListAdapter extends RecyclerView.Adapter<MoodListAdapter.MoodVH
 
     public MoodListAdapter(ArrayList<Mood> moodHistory) {
         this.moodHistory = moodHistory;
+    }
 
+    public void initArrays() {
         //initializes colors array
         moodColors = new HashMap<>();
         moodColors.put("happy", R.color.happy);
@@ -85,8 +87,12 @@ public class MoodListAdapter extends RecyclerView.Adapter<MoodListAdapter.MoodVH
         moodEmojis.put("annoyed", new String(Character.toChars(0x1F620)));
         moodEmojis.put("hopeless", new String(Character.toChars(0x1F625)));
         moodEmojis.put("lonely", new String(Character.toChars(0x1F614)));
-
     }
+
+    public ArrayList<Mood> getList () {
+        return moodHistory;
+    }
+    public void setList(ArrayList<Mood> moodHistory) { this.moodHistory = moodHistory; }
 
     @NonNull
     @Override
@@ -99,6 +105,7 @@ public class MoodListAdapter extends RecyclerView.Adapter<MoodListAdapter.MoodVH
     @Override
     public void onBindViewHolder(@NonNull MoodVH holder, int position) {
         Mood mood = moodHistory.get(position);
+        initArrays();
 
         holder.feeling.setText(mood.getFeeling() + " " + moodEmojis.get(mood.getFeeling()));
         holder.reason.setText(mood.getReason());
