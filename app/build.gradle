@@ -4,8 +4,11 @@ android {
     compileSdkVersion 29
     buildToolsVersion "29.0.2"
     defaultConfig {
+    
+        multiDexEnabled true
         applicationId "com.example.moodtracker"
         minSdkVersion 21
+
         targetSdkVersion 29
         versionCode 1
         versionName "1.0"
@@ -22,6 +25,7 @@ android {
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation 'androidx.appcompat:appcompat:1.1.0'
+    implementation 'com.google.firebase:firebase-analytics:17.2.1'
     implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
     implementation 'com.google.android.material:material:1.2.0-alpha01'
     implementation 'androidx.cardview:cardview:1.0.0'
@@ -37,7 +41,7 @@ dependencies {
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test:runner:1.2.0'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
-
+    implementation 'com.android.support:multidex:1.0.3'
 
     implementation 'androidx.vectordrawable:vectordrawable:1.0.1'
     implementation 'androidx.navigation:navigation-fragment:2.0.0'
