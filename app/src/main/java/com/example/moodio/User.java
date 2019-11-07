@@ -13,7 +13,9 @@ public class User {
     }
 
     public void User(FirebaseUser firebaseUser) {
-
+        this.email = firebaseUser.getEmail();
+        this.password = "";
+        this.userID = "";
     }
 
     //There will be no setter for userID so that it cannot be changed

@@ -19,19 +19,20 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Map;
 
 public class MainActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
 
@@ -42,11 +43,12 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     private ArrayList<Mood> moodHistory;
     private MoodListAdapter moodHistoryAdapter;
     private RecyclerView.LayoutManager moodHistoryLM;
-    private HashMap<String, Mood> moodHistoryHM;
 
-    private FirebaseFirestore db;
+    private FirebaseDatabase db;
+    private DatabaseReference moodEventsDR;
     private FirebaseAuth mAuth;
     private static final String TAG = "sample";
+    private User user;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,10 +79,10 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             }
         });
 
-        //initialize firestore
-        db = FirebaseFirestore.getInstance();
+        //initialize firebase
         mAuth = FirebaseAuth.getInstance();
-        moodHistoryHM = new HashMap<>();
+        db = FirebaseDatabase.getInstance();
+        moodEventsDR = db.getReference("moodEvents");
     }
 
     @Override
@@ -93,10 +95,46 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             //start login/register activity
 
             //temp code (start)
-            
+            signInUser();
             //temp code (end)
         }
-        loadDataFromDB();
+    }
+
+    public void createUser() {
+        mAuth.createUserWithEmailAndPassword("ahnafon3@gmail.com", "123456")
+                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<AuthResult> task) {
+                        if (task.isSuccessful()) {
+                            // Sign in success, update UI with the signed-in user's information
+                            Log.d(TAG, "createUserWithEmail:success");
+                            signInUser();
+                        } else {
+                            // If sign in fails, display a message to the user.
+                            Log.w(TAG, "createUserWithEmail:failure", task.getException());
+                            Toast.makeText(getApplicationContext(), "Authentication failed.",
+                                    Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
+    }
+    public void signInUser() {
+        mAuth.signInWithEmailAndPassword("ahnafon3@gmail.com", "123456")
+                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<AuthResult> task) {
+                        if (task.isSuccessful()) {
+                            // Sign in success, update UI with the signed-in user's information
+                            Log.d(TAG, "signInWithEmail:success");
+                            loadDataFromDB();
+                        } else {
+                            // If sign in fails, display a message to the user.
+                            Log.w(TAG, "signInWithEmail:failure", task.getException());
+                            Toast.makeText(getApplicationContext(), "Authentication failed.",
+                                    Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
     }
 
     @Override
@@ -106,49 +144,28 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     }
 
     public void loadDataFromDB() {
-        db.document("/users/user_ahnav/user_events/moodEvents").get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+        moodEventsDR.addValueEventListener(new ValueEventListener() {
             @Override
-            public void onSuccess(DocumentSnapshot documentSnapshot) {
-                Mood mood;
-                for(int i = 1; i <= documentSnapshot.getData().size(); i++) {
-                    mood = (Mood) documentSnapshot.getData().get("event" + i);
-                    moodHistoryHM.put("event" + i, mood);
-                    moodHistory.add(mood);
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if (dataSnapshot.getValue(HashMap.class) != null) {
+                    moodHistory = dataSnapshot.getValue(ArrayList.class);
+                    moodHistoryAdapter.notifyDataSetChanged();
+                    Log.d(TAG, "Read detected. Read successful");
+                } else {
+                    moodEventsDR.setValue(moodHistory);
+                    Log.d(TAG, "Read detected. moodEvents not found. File created.");
                 }
-                moodHistoryAdapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                Log.w(TAG, "Failed to read value.", databaseError.toException());
             }
         });
     }
 
-    public void addEventToDB(Mood newMood) {
-        final DocumentReference docRef = db.document("/users/user_ahnav/user_events/moodEvents");
-
-        moodHistoryHM.put("event" + moodHistory.size(), newMood);
-
-        docRef.set(moodHistoryHM).addOnCompleteListener(new OnCompleteListener<Void>() {
-            @Override
-            public void onComplete(@NonNull Task<Void> task) {
-                if(task.isSuccessful()) {
-                    Log.d(TAG, "Document save successful");
-                } else {
-                    Log.d(TAG, "Document save unsuccessful");
-                }
-            }
-        });
-
-        final DocumentReference docRef2 = db.document("/users/user_ahnav/user_events/totalEvents");
-        Map<String, Integer> data2 = new HashMap<>();
-        data2.put("size", moodHistory.size());
-        docRef2.set(data2).addOnCompleteListener(new OnCompleteListener<Void>() {
-            @Override
-            public void onComplete(@NonNull Task<Void> task) {
-                if(task.isSuccessful()) {
-                    Log.d(TAG, "Size save successful");
-                } else {
-                    Log.d(TAG, "Size save unsuccessful");
-                }
-            }
-        });
+    public void addDataToDB() {
+        moodEventsDR.setValue(moodHistory);
     }
 
     public void createMoodEvent(View view) {
@@ -178,12 +195,11 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                         newMood = new Mood(feeling, socialState, datetimeStr, reason);
                     }
                     moodHistory.add(0, newMood); //inserts new mood at the beginning of list
-                    addEventToDB(newMood);
+                    addDataToDB();
 
                     feeling = "";
                     socialState = "";
                     dialog.dismiss();   //closes the pop up window
-                    moodHistoryAdapter.notifyDataSetChanged();
 
                 } else if (feeling.equals("")) {
                     Toast.makeText(dialog.getContext(), "Please select how you feel", Toast.LENGTH_LONG).show();
