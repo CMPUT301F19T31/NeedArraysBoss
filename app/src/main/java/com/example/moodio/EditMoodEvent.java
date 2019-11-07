@@ -1,7 +1,6 @@
 package com.example.moodio;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Spinner;
@@ -13,15 +12,13 @@ import androidx.emoji.bundled.BundledEmojiCompatConfig;
 import androidx.emoji.text.EmojiCompat;
 import androidx.emoji.widget.EmojiEditText;
 
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 
 public class EditMoodEvent extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
 
@@ -30,9 +27,10 @@ public class EditMoodEvent extends AppCompatActivity implements AdapterView.OnIt
     private int index;      // holds the index of the event in the db that is being edited
     private String feeling = "", socialState = "";
 
-    private FirebaseFirestore db;
+    private FirebaseDatabase db;
+    private DatabaseReference dataRef;
     private Mood mood;
-    private HashMap<String, Mood> moodHM;
+    private ArrayList<Mood> moodHistory;
 
     private ArrayList<String> moods;
     private ArrayList<String> socialStates;
@@ -53,10 +51,9 @@ public class EditMoodEvent extends AppCompatActivity implements AdapterView.OnIt
         initializeArrays();
 
         //load data from DB
-        db = FirebaseFirestore.getInstance();
-        moodHM = new HashMap<>();
-        loadDataFromDB();
-        mood = moodHM.get("event"+index);
+        db = FirebaseDatabase.getInstance();
+        dataRef = db.getReference("moodEvents");
+        loadDataFromDB();   // gets the mood clicked from the db
 
         //initialise spinners and edittexts
         et.setText(mood.getReason());
@@ -65,32 +62,17 @@ public class EditMoodEvent extends AppCompatActivity implements AdapterView.OnIt
 
     }
 
-    public void addMoodToDB () {
-        final DocumentReference docRef = db.document("/users/user_ahnav/user_events/moodEvents");
-        moodHM.remove("event"+index);
-        moodHM.put("event"+index, mood);
-
-        docRef.set(moodHM).addOnCompleteListener(new OnCompleteListener<Void>() {
-            @Override
-            public void onComplete(@NonNull Task<Void> task) {
-                if(task.isSuccessful()) {
-                    Log.d("Sample", "Document save successful");
-                } else {
-                    Log.d("Sample", "Document save unsuccessful");
-                }
-            }
-        });
-    }
-
     public void loadDataFromDB() {
-        db.document("/users/user_ahnav/user_events/moodEvents").get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+        dataRef.addValueEventListener(new ValueEventListener() {
             @Override
-            public void onSuccess(DocumentSnapshot documentSnapshot) {
-                Mood mood;
-                for(int i = 1; i <= documentSnapshot.getData().size(); i++) {
-                    mood = (Mood) documentSnapshot.getData().get("event" + i);
-                    moodHM.put("event" + i, mood);
-                }
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                moodHistory = dataSnapshot.getValue(ArrayList.class);
+                mood = moodHistory.get(index);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
             }
         });
     }
@@ -138,7 +120,8 @@ public class EditMoodEvent extends AppCompatActivity implements AdapterView.OnIt
             }
 
             if(change) {
-                addMoodToDB();
+                moodHistory.set(index, mood);
+                dataRef.setValue(moodHistory);
                 finish();
             }
 
@@ -147,20 +130,8 @@ public class EditMoodEvent extends AppCompatActivity implements AdapterView.OnIt
     }
 
     public void deleteMood(View v) {
-        final DocumentReference docRef = db.document("/users/user_ahnav/user_events/moodEvents");
-        moodHM.remove("event"+index);
-
-        docRef.set(moodHM).addOnCompleteListener(new OnCompleteListener<Void>() {
-            @Override
-            public void onComplete(@NonNull Task<Void> task) {
-                if(task.isSuccessful()) {
-                    Log.d("Sample", "Document save successful");
-                    finish();
-                } else {
-                    Log.d("Sample", "Document save unsuccessful");
-                }
-            }
-        });
+        moodHistory.remove(index);
+        dataRef.setValue(moodHistory);
     }
 
     public void cancel(View v) { finish(); }
