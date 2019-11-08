@@ -27,7 +27,8 @@
         android:textColor="@color/white"
         android:layout_alignParentRight="true"
         android:layout_marginTop="26dp"
-        android:layout_marginRight="30dp"/>
+        android:layout_marginRight="30dp"
+        android:onClick="cancel"/>
 
     <TextView
         android:layout_width="wrap_content"
@@ -89,26 +90,24 @@
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true">
 
-        <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+        <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/deleteEntryBtn"
             android:text="@string/deleteEntryBtn"
             android:backgroundTint="@color/white"
-            app:icon="@drawable/ic_delete_black_24dp"
-            app:cornerRadius="4dp"
-            android:layout_margin="16dp"/>
+            android:layout_margin="16dp"
+            android:onClick="deleteMood"/>
 
-        <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+        <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/editEntryBtn"
             android:text="@string/editEntryBtn"
-            app:icon="@drawable/ic_edit_black_24dp"
-            app:cornerRadius="4dp"
             android:layout_margin="16dp"
             android:layout_gravity="right"
-            android:backgroundTint="@color/white"/>
+            android:backgroundTint="@color/white"
+            android:onClick="editMoodEvent"/>
 
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 

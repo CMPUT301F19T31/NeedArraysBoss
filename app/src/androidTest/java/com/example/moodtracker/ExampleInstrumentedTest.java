@@ -1,4 +1,4 @@
-package com.example.moodio;
+package com.example.moodtracker;
 
 import android.content.Context;
 
@@ -22,6 +22,6 @@ public class ExampleInstrumentedTest {
         // Context of the app under test.
         Context appContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
 
-        assertEquals("com.example.moodio", appContext.getPackageName());
+        assertEquals("com.example.moodtracker", appContext.getPackageName());
     }
 }

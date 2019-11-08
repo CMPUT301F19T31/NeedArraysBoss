@@ -1,5 +1,8 @@
 <resources>
-    <string name="app_name">Mood.io</string>
+    <string name="app_name">MoodTracker</string>
+    <string name="title_home">Home</string>
+    <string name="title_dashboard">Dashboard</string>
+    <string name="title_notifications">Notifications</string>
     <string name="addEntryBtn">Add Event</string>
     <string name="editEntryBtn">Edit Event</string>
     <string name="deleteEntryBtn">Delete Event</string>
