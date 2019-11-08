@@ -1,27 +1,34 @@
 package com.example.moodtracker;
+
+import java.util.ArrayList;
+
 public class User {
 
     private String userID, email, password, phone;
+    private ArrayList<Mood> moodHistory;
 
-    public void User(String userID, String email, String password, String phone) {
+    public User(String userID, String email, String password, String phone) {
         this.userID = userID;
         this.email = email;
         this.password = password;
         this.phone = phone;
+        moodHistory = null;
     }
-    public void User(String userID, String email, String password) {
+    public User(String userID, String email, String password) {
         this.userID = userID;
         this.email = email;
         this.password = password;
         this.phone = null;
+        moodHistory = null;
     }
-    public void User(String userID, String password) {
+    public User(String userID, String password) {
         this.userID = userID;
         this.email = null;
         this.password = password;
         this.phone = null;
+        moodHistory = null;
     }
-    public void User() {
+    public User() {
         //do nothing
     }
 
@@ -34,6 +41,11 @@ public class User {
 
     public void setEmail(String email) { this.email = email; }
     public void setPassword(String password) { this.password = password; }
-
     public void setPhone(String phone) { this.phone = phone; }
+
+    public ArrayList<Mood> getMoodHistory() { return moodHistory; }
+    public void setMoodHistory(ArrayList<Mood> moods) { moodHistory = moods; }
+    public void addMood(Mood newMood) { moodHistory.add(0, newMood); }
+    public void editMood(int index, Mood mood) { moodHistory.set(index, mood); }
+    public void deleteMood(int index) { moodHistory.remove(index); }
 }
