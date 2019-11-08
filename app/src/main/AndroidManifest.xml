@@ -22,7 +22,6 @@
             </intent-filter>
         </activity>
         <activity android:name=".EditMoodEvent"/>
-        <activity android:name=".HomeFragment"/>
     </application>
 
 </manifest>
