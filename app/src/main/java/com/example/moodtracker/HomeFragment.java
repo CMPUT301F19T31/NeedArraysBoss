@@ -49,7 +49,6 @@ public class HomeFragment extends Fragment implements AdapterView.OnItemSelected
     private User user;
     private FloatingActionButton actn_btn;
 
-
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_home, container, false);

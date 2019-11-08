@@ -46,6 +46,11 @@ public class EditMoodEvent extends AppCompatActivity implements AdapterView.OnIt
     private ArrayList<String> moods;
     private ArrayList<String> socialStates;
 
+    /**
+     * Used to create the activity
+     * @param  savedInstanceState
+     * The savedInstanceState is a reference to a Bundle object that is passed into the onCreate method of every Android Activity.
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -70,6 +75,9 @@ public class EditMoodEvent extends AppCompatActivity implements AdapterView.OnIt
 
     }
 
+    /**
+     * Handles sign in for the user
+     */
     public void signIn() {
         mAuth.signInWithEmailAndPassword("ahnafon3@gmail.com", "123456")
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
@@ -90,6 +98,9 @@ public class EditMoodEvent extends AppCompatActivity implements AdapterView.OnIt
                 });
     }
 
+    /**
+     * Loads the userdata from the database
+     */
     public void loadDataFromDB() {
         dataRef.addValueEventListener(new ValueEventListener() {
             @Override
@@ -111,6 +122,9 @@ public class EditMoodEvent extends AppCompatActivity implements AdapterView.OnIt
         });
     }
 
+    /**
+     * Initializes the arrays for feelings and social states
+     */
     public void initializeArrays() {
         moods = new ArrayList<>();
         moods.add("happy");
@@ -132,6 +146,11 @@ public class EditMoodEvent extends AppCompatActivity implements AdapterView.OnIt
         socialStates.add("with a crowd");
     }
 
+    /**
+     * This method is called when the user wants to commit the changes made to the mood event
+     * @param  v
+     * A View occupies a rectangular area on the screen and is responsible for drawing and event handling.
+     */
     public void editMoodEvent(View v) {
         boolean change = false;
 
@@ -163,14 +182,35 @@ public class EditMoodEvent extends AppCompatActivity implements AdapterView.OnIt
             Toast.makeText(getApplicationContext(), "Please select how you feel", Toast.LENGTH_LONG).show();
     }
 
+    /**
+     * This method is called when the user wants to delete the mood event
+     * @param  v
+     * A View occupies a rectangular area on the screen and is responsible for drawing and event handling.
+     */
     public void deleteMood(View v) {
         moodHistory.remove(index);
         dataRef.setValue(moodHistory);
         finish();
     }
 
+    /**
+     * This method is called when the user does not want to commit the changes made to the mood event
+     * @param  v
+     * A View occupies a rectangular area on the screen and is responsible for drawing and event handling.
+     */
     public void cancel(View v) { finish(); }
 
+    /**
+     * This method handles both drop down menus when editing the mood event
+     * @param  parent
+     * The AdapterView where the selection happened
+     * @param  view
+     * The view within the AdapterView that was clicked
+     * @param  position
+     * The position of the view in the adapter
+     * @param  id
+     * The row id of the item that is selected
+     */
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
         if(parent.getId() == R.id.editMoodFeelingSpinner)
@@ -179,6 +219,11 @@ public class EditMoodEvent extends AppCompatActivity implements AdapterView.OnIt
             socialState = parent.getItemAtPosition(position).toString();
     }
 
+    /**
+     * Default handler for no selection
+     * @param  parent
+     * The AdapterView where the selection happened
+     */
     @Override
     public void onNothingSelected(AdapterView<?> parent) {
 
