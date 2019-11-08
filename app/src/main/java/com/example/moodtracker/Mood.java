@@ -1,5 +1,8 @@
 package com.example.moodtracker;
 
+/**
+ * This is a class that keeps track of a mood
+ */
 public class Mood {
 
     private int img;

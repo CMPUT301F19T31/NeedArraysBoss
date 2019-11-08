@@ -26,6 +26,10 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 
+
+/**
+ * This is an activity that handles editing for existing moods
+ */
 public class EditMoodEvent extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
 
     private EmojiEditText et;
