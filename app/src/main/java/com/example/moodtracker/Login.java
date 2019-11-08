@@ -32,10 +32,11 @@ public class Login extends AppCompatActivity {
         mFirebaseAuth = FirebaseAuth.getInstance();
         email = findViewById(R.id.email);
         password = findViewById(R.id.password);
-        SignIn = findViewById(R.id.login);
+        SignIn = findViewById(R.id.loginBtn);
         TextSignIn = findViewById(R.id.textView);
 
     }
+
 
     public void signInUser (View v) {
         String emailID = email.getText().toString();
