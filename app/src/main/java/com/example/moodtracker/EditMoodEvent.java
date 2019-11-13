@@ -21,7 +21,6 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.GenericTypeIndicator;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
@@ -42,6 +41,7 @@ public class EditMoodEvent extends AppCompatActivity implements AdapterView.OnIt
     private DatabaseReference dataRef;
     private Mood mood;
     private ArrayList<Mood> moodHistory;
+    private User user;
 
     private ArrayList<String> moods;
     private ArrayList<String> socialStates;
@@ -86,7 +86,7 @@ public class EditMoodEvent extends AppCompatActivity implements AdapterView.OnIt
                         if (task.isSuccessful()) {
                             // Sign in success, update UI with the signed-in user's information
                             Log.d("sample", "signInWithEmail:success");
-                            dataRef = db.getReference("moodEvents");
+                            dataRef = db.getReference("users").child("user" + mAuth.getCurrentUser().getEmail().replace(".", "*"));
                             loadDataFromDB();
                         } else {
                             // If sign in fails, display a message to the user.
@@ -105,8 +105,8 @@ public class EditMoodEvent extends AppCompatActivity implements AdapterView.OnIt
         dataRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                GenericTypeIndicator<ArrayList<Mood>> temp = new GenericTypeIndicator<ArrayList<Mood>>() {};
-                moodHistory = dataSnapshot.getValue(temp);
+                user = dataSnapshot.getValue(User.class);
+                moodHistory = user.getMoodHistory();
                 mood = moodHistory.get(index);
 
                 //initialise spinners and edittexts
@@ -174,7 +174,8 @@ public class EditMoodEvent extends AppCompatActivity implements AdapterView.OnIt
 
             if(change) {
                 moodHistory.set(index, mood);
-                dataRef.setValue(moodHistory);
+                user.setMoodHistory(moodHistory);
+                dataRef.setValue(user);
                 finish();
             }
 
@@ -189,7 +190,8 @@ public class EditMoodEvent extends AppCompatActivity implements AdapterView.OnIt
      */
     public void deleteMood(View v) {
         moodHistory.remove(index);
-        dataRef.setValue(moodHistory);
+        user.setMoodHistory(moodHistory);
+        dataRef.setValue(user);
         finish();
     }
 
