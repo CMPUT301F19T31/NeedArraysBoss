@@ -159,31 +159,31 @@
             android:layout_centerInParent="true">
 
             <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textColor="@color/headings"
-                android:textSize="13sp"
-                android:text="Email"/>
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textSize="13sp"
-                android:textColor="#000000"
-                android:fontFamily="sans-serif-light"
-                android:text="Address"/>
-
-            <View
                 android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:layout_marginTop="15dp"/>
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
 
-        </LinearLayout>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/headings"
+                    android:textSize="13sp"
+                    android:text="Email"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="13sp"
+                    android:textColor="#000000"
+                    android:fontFamily="sans-serif-light"
+                    android:text="Address"/>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginTop="15dp"/>
+
+            </LinearLayout>
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -217,19 +217,5 @@
         </LinearLayout>
 
     </RelativeLayout>
-
-<!--    <TextView-->
-<!--        android:id="@+id/text_dashboard"-->
-<!--        android:layout_width="match_parent"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:layout_marginStart="8dp"-->
-<!--        android:layout_marginTop="8dp"-->
-<!--        android:layout_marginEnd="8dp"-->
-<!--        android:textAlignment="center"-->
-<!--        android:textSize="20sp"-->
-<!--        app:layout_constraintEnd_toEndOf="parent"-->
-<!--        app:layout_constraintStart_toStartOf="parent"-->
-<!--        app:layout_constraintTop_toTopOf="parent" />-->
-
 
 </RelativeLayout>
