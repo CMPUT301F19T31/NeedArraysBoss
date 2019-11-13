@@ -23,8 +23,13 @@
         android:label="@string/title_notifications"
         tools:layout="@layout/fragment_notifications" />
     <fragment
-        android:id="@+id/search_fragment"
-        android:name="com.example.moodtracker.search_fragment"
-        android:label="fragment_search"
+        android:id="@+id/navigation_search"
+        android:name="com.example.moodtracker.SearchFragment"
+        android:label="Search"
         tools:layout="@layout/fragment_search" />
+    <fragment
+        android:id="@+id/navigation_profile"
+        android:name="com.example.moodtracker.ProfileFragment"
+        android:label="Profile"
+        tools:layout="@layout/fragment_profile" />
 </navigation>
