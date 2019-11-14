@@ -15,12 +15,18 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 public class Login extends AppCompatActivity {
     EditText email, password;
     Button SignIn;
     TextView TextSignIn;
     FirebaseAuth mFirebaseAuth;
+    User user;
     String TAG = "Login";
 
 
@@ -37,9 +43,10 @@ public class Login extends AppCompatActivity {
 
     }
 
+
     public void signInUser (View v) {
-        String emailID = email.getText().toString();
-        String pwd = password.getText().toString();
+        final String emailID = email.getText().toString();
+        final String pwd = password.getText().toString();
         if(emailID.isEmpty()){
             email.setError("Please enter email");
             email.requestFocus();
@@ -56,7 +63,7 @@ public class Login extends AppCompatActivity {
                     .addOnSuccessListener(Login.this, new OnSuccessListener<AuthResult>() {
                         @Override
                         public void onSuccess(AuthResult authResult) {
-                            finish();
+                            commitUser();
                         }
                     }).addOnFailureListener(new OnFailureListener() {
                 @Override
@@ -71,6 +78,34 @@ public class Login extends AppCompatActivity {
     public void createUser(View v) {
         Intent i = new Intent(Login.this,SignUpActivity.class);
         startActivity(i);
+    }
+
+    public void commitUser() {
+        DatabaseReference dataRef = FirebaseDatabase.getInstance().getReference("users")
+                .child("user" + mFirebaseAuth.getCurrentUser().getEmail().replace(".", "*"));
+        dataRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                user = dataSnapshot.getValue(User.class);
+                if (user == null)
+                    addUserToDB();
+                else
+                    finish();
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+    }
+
+    public void addUserToDB() {
+        DatabaseReference dataRef = FirebaseDatabase.getInstance().getReference("users");
+        String email = mFirebaseAuth.getCurrentUser().getEmail();
+        user = new User("0", email,"000000");
+        dataRef.child("user" + email.replace('.', '*')).setValue(user);
+        finish();
     }
 
 }

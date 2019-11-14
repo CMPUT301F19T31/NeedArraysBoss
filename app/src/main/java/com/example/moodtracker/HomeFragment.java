@@ -3,7 +3,6 @@ package com.example.moodtracker;
 import android.app.Dialog;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,17 +19,13 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.GenericTypeIndicator;
 import com.google.firebase.database.ValueEventListener;
 
 import java.text.SimpleDateFormat;
@@ -48,7 +43,7 @@ public class HomeFragment extends Fragment implements AdapterView.OnItemSelected
     private RecyclerView.LayoutManager moodHistoryLM;
 
     private FirebaseDatabase db;
-    private DatabaseReference moodEventsDR;
+    private DatabaseReference userDR;
     private FirebaseAuth mAuth;
     private static final String TAG = "sample";
     private User user;
@@ -58,8 +53,6 @@ public class HomeFragment extends Fragment implements AdapterView.OnItemSelected
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_home, container, false);
-        //final TextView textView = root.findViewById(R.id.text_home);
-        //textView.setText(s);
 
         //set up emoji compatibility
         EmojiCompat.Config config = new BundledEmojiCompatConfig(getContext());
@@ -95,7 +88,7 @@ public class HomeFragment extends Fragment implements AdapterView.OnItemSelected
         //initialize firebase
         mAuth = FirebaseAuth.getInstance();
         db = FirebaseDatabase.getInstance();
-        moodEventsDR = null;
+        userDR = null;
 
         return root;
     }
@@ -112,87 +105,43 @@ public class HomeFragment extends Fragment implements AdapterView.OnItemSelected
             startActivity(intent);
 
         } else {
-            moodEventsDR = db.getReference("moodEvents");
-            loadDataFromDB();
+            onResume();
         }
-    }
-
-    public void createUser() {
-        mAuth.createUserWithEmailAndPassword("ahnafon3@gmail.com", "123456")
-                .addOnCompleteListener(getActivity(), new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        if (task.isSuccessful()) {
-                            // Sign in success, update UI with the signed-in user's information
-                            Log.d(TAG, "createUserWithEmail:success");
-                            signInUser();
-                        } else {
-                            // If sign in fails, display a message to the user.
-                            Log.w(TAG, "createUserWithEmail:failure", task.getException());
-                            Toast.makeText(getActivity().getApplicationContext(), "Authentication failed.",
-                                    Toast.LENGTH_SHORT).show();
-                        }
-                    }
-                });
-    }
-    public void signInUser() {
-        mAuth.signInWithEmailAndPassword("ahnafon3@gmail.com", "123456")
-                .addOnCompleteListener(getActivity(), new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        if (task.isSuccessful()) {
-                            // Sign in success, update UI with the signed-in user's information
-                            Log.d(TAG, "signInWithEmail:success");
-                            moodEventsDR = db.getReference("moodEvents");
-                            loadDataFromDB();
-                        } else {
-                            // If sign in fails, display a message to the user.
-                            Log.w(TAG, "signInWithEmail:failure", task.getException());
-                            Toast.makeText(getContext().getApplicationContext(), "Authentication failed.",
-                                    Toast.LENGTH_SHORT).show();
-                        }
-                    }
-                });
     }
 
     @Override
     public void onResume() {
         super.onResume();
+
+        FirebaseUser currentUser = mAuth.getCurrentUser();
+
+        if(currentUser != null) {
+            userDR = db.getReference("users").child("user" + currentUser.getEmail().replace(".","*"));
+            userDR.addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    user = dataSnapshot.getValue(User.class);
+                    loadDataFromDB();
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                }
+            });
+        }
         loadDataFromDB();
     }
 
     public void loadDataFromDB() {
-        if(moodEventsDR == null) { return; }
+        if(user == null || user.getMoodHistory() == null) { return; }
 
-        moodEventsDR.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                GenericTypeIndicator<ArrayList<Mood>> temp = new GenericTypeIndicator<ArrayList<Mood>>() {};
-                ArrayList<Mood> tempList = dataSnapshot.getValue(temp);
-                if (tempList != null) {
-                    moodHistory.clear();
-                    for(int i=0;i<tempList.size();i++)
-                    {
-                        moodHistory.add(tempList.get(i));
-                    }
-                    moodHistoryAdapter.notifyDataSetChanged();
-                    //moodHistory = new ArrayList<>(tempList);
-                    //moodHistoryAdapter = new MoodListAdapter(moodHistory);
-                    //rv.setAdapter(moodHistoryAdapter);
-                    Log.d(TAG, "Read detected. Read successful");
-
-
-                } else {
-                    moodEventsDR.setValue(moodHistory);
-                    Log.d(TAG, "Read detected. moodEvents not found. File created.");
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-                Log.w(TAG, "Failed to read value.", databaseError.toException());
-            }
-        });
+        moodHistory.clear();
+        for(int i=0; i<user.getMoodHistory().size(); i++)
+        {
+            moodHistory.add(user.getMoodHistory().get(i));
+        }
+        moodHistoryAdapter.notifyDataSetChanged();
     }
 
     public void createMoodEvent(View view) {
@@ -222,7 +171,9 @@ public class HomeFragment extends Fragment implements AdapterView.OnItemSelected
                         newMood = new Mood(feeling, socialState, datetimeStr, reason);
                     }
                     moodHistory.add(0, newMood); //inserts new mood at the beginning of list
-                    moodEventsDR.setValue(moodHistory);
+                    moodHistoryAdapter.notifyDataSetChanged();
+                    user.setMoodHistory(moodHistory);
+                    userDR.setValue(user);
 
                     feeling = "";
                     socialState = "";
