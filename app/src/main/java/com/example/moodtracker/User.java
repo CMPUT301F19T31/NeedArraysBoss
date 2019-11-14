@@ -6,13 +6,24 @@ public class User {
 
     private String userID, email, password, phone;
     private ArrayList<Mood> moodHistory;
+    private String imageurl;
 
-    public User(String userID, String email, String password, String phone) {
+    public void User(String userID,String imageurl, String id, String email, String password) {
         this.userID = userID;
+        this.id=id;
+        this.imageurl=imageurl;
         this.email = email;
         this.password = password;
         this.phone = phone;
         moodHistory = null;
+    }
+  
+    public void User(FirebaseUser firebaseUser) {
+        this.email = firebaseUser.getEmail();
+        this.password = "";
+        this.imageurl=imageurl;
+        this.id=id;
+        this.userID = "";
     }
     public User(String userID, String email, String password) {
         this.userID = userID;
@@ -37,8 +48,10 @@ public class User {
     public String getUserID() { return userID; }
     public String getEmail() { return email; }
     public String getPassword() { return password; }
+    public String getImageurl() { return imageurl; }
     public String getPhone() { return phone; }
 
+    public void setImageurl(String imageurl) { this.imageurl = imageurl; }
     public void setEmail(String email) { this.email = email; }
     public void setPassword(String password) { this.password = password; }
     public void setPhone(String phone) { this.phone = phone; }
