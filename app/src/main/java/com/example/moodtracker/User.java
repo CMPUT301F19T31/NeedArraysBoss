@@ -1,5 +1,7 @@
 package com.example.moodtracker;
 
+import com.google.firebase.auth.FirebaseUser;
+
 import java.util.ArrayList;
 
 public class User {
@@ -7,6 +9,7 @@ public class User {
     private String userID, email, password, phone;
     private ArrayList<Mood> moodHistory;
     private String imageurl;
+    private String id;
 
     public void User(String userID,String imageurl, String id, String email, String password) {
         this.userID = userID;
