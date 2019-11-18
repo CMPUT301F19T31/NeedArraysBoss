@@ -54,8 +54,11 @@ public class MainActivity extends AppCompatActivity {
         BottomNavigationView navView = findViewById(R.id.nav_view);
         // Passing each menu ID as a set of Ids because each
         // menu should be considered as top level destinations.
-        checkMapServices();
-        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+        //checkMapServices();
+        //mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+
+        //checkMapServices();
+
         AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(
                 R.id.navigation_home, R.id.navigation_dashboard, R.id.navigation_notifications)
                 .build();
@@ -64,6 +67,7 @@ public class MainActivity extends AppCompatActivity {
         NavigationUI.setupWithNavController(navView, navController);
     }
 
+    /*
     private void getUserDetails(){
         if(mUserLocation == null){
             mUserLocation = new UserLocation();
@@ -130,8 +134,9 @@ public class MainActivity extends AppCompatActivity {
             });
         }
     }
+*/
 
-
+/*
     private void init(){
         FloatingActionButton btnMap = (FloatingActionButton) findViewById(R.id.btnMap);
         btnMap.setOnClickListener(new View.OnClickListener() {
@@ -177,11 +182,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void getLocationPermission() {
-        /*
-         * Request location permission, so that we can get the location of the
-         * device. The result of the permission request is handled by a callback,
-         * onRequestPermissionsResult.
-         */
+
         if (ContextCompat.checkSelfPermission(this.getApplicationContext(),
                 android.Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED) {
@@ -189,7 +190,7 @@ public class MainActivity extends AppCompatActivity {
             //getChatrooms(); HEREEEEEEEEEEEEEEEEEEEEEEEEEEEE
             init();
             //getLastKnownLocation();
-            getUserDetails();
+            //getUserDetails();
         } else {
             ActivityCompat.requestPermissions(this,
                     new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},
@@ -244,7 +245,7 @@ public class MainActivity extends AppCompatActivity {
                     //getChatrooms(); HEREEEEEEEEEEEEEEEEEEE
                     init();
                     //getLastKnownLocation();
-                    getUserDetails();
+                    //getUserDetails();
                 }
                 else{
                     getLocationPermission();
@@ -254,6 +255,7 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+
     @Override
     protected void onResume() {
         super.onResume();
@@ -262,11 +264,12 @@ public class MainActivity extends AppCompatActivity {
                 //getChatrooms(); HEREEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE
                 init();
                 //getLastKnownLocation();
-                getUserDetails();
+                //getUserDetails();
             }
             else{
                 getLocationPermission();
             }
         }
     }
+*/
 }

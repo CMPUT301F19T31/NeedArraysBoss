@@ -69,8 +69,9 @@ public class HomeFragment extends Fragment implements AdapterView.OnItemSelected
     private static final String TAG = "sample";
     private User user;
     private FloatingActionButton actn_btn;
+    private FloatingActionButton btnMap;
 
-    private static final String TAG = "HomeFragment";
+    //private static final String TAG = "HomeFragment";
     private boolean mLocationPermissionGranted = false;
     public static final int ERROR_DIALOG_REQUEST = 9001;
     public static final int PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 9002;
@@ -79,8 +80,7 @@ public class HomeFragment extends Fragment implements AdapterView.OnItemSelected
     private UserLocation mUserLocation;
 
 
-    public View onCreateView(@NonNull LayoutInflater inflater,
-                             ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_home, container, false);
         //final TextView textView = root.findViewById(R.id.text_home);
         //textView.setText(s);
@@ -89,8 +89,10 @@ public class HomeFragment extends Fragment implements AdapterView.OnItemSelected
         EmojiCompat.Config config = new BundledEmojiCompatConfig(getContext());
         EmojiCompat.init(config);
 
-        checkMapServices();
-        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+        //checkMapServices();
+        //mFusedLocationClient = LocationServices.getFusedLocationProviderClient(getActivity());
+
+        //init();
 
         dialog = new Dialog(getContext());
         moodHistory = new ArrayList<Mood>();
@@ -102,6 +104,33 @@ public class HomeFragment extends Fragment implements AdapterView.OnItemSelected
                 createMoodEvent(v);
             }
         });
+
+        /*
+        btnMap = root.findViewById(R.id.btnMap);
+        btnMap.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(checkMapServices()){
+                    if(mLocationPermissionGranted){
+                        //getChatrooms(); HEREEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE
+                        Intent intent = new Intent(getActivity(), MapActivity.class);
+                        startActivity(intent);
+                        //getLastKnownLocation();
+                        //getUserDetails();
+                    }
+                    else{
+                        getLocationPermission();
+                    }
+                }
+                //Intent intent = new Intent(getActivity(), MapActivity.class);
+                //startActivity(intent);
+            }
+        });
+         */
+
+        if(isServicesOK()){
+            init();
+        }
 
         //initialize recyclerview
         rv = root.findViewById(R.id.moodList);
@@ -162,6 +191,7 @@ public class HomeFragment extends Fragment implements AdapterView.OnItemSelected
                     }
                 });
     }
+
     public void signInUser() {
         mAuth.signInWithEmailAndPassword("ahnafon3@gmail.com", "123456")
                 .addOnCompleteListener(getActivity(), new OnCompleteListener<AuthResult>() {
@@ -182,6 +212,9 @@ public class HomeFragment extends Fragment implements AdapterView.OnItemSelected
                 });
     }
 
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    /*
     private void getUserDetails(){
         if(mUserLocation == null){
             mUserLocation = new UserLocation();
@@ -248,19 +281,53 @@ public class HomeFragment extends Fragment implements AdapterView.OnItemSelected
             });
         }
     }
-
+*/
 
     private void init(){
-        FloatingActionButton btnMap = (FloatingActionButton) findViewById(R.id.btnMap);
+        FloatingActionButton btnMap = (FloatingActionButton) dialog.findViewById(R.id.btnMap);
         btnMap.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(HomeFragment.this, MapActivity.class);
+                /*if(checkMapServices()){
+                    if(mLocationPermissionGranted){
+                        //getChatrooms(); HEREEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE
+                        Intent intent = new Intent(getActivity(), MapActivity.class);
+                        startActivity(intent);
+                        //getLastKnownLocation();
+                        //getUserDetails();
+                    }
+                    else{
+                        getLocationPermission();
+                    }
+                }*/
+                Intent intent = new Intent(getActivity(), MapActivity.class);
                 startActivity(intent);
             }
         });
     }
 
+    public boolean isServicesOK(){
+        Log.d(TAG, "isServicesOK: checking google services version");
+
+        int available = GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(getActivity());
+
+        if(available == ConnectionResult.SUCCESS){
+            //everything is fine and the user can make map requests
+            Log.d(TAG, "isServicesOK: Google Play Services is working");
+            return true;
+        }
+        else if(GoogleApiAvailability.getInstance().isUserResolvableError(available)){
+            //an error occured but we can resolve it
+            Log.d(TAG, "isServicesOK: an error occured but we can fix it");
+            Dialog dialog = GoogleApiAvailability.getInstance().getErrorDialog(getActivity(), available, ERROR_DIALOG_REQUEST);
+            dialog.show();
+        }else{
+            Toast.makeText(getActivity(), "You can't make map requests", Toast.LENGTH_SHORT).show();
+        }
+        return false;
+    }
+
+    /*
     private boolean checkMapServices(){
         if(isServicesOK()){
             if(isMapsEnabled()){
@@ -271,7 +338,7 @@ public class HomeFragment extends Fragment implements AdapterView.OnItemSelected
     }
 
     private void buildAlertMessageNoGps() {
-        final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        final AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setMessage("This application requires GPS to work properly, do you want to enable it?")
                 .setCancelable(false)
                 .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
@@ -285,7 +352,7 @@ public class HomeFragment extends Fragment implements AdapterView.OnItemSelected
     }
 
     public boolean isMapsEnabled(){
-        final LocationManager manager = (LocationManager) getSystemService( Context.LOCATION_SERVICE );
+        final LocationManager manager = (LocationManager) getActivity().getSystemService( Context.LOCATION_SERVICE );
 
         if ( !manager.isProviderEnabled( LocationManager.GPS_PROVIDER ) ) {
             buildAlertMessageNoGps();
@@ -296,25 +363,21 @@ public class HomeFragment extends Fragment implements AdapterView.OnItemSelected
 
     private void getLocationPermission() {
 
-        if (ContextCompat.checkSelfPermission(this.getApplicationContext(),
-                android.Manifest.permission.ACCESS_FINE_LOCATION)
-                == PackageManager.PERMISSION_GRANTED) {
+        if (ContextCompat.checkSelfPermission(getActivity().getApplicationContext(), android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             mLocationPermissionGranted = true;
-            //getChatrooms(); HEREEEEEEEEEEEEEEEEEEEEEEEEEEEE
+            //getChatrooms(); HEREEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE
             init();
             //getLastKnownLocation();
-            getUserDetails();
+            //getUserDetails();
         } else {
-            ActivityCompat.requestPermissions(this,
-                    new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},
-                    PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
+            ActivityCompat.requestPermissions(getActivity(),new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
         }
     }
 
     public boolean isServicesOK(){
         Log.d(TAG, "isServicesOK: checking google services version");
 
-        int available = GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(MainActivity.this);
+        int available = GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(getActivity());
 
         if(available == ConnectionResult.SUCCESS){
             //everything is fine and the user can make map requests
@@ -324,18 +387,16 @@ public class HomeFragment extends Fragment implements AdapterView.OnItemSelected
         else if(GoogleApiAvailability.getInstance().isUserResolvableError(available)){
             //an error occured but we can resolve it
             Log.d(TAG, "isServicesOK: an error occured but we can fix it");
-            Dialog dialog = GoogleApiAvailability.getInstance().getErrorDialog(MainActivity.this, available, ERROR_DIALOG_REQUEST);
+            Dialog dialog = GoogleApiAvailability.getInstance().getErrorDialog(getActivity(), available, ERROR_DIALOG_REQUEST);
             dialog.show();
         }else{
-            Toast.makeText(this, "You can't make map requests", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getActivity(), "You can't make map requests", Toast.LENGTH_SHORT).show();
         }
         return false;
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode,
-                                           @NonNull String permissions[],
-                                           @NonNull int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, @NonNull String permissions[], @NonNull int[] grantResults) {
         mLocationPermissionGranted = false;
         switch (requestCode) {
             case PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION: {
@@ -349,16 +410,16 @@ public class HomeFragment extends Fragment implements AdapterView.OnItemSelected
     }
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         Log.d(TAG, "onActivityResult: called.");
         switch (requestCode) {
             case PERMISSIONS_REQUEST_ENABLE_GPS: {
                 if(mLocationPermissionGranted){
-                    //getChatrooms(); HEREEEEEEEEEEEEEEEEEEE
+                    //getChatrooms(); HEREEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE
                     init();
                     //getLastKnownLocation();
-                    getUserDetails();
+                    //getUserDetails();
                 }
                 else{
                     getLocationPermission();
@@ -367,30 +428,33 @@ public class HomeFragment extends Fragment implements AdapterView.OnItemSelected
         }
 
     }
+*/
 
-    @Override
-    protected void onResume() {
+    public void onResume() {
         super.onResume();
+        loadDataFromDB();
+        /*
         if(checkMapServices()){
             if(mLocationPermissionGranted){
                 //getChatrooms(); HEREEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE
                 init();
                 //getLastKnownLocation();
-                getUserDetails();
+                //getUserDetails();
             }
             else{
                 getLocationPermission();
             }
-        }
+        }*/
     }
 
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    @Override
+    /*
+   @Override
     public void onResume() {
         super.onResume();
         loadDataFromDB();
-    }
+    }*/
 
     public void loadDataFromDB() {
         if(moodEventsDR == null) { return; }
