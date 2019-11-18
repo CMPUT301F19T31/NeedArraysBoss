@@ -1,8 +1,11 @@
 package com.example.moodtracker;
 
 import android.app.Activity;
+import android.view.View;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.Spinner;
+import android.widget.TextView;
 
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.platform.app.InstrumentationRegistry;
@@ -53,49 +56,22 @@ public class MainActivityTest {
     }
 
     /**
-     * Add a city to the listview and check the city name using assertTrue
-     * Clear all the cities from the listview and check again with assertFalse
+     * Add a mood event and check thoughts using assertTrue
      */
 
-
-    /*
     @Test
-    public void addMood(){
+    public void checkAddMood(){
         // Asserts that the current activity is the MainActivity. Otherwise, show “Wrong Activity”
         solo.assertCurrentActivity("Wrong Activity", MainActivity.class);
-        solo.clickOnButton("ADD CITY"); //Click ADD CITY Button
-        //Get view for EditText and enter a city name
-        solo.enterText((EditText) solo.getView(R.id.editText_name), "Edmonton");
-        solo.clickOnButton("CONFIRM"); //Select CONFIRM Button
-        solo.clearEditText((EditText) solo.getView(R.id.editText_name)); //Clear the EditText
-        // True if there is a text: Edmonton on the screen, wait at least 2 seconds and find minimum one match.
-        assertTrue(solo.waitForText("Edmonton", 1, 2000));
-        solo.clickOnButton("ClEAR ALL"); //Select ClEAR ALL
-        //True if there is no text: Edmonton on the screen
-        assertFalse(solo.searchText("Edmonton"));
+        solo.clickOnActionBarHomeButton();
+        View addMood = solo.getView(R.id.addMoodEvent);
+        solo.clickOnView(addMood); //Click Floating Action Button that adds a new mood event
+        solo.pressSpinnerItem(0,4);
+        solo.pressSpinnerItem(1,2);
+        solo.enterText((EditText) solo.getView(R.id.reasonET), "UITest");
+        solo.clickOnButton("Add Event"); //Click ADD EVENT Button
+        assertTrue(solo.waitForText("UITest", 1, 2000));
     }
-    */
-
-    /**
-     * Check item taken from the listview
-     */
-
-
-    /*
-    @Test
-    public void checkCiyListItem(){
-        solo.assertCurrentActivity("Wrong Activity", MainActivity.class);
-        solo.clickOnButton("ADD CITY");
-        solo.enterText((EditText) solo.getView(R.id.editText_name), "Edmonton");
-        solo.clickOnButton("CONFIRM");
-        solo.waitForText("Edmonton", 1, 2000);
-        // Get MainActivity to access its variables and methods.
-        MainActivity activity = (MainActivity) solo.getCurrentActivity();
-        final ListView cityList = activity.cityList; // Get the listview
-        String city = (String) cityList.getItemAtPosition(0); // Get item from first position
-        assertEquals("Edmonton", city);
-    }
-    */
 
     /**
      * Closes the activity after each test
