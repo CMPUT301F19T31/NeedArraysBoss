@@ -129,7 +129,27 @@ public class HomeFragment extends Fragment implements AdapterView.OnItemSelected
          */
 
         if(isServicesOK()){
-            init();
+            //init();
+            btnMap = root.findViewById(R.id.btnMap);
+            btnMap.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    /*if(checkMapServices()){
+                        if(mLocationPermissionGranted){
+                            //getChatrooms(); HEREEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE
+                            Intent intent = new Intent(getActivity(), MapActivity.class);
+                            startActivity(intent);
+                            //getLastKnownLocation();
+                            //getUserDetails();
+                        }
+                        else{
+                            getLocationPermission();
+                        }
+                    }*/
+                    Intent intent = new Intent(getActivity(), MapActivity.class);
+                    startActivity(intent);
+                }
+            });
         }
 
         //initialize recyclerview
@@ -283,6 +303,7 @@ public class HomeFragment extends Fragment implements AdapterView.OnItemSelected
     }
 */
 
+    /*
     private void init(){
         FloatingActionButton btnMap = (FloatingActionButton) dialog.findViewById(R.id.btnMap);
         btnMap.setOnClickListener(new View.OnClickListener() {
@@ -299,12 +320,13 @@ public class HomeFragment extends Fragment implements AdapterView.OnItemSelected
                     else{
                         getLocationPermission();
                     }
-                }*/
+                }
                 Intent intent = new Intent(getActivity(), MapActivity.class);
                 startActivity(intent);
             }
         });
     }
+    */
 
     public boolean isServicesOK(){
         Log.d(TAG, "isServicesOK: checking google services version");
