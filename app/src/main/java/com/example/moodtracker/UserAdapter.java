@@ -72,17 +72,17 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
             @Override
             public void onClick(View view) {
                 if (viewHolder.btn_follow.getText().toString().equals("follow")) {
-                    FirebaseDatabase.getInstance().getReference().child("Follow").child(firebaseUser.getUid())
-                            .child("following").child(user.getUserID()).setValue(true);
-                    FirebaseDatabase.getInstance().getReference().child("Follow").child(user.getUserID())
-                            .child("followers").child(firebaseUser.getUid()).setValue(true);
+                    FirebaseDatabase.getInstance().getReference().child("Follow").child(firebaseUser.getEmail())
+                            .child("following").child(user.getEmail()).setValue(true);
+                    FirebaseDatabase.getInstance().getReference().child("Follow").child(user.getEmail())
+                            .child("followers").child(firebaseUser.getEmail()).setValue(true);
 
 
                 } else {
-                    FirebaseDatabase.getInstance().getReference().child("Follow").child(firebaseUser.getUid())
-                            .child("following").child(user.getUserID()).removeValue();
-                    FirebaseDatabase.getInstance().getReference().child("Follow").child(user.getUserID())
-                            .child("followers").child(firebaseUser.getUid()).removeValue();
+                    FirebaseDatabase.getInstance().getReference().child("Follow").child(firebaseUser.getEmail())
+                            .child("following").child(user.getEmail()).removeValue();
+                    FirebaseDatabase.getInstance().getReference().child("Follow").child(user.getEmail())
+                            .child("followers").child(firebaseUser.getEmail()).removeValue();
                 }
             }
         });
@@ -95,23 +95,26 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
 
     public class ViewHolder extends RecyclerView.ViewHolder {
         public TextView userID;
+        public TextView email;
         public Button btn_follow;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
 
-            userID=itemView.findViewById(R.id.userID);
+            email=itemView.findViewById(R.id.email);
+
+            //userID=itemView.findViewById(R.id.userID);
             btn_follow=itemView.findViewById(R.id.btn_follow);
 
 
         }
     }
-    private void isFollowing(final String userid, final Button button){
-        DatabaseReference reference= FirebaseDatabase.getInstance().getReference().child("Follow").child(firebaseUser.getUid()).child("Following");
+    private void isFollowing(final String email, final Button button){
+        DatabaseReference reference= FirebaseDatabase.getInstance().getReference().child("Follow").child(firebaseUser.getEmail()).child("Following");
         reference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                if (dataSnapshot.child(userid).exists()){
+                if (dataSnapshot.child(email).exists()){
                     button.setText("following");
                 } else{
                     button.setText("follow");
