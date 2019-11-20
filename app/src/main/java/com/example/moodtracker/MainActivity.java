@@ -31,6 +31,10 @@ public class MainActivity extends AppCompatActivity {
                     fragment = new HomeFragment();
                     loadFragment(fragment);
                     return true;
+                case R.id.navigation_search:
+                    fragment = new SearchFragment();
+                    loadFragment(fragment);
+                    return true;
                 case R.id.navigation_dashboard:
                     fragment = new DashboardFragment();
                     loadFragment(fragment);
@@ -39,6 +43,7 @@ public class MainActivity extends AppCompatActivity {
                     fragment = new NotificationsFragment();
                     loadFragment(fragment);
                     return true;
+
                 }
             return false;
         }
