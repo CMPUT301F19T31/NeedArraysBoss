@@ -3,6 +3,7 @@ package com.example.moodtracker;
 import android.app.Dialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,6 +13,7 @@ import android.widget.Spinner;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.emoji.bundled.BundledEmojiCompatConfig;
 import androidx.emoji.text.EmojiCompat;
 import androidx.emoji.widget.EmojiEditText;
@@ -19,18 +21,22 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 public class HomeFragment extends Fragment implements AdapterView.OnItemSelectedListener {
 
@@ -41,10 +47,9 @@ public class HomeFragment extends Fragment implements AdapterView.OnItemSelected
     private ArrayList<Mood> moodHistory;
     private MoodListAdapter moodHistoryAdapter;
     private RecyclerView.LayoutManager moodHistoryLM;
-
-    private FirebaseDatabase db;
-    private DatabaseReference userDR;
+    private DocumentReference userRef;
     private FirebaseAuth mAuth;
+    private FirebaseUser currentUser;
     private static final String TAG = "sample";
     private User user;
     private FloatingActionButton actn_btn;
@@ -75,6 +80,7 @@ public class HomeFragment extends Fragment implements AdapterView.OnItemSelected
         rv.setLayoutManager(moodHistoryLM);
         rv.setAdapter(moodHistoryAdapter);
 
+        //start login activity
         moodHistoryAdapter.setOnClickListener(new MoodListAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(int index) {
@@ -86,8 +92,7 @@ public class HomeFragment extends Fragment implements AdapterView.OnItemSelected
 
         //initialize firebase
         mAuth = FirebaseAuth.getInstance();
-        db = FirebaseDatabase.getInstance();
-        userDR = null;
+        userRef = null;
 
         return root;
     }
@@ -96,7 +101,7 @@ public class HomeFragment extends Fragment implements AdapterView.OnItemSelected
     public void onStart() {
         super.onStart();
         // Check if user is signed in (non-null) and update UI accordingly.
-        FirebaseUser currentUser = mAuth.getCurrentUser();
+        currentUser = mAuth.getCurrentUser();
 
         if(currentUser == null) { // not signed in
             //start login activity
@@ -111,25 +116,19 @@ public class HomeFragment extends Fragment implements AdapterView.OnItemSelected
     @Override
     public void onResume() {
         super.onResume();
-
-        FirebaseUser currentUser = mAuth.getCurrentUser();
+        currentUser = mAuth.getCurrentUser();
 
         if(currentUser != null) {
-            userDR = db.getReference("users").child("user" + currentUser.getEmail().replace(".","*"));
-            userDR.addValueEventListener(new ValueEventListener() {
+            userRef = FirebaseFirestore.getInstance().collection("users").document("user" + currentUser.getEmail());
+            userRef.addSnapshotListener(new EventListener<DocumentSnapshot>() {
                 @Override
-                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                    user = dataSnapshot.getValue(User.class);
+                public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
+                    if (documentSnapshot == null) { return; }
+                    user = documentSnapshot.toObject(User.class);
                     loadDataFromDB();
-                }
-
-                @Override
-                public void onCancelled(@NonNull DatabaseError databaseError) {
-
                 }
             });
         }
-        loadDataFromDB();
     }
 
     public void loadDataFromDB() {
@@ -141,6 +140,21 @@ public class HomeFragment extends Fragment implements AdapterView.OnItemSelected
             moodHistory.add(user.getMoodHistory().get(i));
         }
         moodHistoryAdapter.notifyDataSetChanged();
+    }
+
+    public void oldSaveDataToDB() {
+        Map<String, Object> data = new HashMap<>();
+        data.put("user"+currentUser.getEmail(), user);
+        userRef.set(data).addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+                if(task.isSuccessful()) {
+                    Log.d(TAG, "DocumentSnapshot successfully written!");
+                } else {
+                    Log.w(TAG, "Error writing document", task.getException());
+                }
+            }
+        });
     }
 
     public void createMoodEvent(View view) {
@@ -172,7 +186,7 @@ public class HomeFragment extends Fragment implements AdapterView.OnItemSelected
                     moodHistory.add(0, newMood); //inserts new mood at the beginning of list
                     moodHistoryAdapter.notifyDataSetChanged();
                     user.setMoodHistory(moodHistory);
-                    userDR.setValue(user);
+                    userRef.set(user);  // save to db
 
                     feeling = "";
                     socialState = "";
