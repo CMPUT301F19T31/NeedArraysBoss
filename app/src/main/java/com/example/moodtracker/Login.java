@@ -11,21 +11,24 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+
+import java.util.Map;
 
 public class Login extends AppCompatActivity {
     EditText email, password;
     Button SignIn;
     TextView TextSignIn;
     FirebaseAuth mFirebaseAuth;
+    DocumentReference userRef;
     User user;
     String TAG = "Login";
 
@@ -36,6 +39,7 @@ public class Login extends AppCompatActivity {
         setContentView(R.layout.login);
 
         mFirebaseAuth = FirebaseAuth.getInstance();
+        userRef = null;
         email = findViewById(R.id.email);
         password = findViewById(R.id.password);
         SignIn = findViewById(R.id.loginBtn);
@@ -81,31 +85,27 @@ public class Login extends AppCompatActivity {
     }
 
     public void commitUser() {
-        DatabaseReference dataRef = FirebaseDatabase.getInstance().getReference("users")
-                .child("user" + mFirebaseAuth.getCurrentUser().getEmail().replace(".", "*"));
-        dataRef.addValueEventListener(new ValueEventListener() {
+        userRef = FirebaseFirestore.getInstance().collection("users").document("user"+mFirebaseAuth.getCurrentUser().getEmail());
+        userRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                user = dataSnapshot.getValue(User.class);
-                if (user == null)
-                    addUserToDB();
-                else
-                    finish();
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if(task.isSuccessful()) {
+                    addUserToDB(task.getResult().getData());
+                }
             }
         });
     }
 
-    public void addUserToDB() {
-        DatabaseReference dataRef = FirebaseDatabase.getInstance().getReference("users");
-        String email = mFirebaseAuth.getCurrentUser().getEmail();
-        user = new User("0", email,"000000");
-        dataRef.child("user" + email.replace('.', '*')).setValue(user);
-        finish();
+    public void addUserToDB(Map<String, Object> users) {
+        user = new User("0", mFirebaseAuth.getCurrentUser().getEmail(),"000000");
+        users.put("user"+user.getEmail(), user);
+        userRef.set(users).addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+                if(task.isSuccessful()) {
+                    finish();
+                }
+            }
+        });
     }
-
 }

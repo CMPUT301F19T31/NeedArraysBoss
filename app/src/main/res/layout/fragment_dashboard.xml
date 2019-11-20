@@ -152,11 +152,12 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
+            android:layout_centerInParent="true"
             android:layout_marginLeft="30dp"
+            android:layout_marginTop="20dp"
             android:layout_marginRight="30dp"
-            android:orientation="vertical"
-            android:layout_centerInParent="true">
+            android:background="@color/white"
+            android:orientation="vertical">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -166,24 +167,25 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:text="Email"
                     android:textColor="@color/headings"
-                    android:textSize="13sp"
-                    android:text="Email"/>
+                    android:textSize="13sp" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textSize="13sp"
-                    android:textColor="#000000"
                     android:fontFamily="sans-serif-light"
-                    android:text="Address"/>
+                    android:text="Address"
+                    android:textColor="#000000"
+                    android:textSize="13sp" />
 
                 <View
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
-                    android:layout_marginTop="15dp"/>
+                    android:layout_marginTop="15dp" />
 
             </LinearLayout>
+
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -193,25 +195,24 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:text="Phone"
                     android:textColor="@color/headings"
-                    android:textSize="13sp"
-                    android:text="Phone"/>
+                    android:textSize="13sp" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textSize="13sp"
-                    android:textColor="#000000"
                     android:fontFamily="sans-serif-light"
-                    android:text="Number"/>
+                    android:text="Number"
+                    android:textColor="#000000"
+                    android:textSize="13sp" />
 
                 <View
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
-                    android:layout_marginTop="15dp"/>
+                    android:layout_marginTop="15dp" />
 
             </LinearLayout>
-
 
 
         </LinearLayout>
