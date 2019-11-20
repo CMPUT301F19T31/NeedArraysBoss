@@ -12,6 +12,15 @@ public class User {
     private String id;
 
 
+    public User(String userID, String email, String password, ArrayList<Mood> moodHistory, String imageurl, String phone, String id) {
+        this.userID = userID;
+        this.email = email;
+        this.password = password;
+        this.phone = phone;
+        this.moodHistory = moodHistory;
+        this.imageurl=imageurl;
+        this.id=id;
+    }
 
     public User(String userID, String email, String password, ArrayList<Mood> moodHistory) {
         this.userID = userID;

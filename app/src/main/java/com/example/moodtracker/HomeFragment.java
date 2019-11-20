@@ -134,9 +134,10 @@ public class HomeFragment extends Fragment implements AdapterView.OnItemSelected
 
     public void loadDataFromDB() {
         if(user == null || user.getMoodHistory() == null) { return; }
+        int size=user.getMoodHistory().size();
 
         moodHistory.clear();
-        for(int i=0; i<user.getMoodHistory().size(); i++)
+        for(int i=0; i<size; i++)
         {
             moodHistory.add(user.getMoodHistory().get(i));
         }

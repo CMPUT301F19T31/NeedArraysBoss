@@ -95,8 +95,8 @@ public class EditMoodEvent extends AppCompatActivity implements AdapterView.OnIt
 
                 //initialise spinners and edittexts
                 et.setText(mood.getReason());
-                feelingSpinner.setSelection(moods.indexOf(mood.getFeeling() + 1));
-                socialStateSpinner.setSelection(moods.indexOf(mood.getSocialState() + 1));
+                feelingSpinner.setSelection(moods.indexOf(mood.getFeeling())+1);
+                socialStateSpinner.setSelection(socialStates.indexOf(mood.getSocialState())+1);
             }
         });
     }
