@@ -33,6 +33,7 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -128,8 +129,12 @@ public class HomeFragment extends Fragment implements AdapterView.OnItemSelected
         });
          */
 
-        if(isServicesOK()){
-            //init();
+        btnMap = root.findViewById(R.id.btnMap);
+        init();
+        /*
+        if(checkMapServices()){
+            init();
+            /*
             btnMap = root.findViewById(R.id.btnMap);
             btnMap.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -145,12 +150,14 @@ public class HomeFragment extends Fragment implements AdapterView.OnItemSelected
                         else{
                             getLocationPermission();
                         }
-                    }*/
+                    }
                     Intent intent = new Intent(getActivity(), MapActivity.class);
                     startActivity(intent);
                 }
             });
+
         }
+         */
 
         //initialize recyclerview
         rv = root.findViewById(R.id.moodList);
@@ -303,13 +310,13 @@ public class HomeFragment extends Fragment implements AdapterView.OnItemSelected
     }
 */
 
-    /*
+
     private void init(){
-        FloatingActionButton btnMap = (FloatingActionButton) dialog.findViewById(R.id.btnMap);
+        //FloatingActionButton btnMap = (FloatingActionButton) dialog.findViewById(R.id.btnMap);
         btnMap.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                /*if(checkMapServices()){
+                if(checkMapServices()){
                     if(mLocationPermissionGranted){
                         //getChatrooms(); HEREEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE
                         Intent intent = new Intent(getActivity(), MapActivity.class);
@@ -321,12 +328,13 @@ public class HomeFragment extends Fragment implements AdapterView.OnItemSelected
                         getLocationPermission();
                     }
                 }
-                Intent intent = new Intent(getActivity(), MapActivity.class);
-                startActivity(intent);
+                //Intent intent = new Intent(getActivity(), MapActivity.class);
+                //startActivity(intent);
             }
         });
+
+
     }
-    */
 
     public boolean isServicesOK(){
         Log.d(TAG, "isServicesOK: checking google services version");
@@ -349,7 +357,7 @@ public class HomeFragment extends Fragment implements AdapterView.OnItemSelected
         return false;
     }
 
-    /*
+
     private boolean checkMapServices(){
         if(isServicesOK()){
             if(isMapsEnabled()){
@@ -384,18 +392,52 @@ public class HomeFragment extends Fragment implements AdapterView.OnItemSelected
     }
 
     private void getLocationPermission() {
-
         if (ContextCompat.checkSelfPermission(getActivity().getApplicationContext(), android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             mLocationPermissionGranted = true;
             //getChatrooms(); HEREEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE
-            init();
+            //init();
             //getLastKnownLocation();
             //getUserDetails();
+            Intent intent = new Intent(getActivity(), MapActivity.class);
+            startActivity(intent);
         } else {
             ActivityCompat.requestPermissions(getActivity(),new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
         }
     }
 
+    private void getDeviceLocation() {
+        Log.d(TAG, "getDeviceLocation: getting the devices current location");
+
+        //mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
+        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(getActivity());
+
+        try {
+            if (mLocationPermissionGranted) {
+
+                final Task location = mFusedLocationClient.getLastLocation(); //mFusedLocationProviderClient.getLastLocation();
+                location.addOnCompleteListener(new OnCompleteListener() {
+                    @Override
+                    public void onComplete(@NonNull Task task) {
+                        if (task.isSuccessful()) {
+                            Log.d(TAG, "onComplete: found location!");
+                            Location currentLocation = (Location) task.getResult();
+
+                            //moveCamera(new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude()),
+                              //      DEFAULT_ZOOM);
+
+                        } else {
+                            Log.d(TAG, "onComplete: current location is null");
+                            Toast.makeText(getActivity(), "unable to get current location", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
+            }
+        } catch (SecurityException e) {
+            Log.e(TAG, "getDeviceLocation: SecurityException: " + e.getMessage());
+        }
+    }
+
+    /*
     public boolean isServicesOK(){
         Log.d(TAG, "isServicesOK: checking google services version");
 
@@ -415,7 +457,7 @@ public class HomeFragment extends Fragment implements AdapterView.OnItemSelected
             Toast.makeText(getActivity(), "You can't make map requests", Toast.LENGTH_SHORT).show();
         }
         return false;
-    }
+    }*/
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String permissions[], @NonNull int[] grantResults) {
@@ -450,7 +492,7 @@ public class HomeFragment extends Fragment implements AdapterView.OnItemSelected
         }
 
     }
-*/
+
 
     public void onResume() {
         super.onResume();
@@ -466,7 +508,8 @@ public class HomeFragment extends Fragment implements AdapterView.OnItemSelected
             else{
                 getLocationPermission();
             }
-        }*/
+        }
+         */
     }
 
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
