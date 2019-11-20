@@ -2,6 +2,10 @@ package com.example.moodtracker;
 
 import com.google.firebase.firestore.GeoPoint;
 
+/**
+ * This is a class that keeps track of a mood
+ */
+
 public class Mood {
 
     private int img;

@@ -16,6 +16,10 @@
     <string name="because">because </string>
     <string name="socialStateTV">Are you by yourself?</string>
 
+    <string name="posts">Posts</string>
+    <string name="following">Following</string>
+    <string name="followers">Folllowers</string>
+
     <string-array name="feelings">
         <item></item>
         <item>happy</item>
@@ -38,4 +42,7 @@
         <item>with two or more people</item>
         <item>with a crowd</item>
     </string-array>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

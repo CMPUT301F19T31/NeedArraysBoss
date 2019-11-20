@@ -11,16 +11,21 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 public class Login extends AppCompatActivity {
     EditText email, password;
     Button SignIn;
     TextView TextSignIn;
     FirebaseAuth mFirebaseAuth;
+    DocumentReference userRef;
     String TAG = "Login";
 
 
@@ -30,6 +35,7 @@ public class Login extends AppCompatActivity {
         setContentView(R.layout.login);
 
         mFirebaseAuth = FirebaseAuth.getInstance();
+        userRef = null;
         email = findViewById(R.id.email);
         password = findViewById(R.id.password);
         SignIn = findViewById(R.id.loginBtn);
@@ -37,9 +43,10 @@ public class Login extends AppCompatActivity {
 
     }
 
+
     public void signInUser (View v) {
-        String emailID = email.getText().toString();
-        String pwd = password.getText().toString();
+        final String emailID = email.getText().toString();
+        final String pwd = password.getText().toString();
         if(emailID.isEmpty()){
             email.setError("Please enter email");
             email.requestFocus();
@@ -56,7 +63,7 @@ public class Login extends AppCompatActivity {
                     .addOnSuccessListener(Login.this, new OnSuccessListener<AuthResult>() {
                         @Override
                         public void onSuccess(AuthResult authResult) {
-                            finish();
+                            commitUser();
                         }
                     }).addOnFailureListener(new OnFailureListener() {
                 @Override
@@ -73,4 +80,18 @@ public class Login extends AppCompatActivity {
         startActivity(i);
     }
 
+    public void commitUser() {
+        userRef = FirebaseFirestore.getInstance().collection("users").document("user"+mFirebaseAuth.getCurrentUser().getEmail());
+        //Map<String, Object> data = new HashMap<>();
+        User user = new User("0", mFirebaseAuth.getCurrentUser().getEmail(),"000000");
+        //data.put("user"+user.getEmail(), user);
+        userRef.set(user).addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+                if(task.isSuccessful()) {
+                    finish();
+                }
+            }
+        });
+    }
 }

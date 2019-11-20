@@ -14,18 +14,20 @@ import androidx.emoji.text.EmojiCompat;
 import androidx.emoji.widget.EmojiEditText;
 
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.GenericTypeIndicator;
-import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
 
+
+/**
+ * This is an activity that handles editing for existing moods
+ */
 public class EditMoodEvent extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
 
     private EmojiEditText et;
@@ -34,10 +36,9 @@ public class EditMoodEvent extends AppCompatActivity implements AdapterView.OnIt
     private String feeling = "", socialState = "";
 
     private FirebaseAuth mAuth;
-    private FirebaseDatabase db;
-    private DatabaseReference dataRef;
+    private DocumentReference docRef;
     private Mood mood;
-    private ArrayList<Mood> moodHistory;
+    private User user;
 
     private ArrayList<String> moods;
     private ArrayList<String> socialStates;
@@ -61,7 +62,6 @@ public class EditMoodEvent extends AppCompatActivity implements AdapterView.OnIt
 
         //load data from DB
         mAuth = FirebaseAuth.getInstance();
-        db = FirebaseDatabase.getInstance();
         signIn();
 
     }
@@ -74,7 +74,7 @@ public class EditMoodEvent extends AppCompatActivity implements AdapterView.OnIt
                         if (task.isSuccessful()) {
                             // Sign in success, update UI with the signed-in user's information
                             Log.d("sample", "signInWithEmail:success");
-                            dataRef = db.getReference("moodEvents");
+                            docRef = FirebaseFirestore.getInstance().collection("users").document("user"+mAuth.getCurrentUser().getEmail());
                             loadDataFromDB();
                         } else {
                             // If sign in fails, display a message to the user.
@@ -87,22 +87,16 @@ public class EditMoodEvent extends AppCompatActivity implements AdapterView.OnIt
     }
 
     public void loadDataFromDB() {
-        dataRef.addValueEventListener(new ValueEventListener() {
+        docRef.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
             @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                GenericTypeIndicator<ArrayList<Mood>> temp = new GenericTypeIndicator<ArrayList<Mood>>() {};
-                moodHistory = dataSnapshot.getValue(temp);
-                mood = moodHistory.get(index);
+            public void onSuccess(DocumentSnapshot documentSnapshot) {
+                user = documentSnapshot.toObject(User.class);
+                mood = user.getMoodHistory().get(index);
 
                 //initialise spinners and edittexts
                 et.setText(mood.getReason());
                 feelingSpinner.setSelection(moods.indexOf(mood.getFeeling() + 1));
                 socialStateSpinner.setSelection(moods.indexOf(mood.getSocialState() + 1));
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
             }
         });
     }
@@ -150,9 +144,13 @@ public class EditMoodEvent extends AppCompatActivity implements AdapterView.OnIt
             }
 
             if(change) {
-                moodHistory.set(index, mood);
-                dataRef.setValue(moodHistory);
-                finish();
+                user.getMoodHistory().set(index, mood);
+                docRef.set(user).addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        finish();
+                    }
+                });
             }
 
         } else if (feeling.equals(""))
@@ -160,9 +158,13 @@ public class EditMoodEvent extends AppCompatActivity implements AdapterView.OnIt
     }
 
     public void deleteMood(View v) {
-        moodHistory.remove(index);
-        dataRef.setValue(moodHistory);
-        finish();
+        user.getMoodHistory().remove(index);
+        docRef.set(user).addOnSuccessListener(new OnSuccessListener<Void>() {
+            @Override
+            public void onSuccess(Void aVoid) {
+                finish();
+            }
+        });
     }
 
     public void cancel(View v) { finish(); }
