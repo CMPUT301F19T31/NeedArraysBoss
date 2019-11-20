@@ -48,9 +48,9 @@ public class SearchFragment extends Fragment {
         search_bar = view.findViewById(R.id.search_bar);
 
         mUsers = new ArrayList<>();
-        userAdapter = new UserAdapter(getContext(), mUsers);
+        //userAdapter = new UserAdapter(getContext(), mUsers);
 
-        recyclerView.setAdapter(userAdapter);
+        //recyclerView.setAdapter(userAdapter);
 
 
 
@@ -89,7 +89,7 @@ public class SearchFragment extends Fragment {
                     mUsers.add(user);
                 }
 
-                userAdapter.notifyDataSetChanged();
+                //userAdapter.notifyDataSetChanged();
             }
 
             @Override
@@ -115,7 +115,7 @@ public class SearchFragment extends Fragment {
 
                     }
 
-                    userAdapter.notifyDataSetChanged();
+                    //userAdapter.notifyDataSetChanged();
                 }
             }
 
