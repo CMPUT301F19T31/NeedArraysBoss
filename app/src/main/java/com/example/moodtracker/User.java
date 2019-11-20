@@ -5,8 +5,13 @@ import java.util.ArrayList;
 public class User {
 
     private String userID, email, password, phone;
-    private ArrayList<Mood> moodHistory;
+    private ArrayList<Mood> moodHistory = new ArrayList<>();
     private String imageurl;
+<<<<<<< Updated upstream
+=======
+    private String id;
+    private ArrayList<String> friendList = new ArrayList<>();
+>>>>>>> Stashed changes
 
     public void User(String userID,String imageurl, String id, String email, String password) {
         this.userID = userID;
@@ -15,29 +20,18 @@ public class User {
         this.email = email;
         this.password = password;
         this.phone = phone;
-        moodHistory = null;
-    }
-  
-    public void User(FirebaseUser firebaseUser) {
-        this.email = firebaseUser.getEmail();
-        this.password = "";
-        this.imageurl=imageurl;
-        this.id=id;
-        this.userID = "";
     }
     public User(String userID, String email, String password) {
         this.userID = userID;
         this.email = email;
         this.password = password;
         this.phone = null;
-        moodHistory = null;
     }
     public User(String userID, String password) {
         this.userID = userID;
         this.email = null;
         this.password = password;
         this.phone = null;
-        moodHistory = null;
     }
     public User() {
         //do nothing
@@ -58,7 +52,6 @@ public class User {
 
     public ArrayList<Mood> getMoodHistory() { return moodHistory; }
     public void setMoodHistory(ArrayList<Mood> moods) { moodHistory = moods; }
-    public void addMood(Mood newMood) { moodHistory.add(0, newMood); }
-    public void editMood(int index, Mood mood) { moodHistory.set(index, mood); }
-    public void deleteMood(int index) { moodHistory.remove(index); }
+    public ArrayList<String> getFriendList() { return friendList; }
+    public void setFriendList(ArrayList<String> friends) { friendList = friends; }
 }
