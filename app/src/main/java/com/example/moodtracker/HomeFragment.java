@@ -124,10 +124,18 @@ public class HomeFragment extends Fragment implements AdapterView.OnItemSelected
             userRef.addSnapshotListener(new EventListener<DocumentSnapshot>() {
                 @Override
                 public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
-                    user = (User) documentSnapshot.getData().get("user"+currentUser.getEmail());
+                    if(documentSnapshot == null) { return; }
+
+                    if(documentSnapshot.getData() == null) {
+                        user = new User("0", mAuth.getCurrentUser().getEmail(),"000000");
+                    } else {
+                        user = (User) documentSnapshot.getData().get("user" + currentUser.getEmail());
+                    }
                     loadDataFromDB();
                 }
             });
+        } else {
+            onStart();
         }
     }
 

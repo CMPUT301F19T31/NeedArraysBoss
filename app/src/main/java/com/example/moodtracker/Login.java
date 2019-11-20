@@ -18,9 +18,9 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.util.HashMap;
 import java.util.Map;
 
 public class Login extends AppCompatActivity {
@@ -29,7 +29,6 @@ public class Login extends AppCompatActivity {
     TextView TextSignIn;
     FirebaseAuth mFirebaseAuth;
     DocumentReference userRef;
-    User user;
     String TAG = "Login";
 
 
@@ -86,20 +85,10 @@ public class Login extends AppCompatActivity {
 
     public void commitUser() {
         userRef = FirebaseFirestore.getInstance().collection("users").document("user"+mFirebaseAuth.getCurrentUser().getEmail());
-        userRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                if(task.isSuccessful()) {
-                    addUserToDB(task.getResult().getData());
-                }
-            }
-        });
-    }
-
-    public void addUserToDB(Map<String, Object> users) {
-        user = new User("0", mFirebaseAuth.getCurrentUser().getEmail(),"000000");
-        users.put("user"+user.getEmail(), user);
-        userRef.set(users).addOnCompleteListener(new OnCompleteListener<Void>() {
+        Map<String, Object> data = new HashMap<>();
+        User user = new User("0", mFirebaseAuth.getCurrentUser().getEmail(),"000000");
+        data.put("user"+user.getEmail(), user);
+        userRef.set(data).addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override
             public void onComplete(@NonNull Task<Void> task) {
                 if(task.isSuccessful()) {
