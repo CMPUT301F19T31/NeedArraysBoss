@@ -3,16 +3,11 @@ package com.example.moodtracker;
 import android.app.Activity;
 import android.view.View;
 import android.widget.EditText;
-import android.widget.ListView;
-import android.widget.Spinner;
-import android.widget.TextView;
 
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.platform.app.InstrumentationRegistry;
 import androidx.test.rule.ActivityTestRule;
 
-import com.example.moodtracker.MainActivity;
-import com.example.moodtracker.R;
 import com.robotium.solo.Solo;
 
 import org.junit.After;
@@ -22,8 +17,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import static junit.framework.TestCase.assertTrue;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
+import static junit.framework.TestCase.assertFalse;
 
 /**
  * Test class for MainActivity. All the UI tests are written here. Robotium test framework is
@@ -67,10 +61,67 @@ public class MainActivityTest {
         View addMood = solo.getView(R.id.addMoodEvent);
         solo.clickOnView(addMood); //Click Floating Action Button that adds a new mood event
         solo.pressSpinnerItem(0,4);
+        solo.enterText((EditText) solo.getView(R.id.reasonET), "UITest1");
         solo.pressSpinnerItem(1,2);
-        solo.enterText((EditText) solo.getView(R.id.reasonET), "UITest");
         solo.clickOnButton("Add Event"); //Click ADD EVENT Button
-        assertTrue(solo.waitForText("UITest", 1, 2000));
+        assertTrue(solo.waitForText("UITest1", 1, 2000));
+        //Cleanup
+        solo.clickInRecyclerView(0);
+        solo.clickOnButton("Delete Event"); //Click DELETE EVENT Button
+    }
+
+    /**
+     * Edit mood event and check thoughts using assertTrue
+     */
+
+    @Test
+    public void checkEditMood(){
+        // Asserts that the current activity is the MainActivity. Otherwise, show “Wrong Activity”
+        solo.assertCurrentActivity("Wrong Activity", MainActivity.class);
+        // Initialize test element
+        solo.clickOnActionBarHomeButton();
+        View addMood = solo.getView(R.id.addMoodEvent);
+        solo.clickOnView(addMood); //Click Floating Action Button that adds a new mood event
+        solo.pressSpinnerItem(0,4);
+        solo.enterText((EditText) solo.getView(R.id.reasonET), "UITest1");
+        solo.pressSpinnerItem(1,2);
+        solo.clickOnButton("Add Event"); //Click ADD EVENT Button
+        // Test
+        assertTrue(solo.waitForText("UITest1", 1, 2000));
+        solo.clickInRecyclerView(0);
+        solo.pressSpinnerItem(0,3);
+        solo.clearEditText((EditText) solo.getView(R.id.reasonET2));
+        solo.enterText((EditText) solo.getView(R.id.reasonET2), "UITest2");
+        solo.pressSpinnerItem(1,1);
+        solo.clickOnButton("Edit Event"); //Click EDIT EVENT Button
+        assertFalse(solo.waitForText("UITest1", 1, 2000));
+        assertTrue(solo.waitForText("UITest2", 1, 2000));
+        //Cleanup
+        solo.clickInRecyclerView(0);
+        solo.clickOnButton("Delete Event"); //Click DELETE EVENT Button
+    }
+
+    /**
+     * Delete mood event and check thoughts using assertTrue
+     */
+
+    @Test
+    public void checkDeleteMood(){
+        // Asserts that the current activity is the MainActivity. Otherwise, show “Wrong Activity”
+        solo.assertCurrentActivity("Wrong Activity", MainActivity.class);
+        // Initialize test element
+        solo.clickOnActionBarHomeButton();
+        View addMood = solo.getView(R.id.addMoodEvent);
+        solo.clickOnView(addMood); //Click Floating Action Button that adds a new mood event
+        solo.pressSpinnerItem(0,4);
+        solo.enterText((EditText) solo.getView(R.id.reasonET), "UITest2");
+        solo.pressSpinnerItem(1,2);
+        solo.clickOnButton("Add Event"); //Click ADD EVENT Button
+        // Test
+        assertTrue(solo.waitForText("UITest2", 1, 2000));
+        solo.clickInRecyclerView(0);
+        solo.clickOnButton("Delete Event"); //Click DELETE EVENT Button
+        assertFalse(solo.waitForText("UITest2", 1, 2000));
     }
 
     /**
