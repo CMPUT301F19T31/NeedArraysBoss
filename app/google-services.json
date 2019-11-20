@@ -8,9 +8,9 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:160821997145:android:9b06c03395324cd4888b48",
+        "mobilesdk_app_id": "1:160821997145:android:eb50c6433fbb00f4888b48",
         "android_client_info": {
-          "package_name": "com.example.moodtracker"
+          "package_name": "com.example.moodio"
         }
       },
       "oauth_client": [
@@ -43,16 +43,40 @@
         }
       }
     },
-    
     {
-      
+      "client_info": {
+        "mobilesdk_app_id": "1:160821997145:android:9b06c03395324cd4888b48",
+        "android_client_info": {
+          "package_name": "com.example.moodtracker"
+        }
+      },
       "oauth_client": [
+        {
+          "client_id": "160821997145-kirplnkrfl45kms9qmc7m6asqrms7sgb.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.moodtracker",
+            "certificate_hash": "4136ca2ce9dfce345014e21aabf05b0101e74d6d"
+          }
+        },
+        {
+          "client_id": "160821997145-j13cm7kcb5u3hnctehsfu71bbi7g4scs.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.moodtracker",
+            "certificate_hash": "657c01f6a1aedf77ea1e108e28a8df6e78ec8918"
+          }
+        },
         {
           "client_id": "160821997145-dhq5opf0nfn16qlq1s90fsr6ajd68mm7.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
-      
+      "api_key": [
+        {
+          "current_key": "AIzaSyDFqJT-6YT9qx80w1MRSdwOG4DWcZIL8i4"
+        }
+      ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [

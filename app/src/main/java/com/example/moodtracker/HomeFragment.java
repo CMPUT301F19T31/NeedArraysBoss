@@ -120,22 +120,15 @@ public class HomeFragment extends Fragment implements AdapterView.OnItemSelected
         currentUser = mAuth.getCurrentUser();
 
         if(currentUser != null) {
-            userRef = FirebaseFirestore.getInstance().collection("users").document("user"+currentUser.getEmail());
+            userRef = FirebaseFirestore.getInstance().collection("users").document("user" + currentUser.getEmail());
             userRef.addSnapshotListener(new EventListener<DocumentSnapshot>() {
                 @Override
                 public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
-                    if(documentSnapshot == null) { return; }
-
-                    if(documentSnapshot.getData() == null) {
-                        user = new User("0", mAuth.getCurrentUser().getEmail(),"000000");
-                    } else {
-                        user = (User) documentSnapshot.getData().get("user" + currentUser.getEmail());
-                    }
+                    if (documentSnapshot == null) { return; }
+                    user = documentSnapshot.toObject(User.class);
                     loadDataFromDB();
                 }
             });
-        } else {
-            onStart();
         }
     }
 
@@ -150,7 +143,7 @@ public class HomeFragment extends Fragment implements AdapterView.OnItemSelected
         moodHistoryAdapter.notifyDataSetChanged();
     }
 
-    public void saveDataToDB() {
+    public void oldSaveDataToDB() {
         Map<String, Object> data = new HashMap<>();
         data.put("user"+currentUser.getEmail(), user);
         userRef.set(data).addOnCompleteListener(new OnCompleteListener<Void>() {
@@ -194,7 +187,7 @@ public class HomeFragment extends Fragment implements AdapterView.OnItemSelected
                     moodHistory.add(0, newMood); //inserts new mood at the beginning of list
                     moodHistoryAdapter.notifyDataSetChanged();
                     user.setMoodHistory(moodHistory);
-                    saveDataToDB();
+                    userRef.set(user);  // save to db
 
                     feeling = "";
                     socialState = "";

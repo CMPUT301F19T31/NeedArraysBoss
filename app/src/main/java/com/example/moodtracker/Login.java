@@ -20,9 +20,6 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 
-import java.util.HashMap;
-import java.util.Map;
-
 public class Login extends AppCompatActivity {
     EditText email, password;
     Button SignIn;
@@ -85,10 +82,10 @@ public class Login extends AppCompatActivity {
 
     public void commitUser() {
         userRef = FirebaseFirestore.getInstance().collection("users").document("user"+mFirebaseAuth.getCurrentUser().getEmail());
-        Map<String, Object> data = new HashMap<>();
+        //Map<String, Object> data = new HashMap<>();
         User user = new User("0", mFirebaseAuth.getCurrentUser().getEmail(),"000000");
-        data.put("user"+user.getEmail(), user);
-        userRef.set(data).addOnCompleteListener(new OnCompleteListener<Void>() {
+        //data.put("user"+user.getEmail(), user);
+        userRef.set(user).addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override
             public void onComplete(@NonNull Task<Void> task) {
                 if(task.isSuccessful()) {
