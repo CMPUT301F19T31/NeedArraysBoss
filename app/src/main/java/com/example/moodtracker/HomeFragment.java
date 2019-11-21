@@ -38,6 +38,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
@@ -188,6 +189,9 @@ public class HomeFragment extends Fragment implements AdapterView.OnItemSelected
         if(currentUser == null) { // not signed in
             //start login activity
             Intent intent = new Intent(getActivity().getApplicationContext(), Login.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(intent);
 
         } else {
@@ -195,43 +199,99 @@ public class HomeFragment extends Fragment implements AdapterView.OnItemSelected
         }
     }
 
-    public void createUser() {
-        mAuth.createUserWithEmailAndPassword("ahnafon3@gmail.com", "123456")
-                .addOnCompleteListener(getActivity(), new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        if (task.isSuccessful()) {
-                            // Sign in success, update UI with the signed-in user's information
-                            Log.d(TAG, "createUserWithEmail:success");
-                            signInUser();
-                        } else {
-                            // If sign in fails, display a message to the user.
-                            Log.w(TAG, "createUserWithEmail:failure", task.getException());
-                            Toast.makeText(getActivity().getApplicationContext(), "Authentication failed.",
-                                    Toast.LENGTH_SHORT).show();
-                        }
-                    }
-                });
+    public void onResume() {
+        super.onResume();
+        currentUser = mAuth.getCurrentUser();
+
+        if(currentUser != null) {
+            userRef = FirebaseFirestore.getInstance().collection("users").document("user" + currentUser.getEmail());
+            userRef.addSnapshotListener(new EventListener<DocumentSnapshot>() {
+                @Override
+                public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
+                    if (documentSnapshot == null) { return; }
+                    user = documentSnapshot.toObject(User.class);
+                    loadDataFromDB();
+                }
+            });
+        }
     }
 
-    public void signInUser() {
-        mAuth.signInWithEmailAndPassword("ahnafon3@gmail.com", "123456")
-                .addOnCompleteListener(getActivity(), new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        if (task.isSuccessful()) {
-                            // Sign in success, update UI with the signed-in user's information
-                            Log.d(TAG, "signInWithEmail:success");
-                            moodEventsDR = db.getReference("moodEvents");
-                            loadDataFromDB();
-                        } else {
-                            // If sign in fails, display a message to the user.
-                            Log.w(TAG, "signInWithEmail:failure", task.getException());
-                            Toast.makeText(getContext().getApplicationContext(), "Authentication failed.",
-                                    Toast.LENGTH_SHORT).show();
-                        }
+
+    public void loadDataFromDB() {
+        if(user == null || user.getMoodHistory() == null) { return; }
+        int size=user.getMoodHistory().size();
+
+        moodHistory.clear();
+        for(int i=0; i<size; i++)
+        {
+            moodHistory.add(user.getMoodHistory().get(i));
+        }
+        moodHistoryAdapter.notifyDataSetChanged();
+    }
+
+    public void createMoodEvent(View view) {
+        dialog.setContentView(R.layout.add_mood_event); //opens the pop window
+
+        Spinner feelingSpinner = (Spinner) dialog.findViewById(R.id.feelingSpinner);
+        feelingSpinner.setOnItemSelectedListener(this);
+
+        Spinner socialStateSpinner = (Spinner) dialog.findViewById(R.id.socialStateSpinner);
+        socialStateSpinner.setOnItemSelectedListener(this);
+
+        Button addEventBtn = dialog.findViewById(R.id.addMoodEvent);
+        addEventBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                EmojiEditText et = dialog.findViewById(R.id.reasonET);
+                String reason = et.getText().toString();
+
+                if(!feeling.equals("")) {
+                    Mood newMood;
+
+                    if (reason == null) {
+                        newMood = new Mood(feeling, socialState, System.currentTimeMillis());
+                    } else {
+                        newMood = new Mood(feeling, socialState, System.currentTimeMillis(), reason);
                     }
-                });
+                    moodHistory.add(0, newMood); //inserts new mood at the beginning of list
+                    moodHistoryAdapter.notifyDataSetChanged();
+                    user.setMoodHistory(moodHistory);
+                    userRef.set(user);  // save to db
+
+                    feeling = "";
+                    socialState = "";
+                    dialog.dismiss();   //closes the pop up window
+
+                } else if (feeling.equals("")) {
+                    Toast.makeText(dialog.getContext(), "Please select how you feel", Toast.LENGTH_LONG).show();
+                }
+            }
+        });
+
+        Button clearEventBtn = dialog.findViewById(R.id.clearMoodEvent);
+        clearEventBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                dialog.dismiss();
+            }
+        });
+
+        dialog.show();
+    }
+
+
+    @Override
+    public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+        if(adapterView.getId() == R.id.feelingSpinner)
+            feeling = adapterView.getItemAtPosition(i).toString();
+        else if(adapterView.getId() == R.id.socialStateSpinner)
+            socialState = adapterView.getItemAtPosition(i).toString();
+
+    }
+
+    @Override
+    public void onNothingSelected(AdapterView<?> adapterView) {
+
     }
 
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -418,7 +478,7 @@ public class HomeFragment extends Fragment implements AdapterView.OnItemSelected
                             Location currentLocation = (Location) task.getResult();
 
                             //moveCamera(new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude()),
-                              //      DEFAULT_ZOOM);
+                            //      DEFAULT_ZOOM);
 
                         } else {
                             Log.d(TAG, "onComplete: current location is null");
@@ -489,123 +549,8 @@ public class HomeFragment extends Fragment implements AdapterView.OnItemSelected
     }
 
 
-    public void onResume() {
-        super.onResume();
-        currentUser = mAuth.getCurrentUser();
 
-        if(currentUser != null) {
-            userRef = FirebaseFirestore.getInstance().collection("users").document("user" + currentUser.getEmail());
-            userRef.addSnapshotListener(new EventListener<DocumentSnapshot>() {
-                @Override
-                public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
-                    if (documentSnapshot == null) { return; }
-                    user = documentSnapshot.toObject(User.class);
-                    loadDataFromDB();
-                }
-            });
-        }
-    }
 
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    /*
-   @Override
-    public void onResume() {
-        super.onResume();
-        loadDataFromDB();
-    }*/
-
-    public void loadDataFromDB() {
-        if(user == null || user.getMoodHistory() == null) { return; }
-        int size=user.getMoodHistory().size();
-
-        moodHistory.clear();
-        for(int i=0; i<size; i++)
-        {
-            moodHistory.add(user.getMoodHistory().get(i));
-        }
-        moodHistoryAdapter.notifyDataSetChanged();
-    }
-
-    public void oldSaveDataToDB() {
-        Map<String, Object> data = new HashMap<>();
-        data.put("user"+currentUser.getEmail(), user);
-        userRef.set(data).addOnCompleteListener(new OnCompleteListener<Void>() {
-            @Override
-            public void onComplete(@NonNull Task<Void> task) {
-                if(task.isSuccessful()) {
-                    Log.d(TAG, "DocumentSnapshot successfully written!");
-                } else {
-                    Log.w(TAG, "Error writing document", task.getException());
-                }
-            }
-        });
-    }
-
-    public void createMoodEvent(View view) {
-        dialog.setContentView(R.layout.add_mood_event); //opens the pop window
-
-        Spinner feelingSpinner = (Spinner) dialog.findViewById(R.id.feelingSpinner);
-        feelingSpinner.setOnItemSelectedListener(this);
-
-        Spinner socialStateSpinner = (Spinner) dialog.findViewById(R.id.socialStateSpinner);
-        socialStateSpinner.setOnItemSelectedListener(this);
-
-        Button addEventBtn = dialog.findViewById(R.id.addMoodEvent);
-        addEventBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                EmojiEditText et = dialog.findViewById(R.id.reasonET);
-                String reason = et.getText().toString();
-                SimpleDateFormat datetime = new SimpleDateFormat("(yyyy/MM/dd) 'at' HH:mm");
-                String datetimeStr = datetime.format(new Date());
-
-                if(!feeling.equals("")) {
-                    Mood newMood;
-
-                    if (reason == null) {
-                        newMood = new Mood(feeling, socialState, datetimeStr);
-                    } else {
-                        newMood = new Mood(feeling, socialState, datetimeStr, reason);
-                    }
-                    moodHistory.add(0, newMood); //inserts new mood at the beginning of list
-                    moodHistoryAdapter.notifyDataSetChanged();
-                    user.setMoodHistory(moodHistory);
-                    userRef.set(user);  // save to db
-
-                    feeling = "";
-                    socialState = "";
-                    dialog.dismiss();   //closes the pop up window
-
-                } else if (feeling.equals("")) {
-                    Toast.makeText(dialog.getContext(), "Please select how you feel", Toast.LENGTH_LONG).show();
-                }
-            }
-        });
-
-        Button clearEventBtn = dialog.findViewById(R.id.clearMoodEvent);
-        clearEventBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                dialog.dismiss();
-            }
-        });
-
-        dialog.show();
-    }
-
-
-    @Override
-    public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-        if(adapterView.getId() == R.id.feelingSpinner)
-            feeling = adapterView.getItemAtPosition(i).toString();
-        else if(adapterView.getId() == R.id.socialStateSpinner)
-            socialState = adapterView.getItemAtPosition(i).toString();
-
-    }
-
-    @Override
-    public void onNothingSelected(AdapterView<?> adapterView) {
-
-    }
 }
