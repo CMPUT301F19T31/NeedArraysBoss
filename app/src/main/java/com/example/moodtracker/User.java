@@ -6,7 +6,7 @@ import java.util.ArrayList;
 
 public class User {
 
-    private String userID, email, password, phone;
+    private String userID, email, password, phone, id;
     private ArrayList<Mood> moodHistory = new ArrayList<>();
     private String imageurl;
     private ArrayList<String> friendList = new ArrayList<>();

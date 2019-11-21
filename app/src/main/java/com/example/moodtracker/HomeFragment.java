@@ -38,6 +38,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
@@ -222,7 +223,7 @@ public class HomeFragment extends Fragment implements AdapterView.OnItemSelected
                         if (task.isSuccessful()) {
                             // Sign in success, update UI with the signed-in user's information
                             Log.d(TAG, "signInWithEmail:success");
-                            moodEventsDR = db.getReference("moodEvents");
+                            //moodEventsDR = db.getReference("moodEvents");
                             loadDataFromDB();
                         } else {
                             // If sign in fails, display a message to the user.
