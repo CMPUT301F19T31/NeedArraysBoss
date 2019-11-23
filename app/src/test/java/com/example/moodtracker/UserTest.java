@@ -11,12 +11,12 @@ class UserTest {
 
     private User mockUser() {
         ArrayList<Mood> moodList = new ArrayList<Mood>();
-        User user = new User("1", "user@mymail.com", "abc123", moodList, "http://imgsvr.com/images/portrait.jpg", "0000000000", "1");
+        User user = new User("1", "user@mymail.com", "abc123", moodList, "http://imgsvr.com/images/portrait.jpg", "0000000000");
         return user;
     }
 
     private Mood mockMood() {
-        Mood mood = new Mood("happy", "alone", "05/29/2015 05:50", "Weekend");
+        Mood mood = new Mood("happy", "alone", 1, "Weekend");
         return mood;
     }
 
@@ -37,6 +37,10 @@ class UserTest {
         // Replace empty ArrayList with null
         assertEquals(null, user.getMoodHistory());
     }
+
+
+    // Removed Functions
+    /*
 
     @Test
     void testAddMood() {
@@ -86,4 +90,7 @@ class UserTest {
         assertEquals(1, moodHistory.size());
         assertEquals("feeling sad\nbecause Monday\nwas alone on 05/31/2015 05:50", moodHistory.get(0).toString());
     }
+
+
+     */
 }
