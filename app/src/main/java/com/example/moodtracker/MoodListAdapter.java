@@ -115,7 +115,7 @@ public class MoodListAdapter extends RecyclerView.Adapter<MoodListAdapter.MoodVH
         holder.socialState.setText(mood.getSocialState());
         if(mood.getFriend() != null)
             holder.username.setText(mood.getFriend());
-        holder.time.setText("Posted " + mood.getDate_time());
+        holder.time.setText("Posted " + mood.getTimeAgo());
 
         holder.rl.setBackgroundResource(moodColors.get(mood.getFeeling()));
     }

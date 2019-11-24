@@ -60,23 +60,6 @@ public class NotificationsFragment extends Fragment {
         return root;
     }
 
-    @Override
-    public void onStart() {
-        super.onStart();
-        onResume();
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-
-        mAuth = FirebaseAuth.getInstance();
-        if(mAuth.getCurrentUser() == null) { return; }
-
-
-
-
-    }
 
     public void getFriendList() {
         FirebaseFirestore.getInstance().collection("users")

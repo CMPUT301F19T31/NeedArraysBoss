@@ -58,8 +58,9 @@ public class Mood {
         return geo_point;
     }
     public String getFriend() { return friend; }
+    public long getDate_time() {  return date_time; }
 
-    public String getDate_time() {
+    public String getTimeAgo() {
         int second = 1000;
         int minute = 60 * second;
         int hour = 60 * minute;
@@ -92,8 +93,6 @@ public class Mood {
     public void setFeeling(String feeling) { this.feeling = feeling; }
     public void setSocialState(String socialState) { this.socialState = socialState; }
     public void setReason(String reason) { this.reason = reason; }
-    public void setGeo_point(GeoPoint geo_point) {
-        this.geo_point = geo_point;
-    }
+    public void setGeo_point(GeoPoint geo_point) { this.geo_point = geo_point; }
     public void setFriend(String friend) { this.friend = friend; }
 }
