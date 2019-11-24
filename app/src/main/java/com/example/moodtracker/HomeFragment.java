@@ -15,6 +15,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.Spinner;
 import android.widget.Toast;
@@ -233,9 +234,15 @@ public class HomeFragment extends Fragment implements AdapterView.OnItemSelected
         dialog.setContentView(R.layout.add_mood_event); //opens the pop window
 
         Spinner feelingSpinner = (Spinner) dialog.findViewById(R.id.feelingSpinner);
+        ArrayAdapter<CharSequence> adapter1 = ArrayAdapter.createFromResource(getContext(), R.array.feelings, R.layout.spinner_item);
+        adapter1.setDropDownViewResource(android.R.layout.simple_list_item_1);
+        feelingSpinner.setAdapter(adapter1);
         feelingSpinner.setOnItemSelectedListener(this);
 
         Spinner socialStateSpinner = (Spinner) dialog.findViewById(R.id.socialStateSpinner);
+        ArrayAdapter<CharSequence> adapter2 = ArrayAdapter.createFromResource(getContext(), R.array.socialStates, R.layout.spinner_item);
+        adapter2.setDropDownViewResource(android.R.layout.simple_list_item_1);
+        socialStateSpinner.setAdapter(adapter2);
         socialStateSpinner.setOnItemSelectedListener(this);
 
         Button addEventBtn = dialog.findViewById(R.id.addMoodEvent);
