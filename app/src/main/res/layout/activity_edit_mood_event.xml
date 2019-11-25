@@ -17,6 +17,7 @@
         android:layout_marginBottom="16dp"
         android:text="@string/editMood"
         android:textAppearance="@style/TextAppearance.AppCompat.Display1"
+        android:textStyle="bold"
         android:textColor="@color/white"/>
 
     <TextView
@@ -42,13 +43,13 @@
         android:textSize="20sp"/>
 
     <Spinner
+        android:id="@+id/editMoodFeelingSpinner"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/editMoodFeelingSpinner"
-        android:entries="@array/feelings"
         android:layout_below="@id/editMoodTitle"
-        android:layout_toRightOf="@id/feelingTV2"
-        android:layout_marginTop="16dp"/>
+        android:layout_marginTop="16dp"
+        android:layout_marginLeft="5dp"
+        android:layout_toRightOf="@id/feelingTV2" />
 
     <TextView
         android:layout_width="wrap_content"
@@ -82,8 +83,7 @@
         android:layout_height="wrap_content"
         android:id="@+id/socialStateSpinner2"
         android:layout_below="@id/reasonTV2"
-        android:layout_margin="16dp"
-        android:entries="@array/socialStates"/>
+        android:layout_margin="16dp"/>
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:layout_width="match_parent"

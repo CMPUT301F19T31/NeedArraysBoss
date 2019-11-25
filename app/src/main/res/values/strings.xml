@@ -1,4 +1,5 @@
 <resources>
+    <string name="google_maps_api_key">AIzaSyDH4EllWhYVhff2lzFoa8BIt-2hzfRsZSc</string>
     <string name="app_name">MoodTracker</string>
     <string name="title_home">Home</string>
     <string name="title_dashboard">Dashboard</string>

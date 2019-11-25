@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 import android.widget.Toast;
 
@@ -53,40 +54,31 @@ public class EditMoodEvent extends AppCompatActivity implements AdapterView.OnIt
         EmojiCompat.init(config);
 
         et = findViewById(R.id.reasonET2);
+
         feelingSpinner = findViewById(R.id.editMoodFeelingSpinner);
+        ArrayAdapter<CharSequence> adapter1 = ArrayAdapter.createFromResource(this, R.array.feelings, R.layout.spinner_item);
+        adapter1.setDropDownViewResource(android.R.layout.simple_list_item_1);
+        feelingSpinner.setAdapter(adapter1);
         feelingSpinner.setOnItemSelectedListener(this);
+
         socialStateSpinner = findViewById(R.id.socialStateSpinner2);
+        ArrayAdapter<CharSequence> adapter2 = ArrayAdapter.createFromResource(this, R.array.socialStates, R.layout.spinner_item);
+        adapter2.setDropDownViewResource(android.R.layout.simple_list_item_1);
+        socialStateSpinner.setAdapter(adapter2);
         socialStateSpinner.setOnItemSelectedListener(this);
+
         index = getIntent().getExtras().getInt("index");
         initializeArrays();
 
         //load data from DB
         mAuth = FirebaseAuth.getInstance();
-        signIn();
-
-    }
-
-    public void signIn() {
-        mAuth.signInWithEmailAndPassword("ahnafon3@gmail.com", "123456")
-                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        if (task.isSuccessful()) {
-                            // Sign in success, update UI with the signed-in user's information
-                            Log.d("sample", "signInWithEmail:success");
-                            docRef = FirebaseFirestore.getInstance().collection("users").document("user"+mAuth.getCurrentUser().getEmail());
-                            loadDataFromDB();
-                        } else {
-                            // If sign in fails, display a message to the user.
-                            Log.w("sample", "signInWithEmail:failure", task.getException());
-                            Toast.makeText(getApplicationContext(), "Authentication failed.",
-                                    Toast.LENGTH_SHORT).show();
-                        }
-                    }
-                });
+        loadDataFromDB();
     }
 
     public void loadDataFromDB() {
+        mAuth = FirebaseAuth.getInstance();
+        docRef = FirebaseFirestore.getInstance().collection("users").document("user"+mAuth.getCurrentUser().getEmail());
+
         docRef.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
             @Override
             public void onSuccess(DocumentSnapshot documentSnapshot) {
@@ -95,8 +87,8 @@ public class EditMoodEvent extends AppCompatActivity implements AdapterView.OnIt
 
                 //initialise spinners and edittexts
                 et.setText(mood.getReason());
-                feelingSpinner.setSelection(moods.indexOf(mood.getFeeling() + 1));
-                socialStateSpinner.setSelection(moods.indexOf(mood.getSocialState() + 1));
+                feelingSpinner.setSelection(moods.indexOf(mood.getFeeling())+1);
+                socialStateSpinner.setSelection(socialStates.indexOf(mood.getSocialState())+1);
             }
         });
     }
@@ -124,9 +116,6 @@ public class EditMoodEvent extends AppCompatActivity implements AdapterView.OnIt
 
     public void editMoodEvent(View v) {
         boolean change = false;
-
-        feelingSpinner.setOnItemSelectedListener(this);
-        socialStateSpinner.setOnItemSelectedListener(this);
         String reason = et.getText().toString();
 
         if(!feeling.equals("")) {
