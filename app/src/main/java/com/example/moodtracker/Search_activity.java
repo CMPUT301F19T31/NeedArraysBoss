@@ -35,9 +35,14 @@ public class Search_activity extends AppCompatActivity {
 
         mySearchView = (SearchView) findViewById(R.id.searchView);
         myList = (ListView) findViewById((R.id.myList));
+        list = new ArrayList<String>();
 
         mAuth = FirebaseAuth.getInstance();
         collectionReference = null;
+
+        //list.add("hello");
+        //list.add("good morning");
+
 
     }
 
@@ -51,18 +56,37 @@ public class Search_activity extends AppCompatActivity {
                     @Override
                     public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
                         List<DocumentSnapshot> data = queryDocumentSnapshots.getDocuments();
-                        ///Toast.makeText(getContext(),Integer.toString(data.size()),Toast.LENGTH_SHORT).show();
+                        //Toast.makeText(getContext(),Integer.toString(data.size()),Toast.LENGTH_SHORT).show();
                         for (int i = 0; i < data.size(); i++) {
 
-                            list.addAll(data);
+                            //list.addAll(data);
+                            list.add(data.get(i).toObject(User.class).getUserID());
                             //list.add(data.get(i).toObject(User.class));
                             //Toast.makeText(getActivity(), "", Toast.LENGTH_SHORT).show();
                         }
+
                         //Toast.makeText(getActivity(), myList.get(0).getEmail(), Toast.LENGTH_SHORT).show();
                         //userAdapter.notifyDataSetChanged();
                     }
                 });
             }
+            adapter=new ArrayAdapter<>(this, android.R.layout.simple_list_item_1,list);
+            myList.setAdapter(adapter);
+
+            mySearchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+                @Override
+                public boolean onQueryTextSubmit(String s) {
+                    return false;
+                }
+
+                @Override
+                public boolean onQueryTextChange(String s) {
+
+                    adapter.getFilter().filter(s);
+                    return false;
+                }
+            });
         }
+
 
 }

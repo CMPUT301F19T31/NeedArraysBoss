@@ -71,8 +71,8 @@ public class HomeFragment extends Fragment implements AdapterView.OnItemSelected
     private User user;
     private FloatingActionButton actn_btn;
     private FloatingActionButton btnMap;
-    //private FloatingActionButton button_search;
-    Button button_search;
+    private FloatingActionButton button_search;
+    //Button button_search;
 
     //private static final String TAG = "HomeFragment";
     private boolean mLocationPermissionGranted = false;
@@ -100,7 +100,7 @@ public class HomeFragment extends Fragment implements AdapterView.OnItemSelected
         dialog = new Dialog(getContext());
         moodHistory = new ArrayList<Mood>();
         actn_btn = root.findViewById(R.id.addMoodEvent);
-        button_search=(Button) root.findViewById(R.id.search);
+        button_search= root.findViewById(R.id.search);
         actn_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
