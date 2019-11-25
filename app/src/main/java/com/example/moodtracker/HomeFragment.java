@@ -71,6 +71,8 @@ public class HomeFragment extends Fragment implements AdapterView.OnItemSelected
     private User user;
     private FloatingActionButton actn_btn;
     private FloatingActionButton btnMap;
+    //private FloatingActionButton button_search;
+    Button button_search;
 
     //private static final String TAG = "HomeFragment";
     private boolean mLocationPermissionGranted = false;
@@ -79,6 +81,7 @@ public class HomeFragment extends Fragment implements AdapterView.OnItemSelected
     public static final int PERMISSIONS_REQUEST_ENABLE_GPS = 9003;
     private FusedLocationProviderClient mFusedLocationClient;
     private UserLocation mUserLocation;
+
 
 
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -92,15 +95,26 @@ public class HomeFragment extends Fragment implements AdapterView.OnItemSelected
         //mFusedLocationClient = LocationServices.getFusedLocationProviderClient(getActivity());
 
         //init();
-
+        //private Button button_search;
+        //Button button_search=root.findViewById(R.id.search);
         dialog = new Dialog(getContext());
         moodHistory = new ArrayList<Mood>();
         actn_btn = root.findViewById(R.id.addMoodEvent);
-
+        button_search=(Button) root.findViewById(R.id.search);
         actn_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 createMoodEvent(v);
+            }
+        });
+
+        button_search.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                Intent intent = new Intent(getActivity(), Search_activity.class);
+
+                startActivity(intent);
             }
         });
 
@@ -126,6 +140,8 @@ public class HomeFragment extends Fragment implements AdapterView.OnItemSelected
             }
         });
          */
+
+
 
         btnMap = root.findViewById(R.id.btnMap);
         init();
@@ -180,6 +196,7 @@ public class HomeFragment extends Fragment implements AdapterView.OnItemSelected
         return root;
     }
 
+
     @Override
     public void onStart() {
         super.onStart();
@@ -228,6 +245,9 @@ public class HomeFragment extends Fragment implements AdapterView.OnItemSelected
         }
         moodHistoryAdapter.notifyDataSetChanged();
     }
+
+
+
 
     public void createMoodEvent(View view) {
         dialog.setContentView(R.layout.add_mood_event); //opens the pop window
