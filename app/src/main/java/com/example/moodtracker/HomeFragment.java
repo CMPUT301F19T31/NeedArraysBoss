@@ -1,15 +1,20 @@
 package com.example.moodtracker;
 
 import android.Manifest;
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.ImageDecoder;
 import android.location.Location;
 import android.location.LocationManager;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,6 +23,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -49,6 +55,9 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.GeoPoint;
 
+import java.io.ByteArrayOutputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -71,6 +80,7 @@ public class HomeFragment extends Fragment implements AdapterView.OnItemSelected
     private User user;
     private FloatingActionButton actn_btn;
     private FloatingActionButton btnMap;
+    private Bitmap image;
 
     //private static final String TAG = "HomeFragment";
     private boolean mLocationPermissionGranted = false;
@@ -93,6 +103,7 @@ public class HomeFragment extends Fragment implements AdapterView.OnItemSelected
 
         //init();
 
+        image = null;
         dialog = new Dialog(getContext());
         moodHistory = new ArrayList<Mood>();
         actn_btn = root.findViewById(R.id.addMoodEvent);
@@ -255,10 +266,12 @@ public class HomeFragment extends Fragment implements AdapterView.OnItemSelected
                 if(!feeling.equals("")) {
                     Mood newMood;
 
-                    if (reason == null) {
+                    if (reason == null && image == null) {
                         newMood = new Mood(feeling, socialState, System.currentTimeMillis());
-                    } else {
+                    } else if(image == null) {
                         newMood = new Mood(feeling, socialState, System.currentTimeMillis(), reason);
+                    } else {
+                        newMood = new Mood(feeling, socialState, System.currentTimeMillis(), reason, image);
                     }
                     moodHistory.add(0, newMood); //inserts new mood at the beginning of list
                     moodHistoryAdapter.notifyDataSetChanged();
@@ -267,6 +280,7 @@ public class HomeFragment extends Fragment implements AdapterView.OnItemSelected
 
                     feeling = "";
                     socialState = "";
+                    image = null;
                     dialog.dismiss();   //closes the pop up window
 
                 } else if (feeling.equals("")) {
@@ -280,6 +294,14 @@ public class HomeFragment extends Fragment implements AdapterView.OnItemSelected
             @Override
             public void onClick(View view) {
                 dialog.dismiss();
+            }
+        });
+
+        TextView imageTV = dialog.findViewById(R.id.imageTV);
+        imageTV.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivityForResult(new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.INTERNAL_CONTENT_URI), 3);
             }
         });
 
@@ -539,6 +561,7 @@ public class HomeFragment extends Fragment implements AdapterView.OnItemSelected
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         Log.d(TAG, "onActivityResult: called.");
+
         switch (requestCode) {
             case PERMISSIONS_REQUEST_ENABLE_GPS: {
                 if(mLocationPermissionGranted){
@@ -549,6 +572,20 @@ public class HomeFragment extends Fragment implements AdapterView.OnItemSelected
                 }
                 else{
                     getLocationPermission();
+                }
+            }
+            case 3: {
+                if(resultCode == Activity.RESULT_OK && data != null) {
+                    Uri image = data.getData();
+                    try {
+                        this.image = MediaStore.Images.Media.getBitmap(getActivity().getContentResolver(), image);
+                        Toast.makeText(dialog.getContext(), "Image Uploaded", Toast.LENGTH_SHORT).show();
+
+                    } catch (FileNotFoundException e) {
+                        e.printStackTrace();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                 }
             }
         }
