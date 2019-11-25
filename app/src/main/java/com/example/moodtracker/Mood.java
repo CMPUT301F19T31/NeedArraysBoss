@@ -66,6 +66,40 @@ public class Mood {
     public String getFeeling() { return feeling; }
     public String getSocialState() { return socialState; }
     public String getReason() { return reason; }
+    public GeoPoint getGeo_point() {
+        return geo_point;
+    }
+    public String getFriend() { return friend; }
+    public long getDate_time() { return date_time;}
+
+    public String getTimeAgo() {
+        int second = 1000;
+        int minute = 60 * second;
+        int hour = 60 * minute;
+        int day = 24 * hour;
+        int month = 30 * day;
+
+        long diff = System.currentTimeMillis() - date_time;
+        if(diff < second)
+            return "just now";
+        else if(diff < 2*minute)
+            return "a min ago";
+        else if (diff < hour)
+            return (diff/minute) + " minutes ago";
+        else if (diff < 2*hour)
+            return "an hour ago";
+        else if (diff < day)
+            return (diff/hour) + " hours ago";
+        else if (diff < 2*day)
+            return "a day ago";
+        else if (diff < month)
+            return (diff/day) + " days ago";
+        else if(diff < 2*month)
+            return "a month ago";
+        else
+            return (diff/month) + " months ago";
+
+    }
 
     //setters
     public void setFeeling(String feeling) { this.feeling = feeling; }
