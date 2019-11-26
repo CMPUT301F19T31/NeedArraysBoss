@@ -248,7 +248,7 @@ public class HomeFragment extends Fragment implements AdapterView.OnItemSelected
 
 
     public void createMoodEvent(View view) {
-        dialog.setContentView(R.layout.add_mood_event); //opens the pop window
+        dialog.setContentView(R.layout.add_mood_event);
 
         Spinner feelingSpinner = (Spinner) dialog.findViewById(R.id.feelingSpinner);
         ArrayAdapter<CharSequence> adapter1 = ArrayAdapter.createFromResource(getContext(), R.array.feelings, R.layout.spinner_item);
@@ -311,7 +311,7 @@ public class HomeFragment extends Fragment implements AdapterView.OnItemSelected
             }
         });
 
-        dialog.show();
+        dialog.show();  //opens the pop window
     }
 
 

@@ -143,7 +143,7 @@ public class UserMoods extends Fragment implements AdapterView.OnItemSelectedLis
 
 
     public void createMoodEvent(View view) {
-        dialog.setContentView(R.layout.add_mood_event); //opens the pop window
+        dialog.setContentView(R.layout.add_mood_event);
 
         Spinner feelingSpinner = (Spinner) dialog.findViewById(R.id.feelingSpinner);
         ArrayAdapter<CharSequence> adapter1 = ArrayAdapter.createFromResource(getContext(), R.array.feelings, R.layout.spinner_item);
@@ -164,12 +164,12 @@ public class UserMoods extends Fragment implements AdapterView.OnItemSelectedLis
                 EmojiEditText et = dialog.findViewById(R.id.reasonET);
                 String reason = et.getText().toString();
 
-                if (!feeling.equals("")) {
+                if(!feeling.equals("")) {
                     Mood newMood;
 
                     if (reason == null && image == null) {
                         newMood = new Mood(feeling, socialState, System.currentTimeMillis());
-                    } else if (image == null) {
+                    } else if(image == null) {
                         newMood = new Mood(feeling, socialState, System.currentTimeMillis(), reason);
                     } else {
                         newMood = new Mood(feeling, socialState, System.currentTimeMillis(), reason, image);
@@ -206,7 +206,7 @@ public class UserMoods extends Fragment implements AdapterView.OnItemSelectedLis
             }
         });
 
-        dialog.show();
+        dialog.show();  //opens the pop window
     }
 
 
