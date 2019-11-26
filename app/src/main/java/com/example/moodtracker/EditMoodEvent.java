@@ -5,6 +5,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.Toast;
 
@@ -33,6 +34,7 @@ public class EditMoodEvent extends AppCompatActivity implements AdapterView.OnIt
 
     private EmojiEditText et;
     private Spinner feelingSpinner, socialStateSpinner;
+    private ImageView imageView;
     private int index;      // holds the index of the event in the db that is being edited
     private String feeling = "", socialState = "";
 
@@ -54,6 +56,7 @@ public class EditMoodEvent extends AppCompatActivity implements AdapterView.OnIt
         EmojiCompat.init(config);
 
         et = findViewById(R.id.reasonET2);
+        imageView = findViewById(R.id.moodImage);
 
         feelingSpinner = findViewById(R.id.editMoodFeelingSpinner);
         ArrayAdapter<CharSequence> adapter1 = ArrayAdapter.createFromResource(this, R.array.feelings, R.layout.spinner_item);
@@ -87,8 +90,10 @@ public class EditMoodEvent extends AppCompatActivity implements AdapterView.OnIt
 
                 //initialise spinners and edittexts
                 et.setText(mood.getReason());
+                imageView.setImageBitmap(mood.getImg());
                 feelingSpinner.setSelection(moods.indexOf(mood.getFeeling())+1);
                 socialStateSpinner.setSelection(socialStates.indexOf(mood.getSocialState())+1);
+
             }
         });
     }

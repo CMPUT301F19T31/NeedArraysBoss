@@ -85,30 +85,69 @@
         android:layout_below="@id/reasonTV2"
         android:layout_margin="16dp"/>
 
-    <androidx.coordinatorlayout.widget.CoordinatorLayout
+    <CheckBox
+        android:id="@+id/locationCB2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:layout_alignParentRight="true"
+        android:layout_below="@id/socialStateSpinner2" />
+
+    <TextView
+        android:id="@+id/locationTV2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/locationTV"
+        android:textSize="17sp"
+        android:textColor="@color/white"
+        android:textStyle="italic"
+        android:layout_marginTop="18dp"
+        android:layout_toLeftOf="@id/locationCB2"
+        android:layout_below="@id/socialStateSpinner2"/>
+
+    <TextView
+        android:id="@+id/imageTV2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/imageTV"
+        android:textColor="@color/white"
+        android:textSize="17sp"
+        android:padding="5dp"
+        android:background="@color/appBackgroundAccent"
+        android:layout_margin="16dp"
+        android:layout_below="@id/socialStateSpinner2"/>
+
+    <ImageView
+        android:id="@+id/moodImage"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true">
+        android:layout_marginTop="16dp"
+        android:layout_marginLeft="50dp"
+        android:layout_marginRight="50dp"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@id/locationCB2"/>
 
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/deleteEntryBtn"
-            android:text="@string/deleteEntryBtn"
-            android:backgroundTint="@color/white"
-            android:layout_margin="16dp"
-            android:onClick="deleteMood"/>
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/deleteEntryBtn"
+        android:text="@string/deleteEntryBtn"
+        android:backgroundTint="@color/white"
+        android:layout_margin="16dp"
+        android:onClick="deleteMood"
+        android:layout_alignParentBottom="true"/>
 
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/editEntryBtn"
-            android:text="@string/editEntryBtn"
-            android:layout_margin="16dp"
-            android:layout_gravity="right"
-            android:backgroundTint="@color/white"
-            android:onClick="editMoodEvent"/>
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/editEntryBtn"
+        android:text="@string/editEntryBtn"
+        android:layout_margin="16dp"
+        android:layout_gravity="right"
+        android:backgroundTint="@color/white"
+        android:onClick="editMoodEvent"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"/>
 
-    </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
 </RelativeLayout>
