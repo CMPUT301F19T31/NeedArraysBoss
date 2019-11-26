@@ -24,7 +24,7 @@ TextView textView, tv;
         tv=findViewById(R.id.emailaddress);
         tv.setText(getIntent().getStringExtra("email"));
 
-        
+        String text=tv.getText().toString();
 
         testButton.setOnClickListener(new View.OnClickListener() {
             @Override
