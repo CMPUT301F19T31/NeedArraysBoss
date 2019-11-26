@@ -83,7 +83,7 @@ public class MainActivity extends AppCompatActivity {
                     fragment = new NotificationsFragment();
                     loadFragment(fragment);
                     return true;
-                }
+            }
             return false;
         }
     };
@@ -95,7 +95,6 @@ public class MainActivity extends AppCompatActivity {
         transaction.addToBackStack(null);
         transaction.commit();
     }
-}
 
     /*
     private void getUserDetails(){
