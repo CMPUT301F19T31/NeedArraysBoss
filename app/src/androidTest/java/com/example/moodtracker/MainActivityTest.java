@@ -55,7 +55,6 @@ public class MainActivityTest {
 
     @Test
     public void checkAddMood(){
-        /*
         // Asserts that the current activity is the MainActivity. Otherwise, show “Wrong Activity”
         solo.assertCurrentActivity("Wrong Activity", MainActivity.class);
         solo.clickOnActionBarHomeButton();
@@ -67,7 +66,6 @@ public class MainActivityTest {
         solo.clickOnButton("Add Event"); //Click ADD EVENT Button
         assertTrue(solo.waitForText("UITest1", 1, 2000));
         //Cleanup
-         */
         solo.clickInRecyclerView(0);
         solo.clickOnButton("Delete Event"); //Click DELETE EVENT Button
     }
