@@ -2,6 +2,7 @@ package com.example.moodtracker;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -11,6 +12,11 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -22,11 +28,12 @@ import com.google.firebase.firestore.FirebaseFirestore;
 
 public class Login extends AppCompatActivity {
     EditText email, password;
-    Button SignIn;
+    Button SignIn, GoogleSign;
     TextView TextSignIn;
     FirebaseAuth mFirebaseAuth;
     DocumentReference userRef;
     String TAG = "Login";
+
 
 
     @Override
@@ -41,25 +48,24 @@ public class Login extends AppCompatActivity {
         SignIn = findViewById(R.id.loginBtn);
         TextSignIn = findViewById(R.id.textView);
 
+
+
     }
 
 
-    public void signInUser (View v) {
+    public void signInUser(View v) {
         final String emailID = email.getText().toString();
         final String pwd = password.getText().toString();
-        if(emailID.isEmpty()){
+        if (emailID.isEmpty()) {
             email.setError("Please enter email");
             email.requestFocus();
-        }
-        else if (pwd.isEmpty()){
+        } else if (pwd.isEmpty()) {
             password.setError("Please enter your password");
             password.requestFocus();
-        }
-        else if (emailID.isEmpty() && pwd.isEmpty()){
+        } else if (emailID.isEmpty() && pwd.isEmpty()) {
             Toast.makeText(Login.this, "Fields Are Empty!", Toast.LENGTH_LONG);
-        }
-        else {
-            mFirebaseAuth.signInWithEmailAndPassword(emailID,pwd)
+        } else {
+            mFirebaseAuth.signInWithEmailAndPassword(emailID, pwd)
                     .addOnSuccessListener(Login.this, new OnSuccessListener<AuthResult>() {
                         @Override
                         public void onSuccess(AuthResult authResult) {
@@ -81,7 +87,17 @@ public class Login extends AppCompatActivity {
     }
 
     public void createUser(View v) {
-        Intent i = new Intent(Login.this,SignUpActivity.class);
+        Intent i = new Intent(Login.this, SignUpActivity.class);
         startActivity(i);
     }
 }
+
+/*
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+        GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(this);
+    }
+}*/

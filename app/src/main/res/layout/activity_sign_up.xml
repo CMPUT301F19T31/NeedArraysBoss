@@ -62,25 +62,12 @@
         android:layout_margin="8dp"
         android:gravity="center"/>
 
-    <EditText
-        android:id="@+id/phone"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:layout_below="@id/signupemail"
-        android:ems="10"
-        android:hint="Phone No."
-        android:inputType="phone"
-        android:textColor="@color/white"
-        android:textColorHint="@color/white"
-        android:layout_margin="8dp"
-        android:gravity="center"/>
 
     <Button
         android:id="@+id/signup"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/phone"
+        android:layout_below="@id/signupemail"
         android:layout_centerHorizontal="true"
         android:backgroundTint="@color/cardview_shadow_end_color"
         android:text="Sign Up"
@@ -98,4 +85,13 @@
         android:textColor="@color/white"
         android:onClick="cancel"
         android:layout_margin="24dp"/>
+
+    <com.google.android.gms.common.SignInButton
+        android:id="@+id/sign_in_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/textView2"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="25dp" />
+
 </RelativeLayout>

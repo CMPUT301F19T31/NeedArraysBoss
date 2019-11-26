@@ -1,7 +1,9 @@
 package com.example.moodtracker;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -11,6 +13,11 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -28,12 +35,14 @@ import java.util.ArrayList;
 public class SignUpActivity extends AppCompatActivity {
     EditText username, password, repassword, email, phone;
     String uname, emailID, pwd;
-    Button SignUp;
+    Button SignUp, GoogleSign;
     TextView TextSignUp;
     FirebaseAuth mFirebaseAuth;
-    String TAG = "";
+    String TAG = "Error";
     private FirebaseAuth.AuthStateListener mAuthStateListener;
     private ArrayList<User> users;
+    GoogleSignInClient mGoogleSignInClient;
+    int RC_SIGN_IN = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,18 +55,80 @@ public class SignUpActivity extends AppCompatActivity {
         email = findViewById(R.id.signupemail);
         password = findViewById(R.id.signuppassword);
         repassword = findViewById(R.id.confirmpword);
-        phone = findViewById(R.id.phone);
         SignUp = findViewById(R.id.signup);
         TextSignUp = findViewById(R.id.textView2);
 
+        GoogleSign = findViewById(R.id.sign_in_button);
+
+        GoogleSign.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                switch (v.getId()) {
+                    case R.id.sign_in_button:
+                        signIn();
+                        break;
+
+                }
+            }
+        });
+
+
+        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestEmail()
+                .build();
+        mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
+
     }
+
+
+    private void signIn() {
+        Intent signInIntent = mGoogleSignInClient.getSignInIntent();
+        startActivityForResult(signInIntent, RC_SIGN_IN);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        // Result returned from launching the Intent from GoogleSignInClient.getSignInIntent(...);
+        if (requestCode == RC_SIGN_IN) {
+            // The Task returned from this call is always completed, no need to attach
+            // a listener.
+            Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
+            handleSignInResult(task);
+        }
+    }
+
+    private void handleSignInResult(Task<GoogleSignInAccount> completedTask) {
+        try {
+            GoogleSignInAccount account = completedTask.getResult(ApiException.class);
+
+            // Signed in successfully, show authenticated UI.
+
+            GoogleSignInAccount acct = GoogleSignIn.getLastSignedInAccount(this);
+            if (acct != null) {
+                username.setText(acct.getDisplayName());
+                email.setText(acct.getEmail());
+                //String personId = acct.getId();
+                //Uri personPhoto = acct.getPhotoUrl();
+                commitUser();
+            }
+
+
+        } catch (ApiException e) {
+            // The ApiException status code indicates the detailed failure reason.
+            // Please refer to the GoogleSignInStatusCodes class reference for more information.
+            Log.w(TAG, "signInResult:failed code=" + e.getStatusCode());
+        }
+    }
+
+
 
     public void signUpUser(View v) {
         uname = username.getText().toString();
         emailID = email.getText().toString();
         pwd = password.getText().toString();
         String repwd = repassword.getText().toString();
-        String pno = phone.getText().toString();
 
         if (uname.isEmpty()) {
             password.setError("Please enter your username");
@@ -75,14 +146,11 @@ public class SignUpActivity extends AppCompatActivity {
             password.setError("Please re-enter your password ");
             password.requestFocus();
         }
-        else if (pno.isEmpty()) {
-            password.setError("Please enter your password");
-            password.requestFocus();
-        }
-        else if (emailID.isEmpty() && pwd.isEmpty() && uname.isEmpty() && repwd.isEmpty() && pno.isEmpty()){
+
+        else if (emailID.isEmpty() && pwd.isEmpty() && uname.isEmpty() && repwd.isEmpty()){
             Toast.makeText(SignUpActivity.this, "Fields Are Empty!", Toast.LENGTH_LONG);
         }
-        else if(!(emailID.isEmpty() && pwd.isEmpty() && uname.isEmpty() && repwd.isEmpty() && pno.isEmpty())){
+        else if(!(emailID.isEmpty() && pwd.isEmpty() && uname.isEmpty() && repwd.isEmpty())){
             if(mFirebaseAuth.getCurrentUser() != null) {
                 commitUser();
             }
