@@ -35,8 +35,7 @@
         android:layout_gravity="start|bottom"
         android:layout_margin="16dp"
         android:clickable="true"
-        app:srcCompat="@android:drawable/ic_dialog_map"
-        app:useCompatPadding="false"
+        android:src="@android:drawable/ic_dialog_map"
         android:focusable="true" />
 
 

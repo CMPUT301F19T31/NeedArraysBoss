@@ -33,6 +33,7 @@ public class MoodListAdapter extends RecyclerView.Adapter<MoodListAdapter.MoodVH
         RelativeLayout rl;
         EmojiTextView feeling, reason;
         TextView socialState;
+        TextView username, time;
 
         public MoodVH(@NonNull View itemView, final OnItemClickListener listener) {
             super(itemView);
@@ -41,6 +42,8 @@ public class MoodListAdapter extends RecyclerView.Adapter<MoodListAdapter.MoodVH
             feeling = itemView.findViewById(R.id.feelingVH);
             reason = itemView.findViewById(R.id.reasonVH);
             socialState = itemView.findViewById(R.id.socialStateVH);
+            username = itemView.findViewById(R.id.currentUserTV);
+            time = itemView.findViewById(R.id.timeTV);
 
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -57,6 +60,7 @@ public class MoodListAdapter extends RecyclerView.Adapter<MoodListAdapter.MoodVH
 
     public MoodListAdapter(ArrayList<Mood> moodHistory) {
         this.moodHistory = moodHistory;
+        initArrays();
     }
 
     public void initArrays() {
@@ -105,11 +109,14 @@ public class MoodListAdapter extends RecyclerView.Adapter<MoodListAdapter.MoodVH
     @Override
     public void onBindViewHolder(@NonNull MoodVH holder, int position) {
         Mood mood = moodHistory.get(position);
-        initArrays();
 
         holder.feeling.setText(mood.getFeeling() + " " + moodEmojis.get(mood.getFeeling()));
         holder.reason.setText(mood.getReason());
         holder.socialState.setText(mood.getSocialState());
+        if(mood.getFriend() != null)
+            holder.username.setText(mood.getFriend());
+        holder.time.setText("Posted " + mood.getTimeAgo());
+
         holder.rl.setBackgroundResource(moodColors.get(mood.getFeeling()));
     }
 
