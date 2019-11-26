@@ -17,6 +17,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -33,9 +34,10 @@ import com.google.firebase.firestore.QuerySnapshot;
 import java.util.ArrayList;
 
 public class SignUpActivity extends AppCompatActivity {
-    EditText username, password, repassword, email, phone;
+    EditText username, password, repassword, email;
     String uname, emailID, pwd;
-    Button SignUp, GoogleSign;
+    Button SignUp;
+    SignInButton GoogleSign;
     TextView TextSignUp;
     FirebaseAuth mFirebaseAuth;
     String TAG = "Error";
@@ -107,7 +109,7 @@ public class SignUpActivity extends AppCompatActivity {
 
             GoogleSignInAccount acct = GoogleSignIn.getLastSignedInAccount(this);
             if (acct != null) {
-                username.setText(acct.getDisplayName());
+                username.setText(acct.getId());
                 email.setText(acct.getEmail());
                 //String personId = acct.getId();
                 //Uri personPhoto = acct.getPhotoUrl();
