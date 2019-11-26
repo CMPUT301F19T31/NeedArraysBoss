@@ -1,6 +1,9 @@
 package com.example.moodtracker;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.SearchView;
@@ -85,8 +88,18 @@ public class Search_activity extends AppCompatActivity {
                     adapter.getFilter().filter(s);
                     return false;
                 }
+
+            });
+
+            myList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                    Intent intent= new Intent(Search_activity.this, search_userdata.class);
+                    startActivity(intent);
+                }
             });
         }
+
 
 
 }
