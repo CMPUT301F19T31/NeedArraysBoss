@@ -131,7 +131,14 @@ public class MoodListAdapter extends RecyclerView.Adapter<MoodListAdapter.MoodVH
         moodEmojis.put("lonely", new String(Character.toChars(0x1F614)));
     }
 
+    /**
+     * This is a helper function that takes the ImageView and image as a string and sets
+     * the image of the ImageView to the image
+     * @param completeImageData the image file represented as a string
+     * @param imageView the view on which the image will be shown
+     */
     public void decodeImage(String completeImageData, ImageView imageView) {
+        if (completeImageData == null) { return; }
 
         // Incase you're storing into aws or other places where we have extension stored in the starting.
         String imageDataBytes = completeImageData.substring(completeImageData.indexOf(",")+1);
