@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.SearchView;
 import android.widget.Toast;
@@ -29,6 +30,7 @@ public class Search_activity extends AppCompatActivity {
     private FirebaseAuth mAuth;
 
     ArrayList<String> list;
+    ArrayList<String> list1;
     ArrayAdapter<String> adapter;
 
     @Override
@@ -39,9 +41,11 @@ public class Search_activity extends AppCompatActivity {
         mySearchView = (SearchView) findViewById(R.id.searchView);
         myList = (ListView) findViewById((R.id.myList));
         list = new ArrayList<String>();
+        list1=new ArrayList<String>();
 
         mAuth = FirebaseAuth.getInstance();
         collectionReference = null;
+
 
         //list.add("hello");
         //list.add("good morning");
@@ -64,6 +68,7 @@ public class Search_activity extends AppCompatActivity {
 
                             //list.addAll(data);
                             list.add(data.get(i).toObject(User.class).getUserID());
+                            list1.add(data.get(i).toObject(User.class).getEmail());
                             //list.add(data.get(i).toObject(User.class));
                             //Toast.makeText(getActivity(), "", Toast.LENGTH_SHORT).show();
                         }
@@ -90,11 +95,15 @@ public class Search_activity extends AppCompatActivity {
                 }
 
             });
-
+            EditText editText;
             myList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+                    String email= list1.get(position);
+                    //String email=username.getE
                     Intent intent= new Intent(Search_activity.this, search_userdata.class);
+                    intent.putExtra("email",email);
                     startActivity(intent);
                 }
             });
