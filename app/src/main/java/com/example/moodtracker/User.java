@@ -27,7 +27,7 @@ public class User {
         imageurl="";
     }
 
-    public void User(String userID,String imageurl, String id, String email, String password) {
+    public User(String userID,String imageurl, String id, String email, String password) {
         this.userID = userID;
         this.imageurl=imageurl;
         this.email = email;
