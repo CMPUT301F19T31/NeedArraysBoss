@@ -70,6 +70,7 @@ public class Mood {
     }
     public String getFriend() { return friend; }
     public long getDate_time() {  return date_time; }
+    public Bitmap getImg() {  return img; }
 
     public String getTimeAgo() {
         int second = 1000;
