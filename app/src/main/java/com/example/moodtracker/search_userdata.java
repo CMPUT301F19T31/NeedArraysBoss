@@ -16,7 +16,7 @@ public class search_userdata extends AppCompatActivity {
 
         final Button testButton = (Button) findViewById(R.id.button1);
         testButton.setTag(1);
-        testButton.setText("Play");
+
         testButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
