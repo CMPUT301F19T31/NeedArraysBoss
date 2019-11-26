@@ -102,6 +102,6 @@ public class User {
 
     public ArrayList<Mood> getMoodHistory() { return moodHistory; }
     public void setMoodHistory(ArrayList<Mood> moods) { moodHistory = moods; }
-    public ArrayList<String> getFriendList() { return friendList; }
+    public ArrayList<String> getFriendList() {  return friendList; }
     public void setFriendList(ArrayList<String> friends) { friendList = friends; }
 }
