@@ -1,57 +1,57 @@
 package com.example.moodtracker;
 
+import android.graphics.Bitmap;
+import android.net.Uri;
+
+import com.google.firebase.firestore.GeoPoint;
+
 /**
  * This is a class that keeps track of a mood
  */
+
 public class Mood {
 
-    private int img;
-    private String feeling, socialState, reason, date_time;
+    private Bitmap img;
+    private String feeling, socialState, reason;
+    private long date_time;
+    private GeoPoint geo_point;
+    private String friend = null;
 
-    /**
-     * This is the constructor including the optional reason argument
-     *  @param feeling
-     *  The mood of the mood event
-     *  @param socialState
-     *  Who the user is with
-     *  @param date_time
-     *  The timestamp
-     */
-    public Mood (String feeling, String socialState, String date_time, String reason) {
+    public Mood (String feeling, String socialState, long date_time, String reason, Bitmap image) {
         this.feeling = feeling;
         this.socialState = socialState;
         this.date_time = date_time;
         this.reason = reason;
+        this.img = image;
     }
 
-    /**
-     * This the constructor with 4 arguments
-     * @param feeling
-     * The mood of the mood event
-     * @param socialState
-     * Who the user is with
-     * @param date_time
-     * The timestamp
-     */
-    public Mood (String feeling, String socialState, String date_time) {
+    public Mood (String feeling, String socialState, long date_time, String reason) {
+        this.feeling = feeling;
+        this.socialState = socialState;
+        this.date_time = date_time;
+        this.reason = reason;
+        this.geo_point=null;
+    }
+
+    public Mood (String feeling, String socialState, long date_time, String reason, GeoPoint geo_point) {
+        this.feeling = feeling;
+        this.socialState = socialState;
+        this.date_time = date_time;
+        this.reason = reason;
+        this.geo_point=geo_point;
+    }
+
+    public Mood (String feeling, String socialState, long date_time) {
         this.feeling = feeling;
         this.socialState = socialState;
         this.date_time = date_time;
         this.reason = "";
+        this.geo_point= null;
     }
-
-    /**
-     * This the no argument constructor
-     */
     public Mood () {
         //do nothing!
     }
 
-    /**
-     * This method converts the mood to a readable string
-     * @return
-     * Returns the readable string
-     */
     public String toString() {
         String text = "feeling " + feeling + "\n";
         if (!reason.equals(""))
@@ -61,7 +61,6 @@ public class Mood {
         return text;
     }
 
-
     //getters
     public String getFeeling() { return feeling; }
     public String getSocialState() { return socialState; }
@@ -70,7 +69,8 @@ public class Mood {
         return geo_point;
     }
     public String getFriend() { return friend; }
-    public long getDate_time() { return date_time;}
+    public long getDate_time() {  return date_time; }
+    public Bitmap getImg() {  return img; }
 
     public String getTimeAgo() {
         int second = 1000;
@@ -105,4 +105,7 @@ public class Mood {
     public void setFeeling(String feeling) { this.feeling = feeling; }
     public void setSocialState(String socialState) { this.socialState = socialState; }
     public void setReason(String reason) { this.reason = reason; }
+    public void setGeo_point(GeoPoint geo_point) { this.geo_point = geo_point; }
+    public void setFriend(String friend) { this.friend = friend; }
+    public void setImg(Bitmap img) { this.img = img; }
 }

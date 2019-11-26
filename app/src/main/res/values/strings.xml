@@ -1,4 +1,5 @@
 <resources>
+    <string name="google_maps_api_key">AIzaSyDH4EllWhYVhff2lzFoa8BIt-2hzfRsZSc</string>
     <string name="app_name">MoodTracker</string>
     <string name="title_home">Home</string>
     <string name="title_dashboard">Dashboard</string>
@@ -14,6 +15,13 @@
     <string name="reasonET2">(reason)</string>
     <string name="because">because </string>
     <string name="socialStateTV">Are you by yourself?</string>
+
+    <string name="imageTV">Upload Image</string>
+    <string name="locationTV">Use Location</string>
+
+    <string name="posts">Posts</string>
+    <string name="following">Following</string>
+    <string name="followers">Folllowers</string>
 
     <string-array name="feelings">
         <item></item>
@@ -37,4 +45,7 @@
         <item>with two or more people</item>
         <item>with a crowd</item>
     </string-array>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

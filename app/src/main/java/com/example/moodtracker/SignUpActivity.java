@@ -1,5 +1,6 @@
 package com.example.moodtracker;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -11,17 +12,28 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QuerySnapshot;
+
+import java.util.ArrayList;
 
 public class SignUpActivity extends AppCompatActivity {
     EditText username, password, repassword, email, phone;
+    String uname, emailID, pwd;
     Button SignUp;
     TextView TextSignUp;
     FirebaseAuth mFirebaseAuth;
     String TAG = "";
     private FirebaseAuth.AuthStateListener mAuthStateListener;
+    private ArrayList<User> users;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,11 +53,12 @@ public class SignUpActivity extends AppCompatActivity {
     }
 
     public void signUpUser(View v) {
-        String uname = username.getText().toString();
-        String emailID = email.getText().toString();
-        String pwd = password.getText().toString();
+        uname = username.getText().toString();
+        emailID = email.getText().toString();
+        pwd = password.getText().toString();
         String repwd = repassword.getText().toString();
         String pno = phone.getText().toString();
+
         if (uname.isEmpty()) {
             password.setError("Please enter your username");
             password.requestFocus();
@@ -70,15 +83,17 @@ public class SignUpActivity extends AppCompatActivity {
             Toast.makeText(SignUpActivity.this, "Fields Are Empty!", Toast.LENGTH_LONG);
         }
         else if(!(emailID.isEmpty() && pwd.isEmpty() && uname.isEmpty() && repwd.isEmpty() && pno.isEmpty())){
+            if(mFirebaseAuth.getCurrentUser() != null) {
+                commitUser();
+            }
+
             mFirebaseAuth.createUserWithEmailAndPassword(emailID, pwd).addOnCompleteListener(SignUpActivity.this, new OnCompleteListener<AuthResult>() {
                 @Override
                 public void onComplete(@NonNull Task<AuthResult> task) {
                     if(!task.isSuccessful()){
-
-                        Toast.makeText(SignUpActivity.this, "SignUp Unsuccessful. Please try again!", Toast.LENGTH_LONG);
-                    }
-                    else {
-                        finish();
+                        Toast.makeText(SignUpActivity.this, "SignUp Unsuccessful.\n Please change your email try again!", Toast.LENGTH_LONG);
+                    } else {
+                        signInUser();
                     }
                 }
             });
@@ -156,8 +171,6 @@ public class SignUpActivity extends AppCompatActivity {
      * @return true if doesnt exist, else false
      */
     public boolean checkUsername() {
-        if(uname.equals(""))
-            return false;
         if(users == null)
             getUsers();
 

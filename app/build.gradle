@@ -4,7 +4,7 @@ android {
     compileSdkVersion 29
     buildToolsVersion "29.0.2"
     defaultConfig {
-    
+
         multiDexEnabled true
         applicationId "com.example.moodtracker"
         minSdkVersion 21
@@ -23,6 +23,16 @@ android {
 }
 
 dependencies {
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.5.2'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.5.2'
+    androidTestImplementation 'com.jayway.android.robotium:robotium-solo:5.6.3'
+    testImplementation 'junit:junit:4.12'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.1'
+    androidTestImplementation 'androidx.test:runner:1.2.0'
+    androidTestImplementation 'androidx.test:rules:1.2.0'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
+
+
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation 'androidx.appcompat:appcompat:1.1.0'
     implementation 'com.google.firebase:firebase-analytics:17.2.1'
@@ -38,6 +48,7 @@ dependencies {
     implementation 'com.google.android.gms:play-services-tasks:17.0.0'
 
     implementation 'com.google.firebase:firebase-database:19.2.0'
+    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test:runner:1.2.0'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
@@ -47,6 +58,17 @@ dependencies {
     implementation 'androidx.navigation:navigation-fragment:2.0.0'
     implementation 'androidx.navigation:navigation-ui:2.0.0'
     implementation 'androidx.lifecycle:lifecycle-extensions:2.0.0'
+
+    implementation 'de.hdodenhof:circleimageview:2.2.0'
+    //implementation 'com.android.support:design:26.1.0'
+
+    //google maps
+    implementation 'com.google.android.gms:play-services-location:17.0.0'
+
+    implementation 'com.google.maps.android:android-maps-utils:0.5'
+
+    //google location
+    implementation 'com.google.android.gms:play-services-maps:17.0.0'
 }
 
 apply plugin: 'com.google.gms.google-services'

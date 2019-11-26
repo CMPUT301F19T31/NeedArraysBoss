@@ -4,25 +4,62 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
+import android.widget.AdapterView;
 
-import androidx.annotation.Nullable;
 import androidx.annotation.NonNull;
+import androidx.emoji.bundled.BundledEmojiCompatConfig;
+import androidx.emoji.text.EmojiCompat;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.Observer;
-import androidx.lifecycle.ViewModelProviders;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.moodtracker.R;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QuerySnapshot;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class NotificationsFragment extends Fragment {
+
+    private FirebaseAuth mAuth;
+    private CollectionReference userRef;
+    private User currentUser;
+    private ArrayList<String> friends;
+
+    private RecyclerView rv;
+    private ArrayList<Mood> friendMoodHistory;
+    private MoodListAdapter friendMoodHistoryAdapter;
+    private RecyclerView.LayoutManager rvLM;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_notifications, container, false);
-        final TextView textView = root.findViewById(R.id.text_notifications);
-        textView.setText("Notification");
+
+        //set up emoji compatibility
+        EmojiCompat.Config config = new BundledEmojiCompatConfig(getContext());
+        EmojiCompat.init(config);
+
+        // initialise variables
+        mAuth = FirebaseAuth.getInstance();
+
+        friends = new ArrayList<>();
+        rv = root.findViewById(R.id.FollowingMoodlist);
+        friendMoodHistory = new ArrayList<>();
+        friendMoodHistoryAdapter = new MoodListAdapter(friendMoodHistory);
+        rvLM = new LinearLayoutManager(getContext());
+        rv.setAdapter(friendMoodHistoryAdapter);
+        rv.setLayoutManager(rvLM);
+
+        getFriendList();
+
         return root;
     }
+
 
     public void getFriendList() {
         FirebaseFirestore.getInstance().collection("users")

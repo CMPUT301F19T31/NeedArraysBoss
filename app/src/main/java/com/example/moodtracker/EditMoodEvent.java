@@ -4,6 +4,8 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.Toast;
 
@@ -14,14 +16,13 @@ import androidx.emoji.text.EmojiCompat;
 import androidx.emoji.widget.EmojiEditText;
 
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
 
@@ -33,24 +34,18 @@ public class EditMoodEvent extends AppCompatActivity implements AdapterView.OnIt
 
     private EmojiEditText et;
     private Spinner feelingSpinner, socialStateSpinner;
+    private ImageView imageView;
     private int index;      // holds the index of the event in the db that is being edited
     private String feeling = "", socialState = "";
 
     private FirebaseAuth mAuth;
-    private FirebaseDatabase db;
-    private DatabaseReference dataRef;
+    private DocumentReference docRef;
     private Mood mood;
-    private ArrayList<Mood> moodHistory;
     private User user;
 
     private ArrayList<String> moods;
     private ArrayList<String> socialStates;
 
-    /**
-     * Used to create the activity
-     * @param  savedInstanceState
-     * The savedInstanceState is a reference to a Bundle object that is passed into the onCreate method of every Android Activity.
-     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -61,70 +56,48 @@ public class EditMoodEvent extends AppCompatActivity implements AdapterView.OnIt
         EmojiCompat.init(config);
 
         et = findViewById(R.id.reasonET2);
+        imageView = findViewById(R.id.moodImage);
+
         feelingSpinner = findViewById(R.id.editMoodFeelingSpinner);
+        ArrayAdapter<CharSequence> adapter1 = ArrayAdapter.createFromResource(this, R.array.feelings, R.layout.spinner_item);
+        adapter1.setDropDownViewResource(android.R.layout.simple_list_item_1);
+        feelingSpinner.setAdapter(adapter1);
         feelingSpinner.setOnItemSelectedListener(this);
+
         socialStateSpinner = findViewById(R.id.socialStateSpinner2);
+        ArrayAdapter<CharSequence> adapter2 = ArrayAdapter.createFromResource(this, R.array.socialStates, R.layout.spinner_item);
+        adapter2.setDropDownViewResource(android.R.layout.simple_list_item_1);
+        socialStateSpinner.setAdapter(adapter2);
         socialStateSpinner.setOnItemSelectedListener(this);
+
         index = getIntent().getExtras().getInt("index");
         initializeArrays();
 
         //load data from DB
         mAuth = FirebaseAuth.getInstance();
-        db = FirebaseDatabase.getInstance();
-        signIn();
-
+        loadDataFromDB();
     }
 
-    /**
-     * Handles sign in for the user
-     */
-    public void signIn() {
-        mAuth.signInWithEmailAndPassword("ahnafon3@gmail.com", "123456")
-                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        if (task.isSuccessful()) {
-                            // Sign in success, update UI with the signed-in user's information
-                            Log.d("sample", "signInWithEmail:success");
-                            dataRef = db.getReference("users").child("user" + mAuth.getCurrentUser().getEmail().replace(".", "*"));
-                            loadDataFromDB();
-                        } else {
-                            // If sign in fails, display a message to the user.
-                            Log.w("sample", "signInWithEmail:failure", task.getException());
-                            Toast.makeText(getApplicationContext(), "Authentication failed.",
-                                    Toast.LENGTH_SHORT).show();
-                        }
-                    }
-                });
-    }
-
-    /**
-     * Loads the userdata from the database
-     */
     public void loadDataFromDB() {
-        dataRef.addValueEventListener(new ValueEventListener() {
+        mAuth = FirebaseAuth.getInstance();
+        docRef = FirebaseFirestore.getInstance().collection("users").document("user"+mAuth.getCurrentUser().getEmail());
+
+        docRef.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
             @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                user = dataSnapshot.getValue(User.class);
-                moodHistory = user.getMoodHistory();
-                mood = moodHistory.get(index);
+            public void onSuccess(DocumentSnapshot documentSnapshot) {
+                user = documentSnapshot.toObject(User.class);
+                mood = user.getMoodHistory().get(index);
 
                 //initialise spinners and edittexts
                 et.setText(mood.getReason());
-                feelingSpinner.setSelection(moods.indexOf(mood.getFeeling() + 1));
-                socialStateSpinner.setSelection(moods.indexOf(mood.getSocialState() + 1));
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
+                imageView.setImageBitmap(mood.getImg());
+                feelingSpinner.setSelection(moods.indexOf(mood.getFeeling())+1);
+                socialStateSpinner.setSelection(socialStates.indexOf(mood.getSocialState())+1);
 
             }
         });
     }
 
-    /**
-     * Initializes the arrays for feelings and social states
-     */
     public void initializeArrays() {
         moods = new ArrayList<>();
         moods.add("happy");
@@ -146,16 +119,8 @@ public class EditMoodEvent extends AppCompatActivity implements AdapterView.OnIt
         socialStates.add("with a crowd");
     }
 
-    /**
-     * This method is called when the user wants to commit the changes made to the mood event
-     * @param  v
-     * A View occupies a rectangular area on the screen and is responsible for drawing and event handling.
-     */
     public void editMoodEvent(View v) {
         boolean change = false;
-
-        feelingSpinner.setOnItemSelectedListener(this);
-        socialStateSpinner.setOnItemSelectedListener(this);
         String reason = et.getText().toString();
 
         if(!feeling.equals("")) {
@@ -173,46 +138,31 @@ public class EditMoodEvent extends AppCompatActivity implements AdapterView.OnIt
             }
 
             if(change) {
-                moodHistory.set(index, mood);
-                user.setMoodHistory(moodHistory);
-                dataRef.setValue(user);
-                finish();
+                user.getMoodHistory().set(index, mood);
+                docRef.set(user).addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        finish();
+                    }
+                });
             }
 
         } else if (feeling.equals(""))
             Toast.makeText(getApplicationContext(), "Please select how you feel", Toast.LENGTH_LONG).show();
     }
 
-    /**
-     * This method is called when the user wants to delete the mood event
-     * @param  v
-     * A View occupies a rectangular area on the screen and is responsible for drawing and event handling.
-     */
     public void deleteMood(View v) {
-        moodHistory.remove(index);
-        user.setMoodHistory(moodHistory);
-        dataRef.setValue(user);
-        finish();
+        user.getMoodHistory().remove(index);
+        docRef.set(user).addOnSuccessListener(new OnSuccessListener<Void>() {
+            @Override
+            public void onSuccess(Void aVoid) {
+                finish();
+            }
+        });
     }
 
-    /**
-     * This method is called when the user does not want to commit the changes made to the mood event
-     * @param  v
-     * A View occupies a rectangular area on the screen and is responsible for drawing and event handling.
-     */
     public void cancel(View v) { finish(); }
 
-    /**
-     * This method handles both drop down menus when editing the mood event
-     * @param  parent
-     * The AdapterView where the selection happened
-     * @param  view
-     * The view within the AdapterView that was clicked
-     * @param  position
-     * The position of the view in the adapter
-     * @param  id
-     * The row id of the item that is selected
-     */
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
         if(parent.getId() == R.id.editMoodFeelingSpinner)
@@ -221,11 +171,6 @@ public class EditMoodEvent extends AppCompatActivity implements AdapterView.OnIt
             socialState = parent.getItemAtPosition(position).toString();
     }
 
-    /**
-     * Default handler for no selection
-     * @param  parent
-     * The AdapterView where the selection happened
-     */
     @Override
     public void onNothingSelected(AdapterView<?> parent) {
 
