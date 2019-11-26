@@ -1,8 +1,12 @@
 package com.example.moodtracker;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.util.Base64;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -10,6 +14,8 @@ import androidx.annotation.NonNull;
 import androidx.emoji.widget.EmojiTextView;
 import androidx.recyclerview.widget.RecyclerView;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -49,6 +55,7 @@ public class MoodListAdapter extends RecyclerView.Adapter<MoodListAdapter.MoodVH
         EmojiTextView feeling, reason;
         TextView socialState;
         TextView username, time;
+        ImageView image;
 
         /**
          * This is the constructor for the view holder class
@@ -66,6 +73,7 @@ public class MoodListAdapter extends RecyclerView.Adapter<MoodListAdapter.MoodVH
             socialState = itemView.findViewById(R.id.socialStateVH);
             username = itemView.findViewById(R.id.currentUserTV);
             time = itemView.findViewById(R.id.timeTV);
+            image = itemView.findViewById(R.id.displayMoodImage);
 
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -123,6 +131,22 @@ public class MoodListAdapter extends RecyclerView.Adapter<MoodListAdapter.MoodVH
         moodEmojis.put("lonely", new String(Character.toChars(0x1F614)));
     }
 
+    /**
+     * This is a helper function that takes the ImageView and image as a string and sets
+     * the image of the ImageView to the image
+     * @param completeImageData the image file represented as a string
+     * @param imageView the view on which the image will be shown
+     */
+    public void decodeImage(String completeImageData, ImageView imageView) {
+        if (completeImageData == null) { return; }
+
+        // Incase you're storing into aws or other places where we have extension stored in the starting.
+        String imageDataBytes = completeImageData.substring(completeImageData.indexOf(",")+1);
+        InputStream stream = new ByteArrayInputStream(Base64.decode(imageDataBytes.getBytes(), Base64.DEFAULT));
+        Bitmap bitmap = BitmapFactory.decodeStream(stream);
+        imageView.setImageBitmap(bitmap);
+    }
+
 
     public ArrayList<Mood> getList () {
         return moodHistory;
@@ -161,6 +185,9 @@ public class MoodListAdapter extends RecyclerView.Adapter<MoodListAdapter.MoodVH
         if(mood.getFriend() != null)
             holder.username.setText(mood.getFriend());
         holder.time.setText("Posted " + mood.getTimeAgo());
+        if(mood.getImg() == null) {
+            decodeImage(mood.getImg(), holder.image);
+        }
 
         holder.rl.setBackgroundResource(moodColors.get(mood.getFeeling()));
     }

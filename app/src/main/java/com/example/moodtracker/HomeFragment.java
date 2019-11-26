@@ -15,6 +15,7 @@ import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -81,7 +82,7 @@ public class HomeFragment extends Fragment implements AdapterView.OnItemSelected
     private FloatingActionButton actn_btn;
     private FloatingActionButton btnMap;
     private FloatingActionButton button_search;
-    private Bitmap image;
+    private String image;
 
     //private static final String TAG = "HomeFragment";
     private boolean mLocationPermissionGranted = false;
@@ -120,9 +121,7 @@ public class HomeFragment extends Fragment implements AdapterView.OnItemSelected
         button_search.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
                 Intent intent = new Intent(getActivity(), Search_activity.class);
-
                 startActivity(intent);
             }
         });
@@ -585,7 +584,10 @@ public class HomeFragment extends Fragment implements AdapterView.OnItemSelected
                 if(resultCode == Activity.RESULT_OK && data != null) {
                     Uri image = data.getData();
                     try {
-                        this.image = MediaStore.Images.Media.getBitmap(getActivity().getContentResolver(), image);
+                        Bitmap temp = MediaStore.Images.Media.getBitmap(getActivity().getContentResolver(), image);
+                        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+                        temp.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream);
+                        this.image = Base64.encodeToString(byteArrayOutputStream.toByteArray(), Base64.DEFAULT);
                         Toast.makeText(dialog.getContext(), "Image Uploaded", Toast.LENGTH_SHORT).show();
 
                     } catch (FileNotFoundException e) {
