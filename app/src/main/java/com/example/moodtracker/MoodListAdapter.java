@@ -13,6 +13,9 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+/**
+ * This is a custom recycler view adapter
+ */
 public class MoodListAdapter extends RecyclerView.Adapter<MoodListAdapter.MoodVH> {
 
     private ArrayList<Mood> moodHistory;
@@ -20,14 +23,26 @@ public class MoodListAdapter extends RecyclerView.Adapter<MoodListAdapter.MoodVH
     private HashMap<String, String> moodEmojis;
     private OnItemClickListener clickListener;
 
+    /**
+     * Creates the interface for the OnItemClickListener
+     */
     public interface OnItemClickListener {
         void onItemClick(int index);
     }
 
+    /**
+     * This sets the Listener
+     * @param listener
+     * The listener that will be set to handle item clicks
+     */
     public void setOnClickListener (OnItemClickListener listener) {
         clickListener = listener;
     }
 
+
+    /**
+     * This is the class for the view holder for the recycler view
+     */
     public static class MoodVH extends RecyclerView.ViewHolder {
 
         RelativeLayout rl;
@@ -35,6 +50,13 @@ public class MoodListAdapter extends RecyclerView.Adapter<MoodListAdapter.MoodVH
         TextView socialState;
         TextView username, time;
 
+        /**
+         * This is the constructor for the view holder class
+         * @param itemView
+         * The view within the recycler view that was clicked
+         * @param listener
+         * The listener that will be set to handle item clicks
+         */
         public MoodVH(@NonNull View itemView, final OnItemClickListener listener) {
             super(itemView);
 
@@ -58,11 +80,19 @@ public class MoodListAdapter extends RecyclerView.Adapter<MoodListAdapter.MoodVH
         }
     }
 
+    /**
+     * This is the constructor for the mood list adapter
+     * @param moodHistory
+     * The array list of mood events
+     */
     public MoodListAdapter(ArrayList<Mood> moodHistory) {
         this.moodHistory = moodHistory;
         initArrays();
     }
 
+    /**
+     * Initializes the arrays for feelings and social states
+     */
     public void initArrays() {
         //initializes colors array
         moodColors = new HashMap<>();
@@ -93,11 +123,19 @@ public class MoodListAdapter extends RecyclerView.Adapter<MoodListAdapter.MoodVH
         moodEmojis.put("lonely", new String(Character.toChars(0x1F614)));
     }
 
+
     public ArrayList<Mood> getList () {
         return moodHistory;
     }
     public void setList(ArrayList<Mood> moodHistory) { this.moodHistory = moodHistory; }
 
+    /**
+     * Used to initialize the view holder
+     * @param  parent
+     * The view group that initializes the view holder
+     * @param viewType
+     * The savedInstanceState is a reference to a Bundle object that is passed into the onCreate method of every Android Activity.
+     */
     @NonNull
     @Override
     public MoodVH onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -106,6 +144,13 @@ public class MoodListAdapter extends RecyclerView.Adapter<MoodListAdapter.MoodVH
         return mvh;
     }
 
+    /**
+     * Called by RecyclerView to display the data at the specified position.
+     * @param  holder
+     * The ViewHolder which should be updated to represent the contents of the item at the given position in the data set.
+     * @param position
+     * The position of the item within the adapter's data set.
+     */
     @Override
     public void onBindViewHolder(@NonNull MoodVH holder, int position) {
         Mood mood = moodHistory.get(position);
@@ -120,6 +165,11 @@ public class MoodListAdapter extends RecyclerView.Adapter<MoodListAdapter.MoodVH
         holder.rl.setBackgroundResource(moodColors.get(mood.getFeeling()));
     }
 
+    /**
+     * Counts the number of mood events
+     * @return
+     * Returns the size of the adapter
+     */
     @Override
     public int getItemCount() {
         return moodHistory.size();

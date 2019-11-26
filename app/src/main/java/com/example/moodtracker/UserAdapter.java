@@ -53,8 +53,8 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
         viewHolder.btn_follow.setVisibility(View.VISIBLE);
         isFollowing(user.getUserID(), viewHolder.btn_follow);
 
-        viewHolder.userID.setText(user.getUserID());
-        if (user.getEmail().equals(firebaseUser.getUid())) {
+        viewHolder.email.setText(user.getEmail());
+        if (user.getEmail().equals(firebaseUser.getEmail())) {
             viewHolder.btn_follow.setVisibility(View.GONE);
         }
 
@@ -62,7 +62,7 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
             @Override
             public void onClick(View view) {
                 SharedPreferences.Editor editor = mContext.getSharedPreferences("PREFS", Context.MODE_PRIVATE).edit();
-                editor.putString("profield", user.getUserID());
+                editor.putString("profield", user.getEmail());
                 editor.apply();
                 ((FragmentActivity) mContext).getSupportFragmentManager().beginTransaction().replace(R.id.container, new ProfileFragment()).commit();
 

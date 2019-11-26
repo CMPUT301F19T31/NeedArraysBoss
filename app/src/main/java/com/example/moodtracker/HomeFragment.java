@@ -80,6 +80,7 @@ public class HomeFragment extends Fragment implements AdapterView.OnItemSelected
     private User user;
     private FloatingActionButton actn_btn;
     private FloatingActionButton btnMap;
+    private FloatingActionButton button_search;
     private Bitmap image;
 
     //private static final String TAG = "HomeFragment";
@@ -89,6 +90,7 @@ public class HomeFragment extends Fragment implements AdapterView.OnItemSelected
     public static final int PERMISSIONS_REQUEST_ENABLE_GPS = 9003;
     private FusedLocationProviderClient mFusedLocationClient;
     private UserLocation mUserLocation;
+
 
 
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -107,11 +109,21 @@ public class HomeFragment extends Fragment implements AdapterView.OnItemSelected
         dialog = new Dialog(getContext());
         moodHistory = new ArrayList<Mood>();
         actn_btn = root.findViewById(R.id.addMoodEvent);
-
+        button_search= root.findViewById(R.id.search);
         actn_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 createMoodEvent(v);
+            }
+        });
+
+        button_search.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                Intent intent = new Intent(getActivity(), Search_activity.class);
+
+                startActivity(intent);
             }
         });
 
@@ -137,6 +149,8 @@ public class HomeFragment extends Fragment implements AdapterView.OnItemSelected
             }
         });
          */
+
+
 
         btnMap = root.findViewById(R.id.btnMap);
         init();
@@ -164,7 +178,6 @@ public class HomeFragment extends Fragment implements AdapterView.OnItemSelected
                     startActivity(intent);
                 }
             });
-
         }
          */
 
@@ -191,6 +204,7 @@ public class HomeFragment extends Fragment implements AdapterView.OnItemSelected
 
         return root;
     }
+
 
     @Override
     public void onStart() {
@@ -240,6 +254,9 @@ public class HomeFragment extends Fragment implements AdapterView.OnItemSelected
         }
         moodHistoryAdapter.notifyDataSetChanged();
     }
+
+
+
 
     public void createMoodEvent(View view) {
         dialog.setContentView(R.layout.add_mood_event); //opens the pop window
@@ -331,7 +348,6 @@ public class HomeFragment extends Fragment implements AdapterView.OnItemSelected
             mUserLocation = new UserLocation();
             DocumentReference userRef = db.collection("Users")
                     .document(FirebaseAuth.getInstance().getUid());
-
             userRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                 @Override
                 public void onComplete(@NonNull Task<DocumentSnapshot> task) {
@@ -348,8 +364,6 @@ public class HomeFragment extends Fragment implements AdapterView.OnItemSelected
             getLastKnownLocation();
         }
     }
-
-
     private void getLastKnownLocation() {
         Log.d(TAG, "getLastKnownLocation: called.");
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -363,23 +377,18 @@ public class HomeFragment extends Fragment implements AdapterView.OnItemSelected
                     GeoPoint geoPoint = new GeoPoint(location.getLatitude(), location.getLongitude());
                     Log.d(TAG, "onComplete: latitude: " + geoPoint.getLatitude());
                     Log.d(TAG, "onComplete: longitude: " + geoPoint.getLongitude());
-
                     mUserLocation.setGeo_point(geoPoint);
                     //mUserLocation.setTimestamp(null);
                     saveUserLocation();
                 }
             }
         });
-
     }
-
     private void saveUserLocation(){
-
         if(mUserLocation != null){
             DocumentReference locationRef = db
                     .collection("UserLocation")
                     .document(FirebaseAuth.getInstance().getUid());
-
             locationRef.set(mUserLocation).addOnCompleteListener(new OnCompleteListener<Void>() {
                 @Override
                 public void onComplete(@NonNull Task<Void> task) {
@@ -524,9 +533,7 @@ public class HomeFragment extends Fragment implements AdapterView.OnItemSelected
     /*
     public boolean isServicesOK(){
         Log.d(TAG, "isServicesOK: checking google services version");
-
         int available = GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(getActivity());
-
         if(available == ConnectionResult.SUCCESS){
             //everything is fine and the user can make map requests
             Log.d(TAG, "isServicesOK: Google Play Services is working");

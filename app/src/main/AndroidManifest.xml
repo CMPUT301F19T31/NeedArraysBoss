@@ -30,6 +30,7 @@
         </activity>
         <activity android:name=".EditMoodEvent"/>
         <activity android:name=".HomeFragment"/>
+        <activity android:name=".Search_activity"/>
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"

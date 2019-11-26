@@ -43,7 +43,6 @@ public class Login extends AppCompatActivity {
 
     }
 
-
     public void signInUser (View v) {
         final String emailID = email.getText().toString();
         final String pwd = password.getText().toString();
