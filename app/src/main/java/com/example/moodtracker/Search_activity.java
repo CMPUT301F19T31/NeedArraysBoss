@@ -4,7 +4,6 @@ import android.os.Bundle;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.SearchView;
-import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -42,7 +41,6 @@ public class Search_activity extends AppCompatActivity {
 
         //list.add("hello");
         //list.add("good morning");
-
 
     }
 

@@ -7,7 +7,9 @@ public class User {
     private String userID, email, password, phone, imageurl;
     private int numFollwers;
     private ArrayList<Mood> moodHistory = new ArrayList<>();
-    private ArrayList<String> friendList = new ArrayList<>();
+    private ArrayList<String> followingList = new ArrayList<>();
+    private ArrayList<Integer> followingPermissionList = new ArrayList<>();
+    private ArrayList<Notification> notification = new ArrayList<>();
 
     public User(String userID, String email, String password, ArrayList<Mood> moodHistory, String imageurl, String phone) {
         this.userID = userID;
@@ -103,6 +105,10 @@ public class User {
 
     public ArrayList<Mood> getMoodHistory() { return moodHistory; }
     public void setMoodHistory(ArrayList<Mood> moods) { moodHistory = moods; }
-    public ArrayList<String> getFriendList() { return friendList; }
-    public void setFriendList(ArrayList<String> friends) { friendList = friends; }
+    public ArrayList<String> getFollowingList() { return followingList; }
+    public void setFollowingList(ArrayList<String> friends) { followingList = friends; }
+    public ArrayList<Integer> getFollowingPermissionList() { return followingPermissionList; }
+    public void setFollowingPermissionList(ArrayList<Integer> code) { followingPermissionList = code; }
+    public ArrayList<Notification> getNotification() { return notification; }
+    public void setNotification(ArrayList<Notification> notification) { this.notification = notification; }
 }
