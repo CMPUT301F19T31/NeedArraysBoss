@@ -1,9 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="400dp"
-    android:layout_gravity="center"
-    android:background="@color/appBackground">
+    android:layout_width="300dp" android:layout_height="300dp" android:layout_gravity="center" android:background="@color/appBackground">
 
     <TextView
         android:id="@+id/moodEventIntro"
@@ -12,7 +9,6 @@
         android:background="@color/appBackgroundAccent"
         android:padding="5dp"
         android:text="@string/moodEventIntro"
-        android:textStyle="bold"
         android:textAppearance="@style/TextAppearance.AppCompat.Large"
         android:textColor="@color/white"/>
 
@@ -30,6 +26,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/feelingSpinner"
+        android:entries="@array/feelings"
         android:layout_below="@id/moodEventIntro"
         android:layout_toRightOf="@id/feelingTV"
         android:layout_margin="5dp" />
@@ -60,41 +57,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/socialStateSpinner"
+        android:entries="@array/socialStates"
         android:layout_below="@id/reasonET"
         android:layout_toRightOf="@id/socialStateTV"
         android:layout_margin="5dp"/>
-
-    <TextView
-        android:id="@+id/imageTV"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/imageTV"
-        android:textColor="@color/white"
-        android:textSize="17sp"
-        android:background="@color/appBackgroundAccent"
-        android:padding="5dp"
-        android:layout_margin="16dp"
-        android:layout_below="@id/socialStateTV"/>
-
-    <TextView
-        android:id="@+id/locationTV"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/locationTV"
-        android:textColor="@color/white"
-        android:textSize="17sp"
-        android:textStyle="italic"
-        android:layout_marginTop="19dp"
-        android:layout_below="@id/socialStateTV"
-        android:layout_toLeftOf="@id/locationCB"/>
-
-    <CheckBox
-        android:id="@+id/locationCB"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/socialStateTV"
-        android:layout_alignParentRight="true"
-        android:layout_margin="16dp"/>
 
     <Button
         android:layout_width="wrap_content"
