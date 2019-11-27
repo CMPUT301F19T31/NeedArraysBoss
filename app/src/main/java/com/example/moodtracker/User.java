@@ -42,6 +42,7 @@ public class User {
         this.password = password;
         this.phone = "";
         imageurl="";
+
         //moodHistory = null;
     }
     public User(String userID, String email, String password, String id, String phone, String imageurl) {
@@ -105,15 +106,10 @@ public class User {
 
     public ArrayList<Mood> getMoodHistory() { return moodHistory; }
     public void setMoodHistory(ArrayList<Mood> moods) { moodHistory = moods; }
-<<<<<<< HEAD
     public ArrayList<String> getFollowingList() { return followingList; }
     public void setFollowingList(ArrayList<String> friends) { followingList = friends; }
     public ArrayList<Integer> getFollowingPermissionList() { return followingPermissionList; }
     public void setFollowingPermissionList(ArrayList<Integer> code) { followingPermissionList = code; }
     public ArrayList<Notification> getNotification() { return notification; }
     public void setNotification(ArrayList<Notification> notification) { this.notification = notification; }
-=======
-    public ArrayList<String> getFriendList() {  return friendList; }
-    public void setFriendList(ArrayList<String> friends) { friendList = friends; }
->>>>>>> 735740fa58aea85c1ef11175f658f4629f4bdf27
 }

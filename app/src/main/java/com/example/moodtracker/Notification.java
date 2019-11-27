@@ -5,6 +5,10 @@ public class Notification {
     private int type;
     private String user1, user2;
 
+    public Notification()
+    {
+    }
+
     public Notification(int type, String user1, String user2)
     {
         this.type=type;

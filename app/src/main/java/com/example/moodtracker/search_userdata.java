@@ -1,29 +1,18 @@
 package com.example.moodtracker;
 
-import androidx.appcompat.app.AppCompatActivity;
-
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.EditText;
-import android.widget.SearchView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AppCompatActivity;
+
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QuerySnapshot;
-
-import java.util.List;
-
-import static java.sql.Types.NULL;
 
 public class search_userdata extends AppCompatActivity {
     private TextView textView1, tv, tv_uid;
@@ -31,12 +20,13 @@ public class search_userdata extends AppCompatActivity {
     private FirebaseAuth mAuth;
     private String text;
     private User user;
+    private DocumentReference documentReference;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search_userdata);
-
+        mAuth = FirebaseAuth.getInstance();
 
         final Button testButton = (Button) findViewById(R.id.button1);
         testButton.setTag(1);
@@ -51,15 +41,28 @@ public class search_userdata extends AppCompatActivity {
         testButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                final int status = (Integer) v.getTag();
-                if (status == 1) {
-
-                    testButton.setText("Follow");
-                    v.setTag(0); //pause
-                } else {
-                    testButton.setText("Request sent");
-                    v.setTag(1); //pause
-                }
+                final Notification notification = new Notification(1, mAuth.getCurrentUser().getEmail(),getIntent().getStringExtra("email"));
+                documentReference = FirebaseFirestore.getInstance().collection("users").document(getIntent().getStringExtra("email"));
+                documentReference.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                    @Override
+                    public void onSuccess(DocumentSnapshot documentSnapshot) {
+                        user = documentSnapshot.toObject(User.class);
+                        int flag=1;
+                        for(int i=0; i<user.getNotification().size();i++)
+                        {
+                            if(user.getNotification().get(i).getUser1().compareTo(mAuth.getCurrentUser().getEmail())==0 && user.getNotification().get(i).getType()==1)
+                            {
+                                flag=0;
+                                Toast.makeText(getApplicationContext(), "Follow Request Already Pending!", Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                        if(flag==1) {
+                            user.getNotification().add(notification);
+                            documentReference.set(user);
+                            Toast.makeText(getApplicationContext(), "Follow Request Sent!", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
             }
         });
 
@@ -75,11 +78,11 @@ public class search_userdata extends AppCompatActivity {
         public void onSuccess(DocumentSnapshot documentSnapshot) {
             user = documentSnapshot.toObject(User.class);
             textView1=findViewById(R.id.following_no);
-            if(user.getFriendList()==null || user.getFriendList().isEmpty()) {
+            if(user.getFollowingList()==null || user.getFollowingList().isEmpty()) {
                 textView1.setText("0");
             }
             else {
-                textView1.setText(user.getFriendList().size());
+                textView1.setText(user.getFollowingList().size());
             }
             tv_uid=findViewById(R.id.tv_name);
             tv_uid.setText(user.getUserID());
