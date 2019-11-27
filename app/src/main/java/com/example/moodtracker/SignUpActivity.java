@@ -109,11 +109,14 @@ public class SignUpActivity extends AppCompatActivity {
 
             GoogleSignInAccount acct = GoogleSignIn.getLastSignedInAccount(this);
             if (acct != null) {
-                username.setText(acct.getId());
-                email.setText(acct.getEmail());
+                uname = acct.getDisplayName();
+                emailID = acct.getEmail();
+                pwd = acct.getId();
                 //String personId = acct.getId();
                 //Uri personPhoto = acct.getPhotoUrl();
                 commitUser();
+                signInUser();
+
             }
 
 
