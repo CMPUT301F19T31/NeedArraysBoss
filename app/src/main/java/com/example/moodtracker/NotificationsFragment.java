@@ -4,7 +4,6 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 
 import androidx.annotation.NonNull;
 import androidx.emoji.bundled.BundledEmojiCompatConfig;
@@ -16,7 +15,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
-import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -68,8 +66,8 @@ public class NotificationsFragment extends Fragment {
             @Override
             public void onSuccess(DocumentSnapshot documentSnapshot) {
                 currentUser = documentSnapshot.toObject(User.class);
-                for(int i=0; i<currentUser.getFriendList().size(); i++)
-                    friends.add(currentUser.getFriendList().get(i));
+                for(int i=0; i<currentUser.getFollowingList().size(); i++)
+                    friends.add(currentUser.getFollowingList().get(i));
                 refreshList();
             }
         });

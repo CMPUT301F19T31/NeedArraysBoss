@@ -154,6 +154,7 @@ public class SignUpActivity extends AppCompatActivity {
      * checks for requirments and adds user to database. This method returns the app to the
      * mainactivity if successful.
      */
+
     public void commitUser() {
         if(!checkUsername()) {
             Toast.makeText(SignUpActivity.this, "SignUpUnsuccessful. Username already exits!", Toast.LENGTH_SHORT).show();
