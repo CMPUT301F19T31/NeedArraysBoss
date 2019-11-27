@@ -1,6 +1,5 @@
 package com.example.moodtracker;
 
-import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -9,12 +8,12 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
-import android.graphics.ImageDecoder;
 import android.location.Location;
 import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -41,11 +40,9 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
@@ -53,16 +50,11 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
-import com.google.firebase.firestore.GeoPoint;
 
 import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 
 public class HomeFragment extends Fragment implements AdapterView.OnItemSelectedListener {
 
@@ -81,7 +73,7 @@ public class HomeFragment extends Fragment implements AdapterView.OnItemSelected
     private FloatingActionButton actn_btn;
     private FloatingActionButton btnMap;
     private FloatingActionButton button_search;
-    private Bitmap image;
+    private String image;
 
     //private static final String TAG = "HomeFragment";
     private boolean mLocationPermissionGranted = false;
@@ -90,7 +82,6 @@ public class HomeFragment extends Fragment implements AdapterView.OnItemSelected
     public static final int PERMISSIONS_REQUEST_ENABLE_GPS = 9003;
     private FusedLocationProviderClient mFusedLocationClient;
     private UserLocation mUserLocation;
-
 
 
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -120,9 +111,7 @@ public class HomeFragment extends Fragment implements AdapterView.OnItemSelected
         button_search.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
                 Intent intent = new Intent(getActivity(), Search_activity.class);
-
                 startActivity(intent);
             }
         });
@@ -259,7 +248,7 @@ public class HomeFragment extends Fragment implements AdapterView.OnItemSelected
 
 
     public void createMoodEvent(View view) {
-        dialog.setContentView(R.layout.add_mood_event); //opens the pop window
+        dialog.setContentView(R.layout.add_mood_event);
 
         Spinner feelingSpinner = (Spinner) dialog.findViewById(R.id.feelingSpinner);
         ArrayAdapter<CharSequence> adapter1 = ArrayAdapter.createFromResource(getContext(), R.array.feelings, R.layout.spinner_item);
@@ -322,7 +311,7 @@ public class HomeFragment extends Fragment implements AdapterView.OnItemSelected
             }
         });
 
-        dialog.show();
+        dialog.show();  //opens the pop window
     }
 
 
@@ -585,7 +574,10 @@ public class HomeFragment extends Fragment implements AdapterView.OnItemSelected
                 if(resultCode == Activity.RESULT_OK && data != null) {
                     Uri image = data.getData();
                     try {
-                        this.image = MediaStore.Images.Media.getBitmap(getActivity().getContentResolver(), image);
+                        Bitmap temp = MediaStore.Images.Media.getBitmap(getActivity().getContentResolver(), image);
+                        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+                        temp.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream);
+                        this.image = Base64.encodeToString(byteArrayOutputStream.toByteArray(), Base64.DEFAULT);
                         Toast.makeText(dialog.getContext(), "Image Uploaded", Toast.LENGTH_SHORT).show();
 
                     } catch (FileNotFoundException e) {

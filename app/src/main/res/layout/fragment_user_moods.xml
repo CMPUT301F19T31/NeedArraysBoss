@@ -5,6 +5,7 @@
     android:layout_height="match_parent"
     android:layout_marginBottom="50dp"
     android:background="@color/appBackground"
+
     android:clickable="true">
 
     <RelativeLayout
@@ -28,25 +29,5 @@
         android:layout_margin="16dp"
         android:layout_gravity="end|bottom"
         android:backgroundTint="@color/buttonColor" />
-
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/btnMap"
-        android:layout_width="46dp"
-        android:layout_height="48dp"
-        android:layout_gravity="start|bottom"
-        android:layout_margin="16dp"
-        android:clickable="true"
-        android:src="@android:drawable/ic_dialog_map"
-        android:focusable="true" />
-
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/search"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="end"
-        android:layout_margin="16dp"
-        android:backgroundTint="@color/buttonColor"
-        android:src="@drawable/ic_search_light" />
-
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
