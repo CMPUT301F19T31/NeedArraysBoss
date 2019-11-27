@@ -8,7 +8,6 @@ import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.SearchView;
-import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -50,7 +49,6 @@ public class Search_activity extends AppCompatActivity {
         //list.add("hello");
         //list.add("good morning");
 
-
     }
 
 
@@ -63,14 +61,16 @@ public class Search_activity extends AppCompatActivity {
                     @Override
                     public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
                         List<DocumentSnapshot> data = queryDocumentSnapshots.getDocuments();
-                        //Toast.makeText(getContext(),Integer.toString(data.size()),Toast.LENGTH_SHORT).show();
+                        //Toast.makeText(getApplicationContext(),mAuth.getCurrentUser().getEmail(), Toast.LENGTH_SHORT).show();
                         for (int i = 0; i < data.size(); i++) {
 
                             //list.addAll(data);
-                            list.add(data.get(i).toObject(User.class).getUserID());
-                            list1.add(data.get(i).toObject(User.class).getEmail());
-                            //list.add(data.get(i).toObject(User.class));
-                            //Toast.makeText(getActivity(), "", Toast.LENGTH_SHORT).show();
+                            if(mAuth.getCurrentUser().getEmail().compareTo(data.get(i).toObject(User.class).getEmail())!=0) {
+                                list.add(data.get(i).toObject(User.class).getUserID());
+                                list1.add(data.get(i).toObject(User.class).getEmail());
+                                //list.add(data.get(i).toObject(User.class));
+                                //Toast.makeText(getActivity(), "", Toast.LENGTH_SHORT).show();
+                            }
                         }
 
                         //Toast.makeText(getActivity(), myList.get(0).getEmail(), Toast.LENGTH_SHORT).show();
