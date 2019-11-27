@@ -75,6 +75,7 @@ public class search_userdata extends AppCompatActivity {
         public void onSuccess(DocumentSnapshot documentSnapshot) {
             user = documentSnapshot.toObject(User.class);
             textView1=findViewById(R.id.following_no);
+
             if(user.getFriendList()==null || user.getFriendList().isEmpty()) {
                 textView1.setText("0");
             }
