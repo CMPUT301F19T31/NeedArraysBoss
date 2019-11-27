@@ -42,7 +42,7 @@ public class SearchFragment extends Fragment {
     private void setupViewPager(ViewPager viewPager) {
 
         myAdapter adapter = new myAdapter(getChildFragmentManager());
-        adapter.addFragment(new UserMoods(), "User's Moods");
+        adapter.addFragment(new UserMoods(), "My Moods");
         adapter.addFragment(new FollowingMoods(), "Friend's Moods");
         viewPager.setAdapter(adapter);
     }

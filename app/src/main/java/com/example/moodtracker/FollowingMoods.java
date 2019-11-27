@@ -75,7 +75,6 @@ public class FollowingMoods extends Fragment {
             @Override
             public void onSuccess(DocumentSnapshot documentSnapshot) {
                 currentUser = documentSnapshot.toObject(User.class);
-                friends.add("Ahnav");
                 for(int i=0; i<currentUser.getFriendList().size(); i++)
                     friends.add(currentUser.getFriendList().get(i));
                 refreshList();
