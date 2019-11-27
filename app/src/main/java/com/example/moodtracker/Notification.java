@@ -3,6 +3,7 @@ package com.example.moodtracker;
 public class Notification {
 
     private int type;
+    // 1 = Follow Req
     private String user1, user2;
 
     public Notification()
