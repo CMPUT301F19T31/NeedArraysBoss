@@ -122,14 +122,4 @@
         android:backgroundTint="@color/appBackgroundAccent"
         android:textColor="@color/white"/>
 
-    <CheckBox
-        android:id="@+id/enableMap"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentBottom="true"
-        android:layout_marginLeft="7dp"
-        android:layout_marginBottom="96dp"
-        android:text="Tag Location" />
-
 </RelativeLayout>

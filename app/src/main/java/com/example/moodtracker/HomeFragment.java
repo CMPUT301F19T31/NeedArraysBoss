@@ -22,7 +22,6 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.CheckBox;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -45,7 +44,6 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
@@ -82,18 +80,13 @@ public class HomeFragment extends Fragment implements AdapterView.OnItemSelected
     private String image;
 
     //private static final String TAG = "HomeFragment";
-    private static final String FINE_LOCATION = Manifest.permission.ACCESS_FINE_LOCATION;
-    private static final String COURSE_LOCATION = Manifest.permission.ACCESS_COARSE_LOCATION;
-    //private static final int LOCATION_PERMISSION_REQUEST_CODE = 1234;
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////
     private boolean mLocationPermissionGranted = false;
     public static final int ERROR_DIALOG_REQUEST = 9001;
     public static final int PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 9002;
     public static final int PERMISSIONS_REQUEST_ENABLE_GPS = 9003;
     private FusedLocationProviderClient mFusedLocationClient;
     private UserLocation mUserLocation;
-    boolean getmap=false;
-    GeoPoint geoPoint;
+
 
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_home, container, false);
@@ -153,14 +146,7 @@ public class HomeFragment extends Fragment implements AdapterView.OnItemSelected
 
 
         btnMap = root.findViewById(R.id.btnMap);
-        btnMap.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                getmap=true;
-                init();
-            }
-        });
-        //init();
+        init();
         /*
         if(checkMapServices()){
             init();
@@ -249,6 +235,7 @@ public class HomeFragment extends Fragment implements AdapterView.OnItemSelected
                 }
             });
         }
+<<<<<<< HEAD
     }
 
       /*public void createUser() {
@@ -268,8 +255,10 @@ public class HomeFragment extends Fragment implements AdapterView.OnItemSelected
                         }
                     }
                 });
+=======
+>>>>>>> parent of 31ddfa1... Merge branch 'yash09' into Andalib
     }
-     */
+
 
     public void loadDataFromDB() {
         if(user == null || user.getMoodHistory() == null) { return; }
@@ -283,6 +272,7 @@ public class HomeFragment extends Fragment implements AdapterView.OnItemSelected
         moodHistoryAdapter.notifyDataSetChanged();
     }
 
+<<<<<<< HEAD
     /*public void signInUser() {
         mAuth.signInWithEmailAndPassword("ahnafon3@gmail.com", "123456")
                 .addOnCompleteListener(getActivity(), new OnCompleteListener<AuthResult>() {
@@ -299,6 +289,42 @@ public class HomeFragment extends Fragment implements AdapterView.OnItemSelected
                             Toast.makeText(getContext().getApplicationContext(), "Authentication failed.",
                                     Toast.LENGTH_SHORT).show();
                         }
+=======
+
+
+
+    public void createMoodEvent(View view) {
+        dialog.setContentView(R.layout.add_mood_event);
+
+        Spinner feelingSpinner = (Spinner) dialog.findViewById(R.id.feelingSpinner);
+        ArrayAdapter<CharSequence> adapter1 = ArrayAdapter.createFromResource(getContext(), R.array.feelings, R.layout.spinner_item);
+        adapter1.setDropDownViewResource(android.R.layout.simple_list_item_1);
+        feelingSpinner.setAdapter(adapter1);
+        feelingSpinner.setOnItemSelectedListener(this);
+
+        Spinner socialStateSpinner = (Spinner) dialog.findViewById(R.id.socialStateSpinner);
+        ArrayAdapter<CharSequence> adapter2 = ArrayAdapter.createFromResource(getContext(), R.array.socialStates, R.layout.spinner_item);
+        adapter2.setDropDownViewResource(android.R.layout.simple_list_item_1);
+        socialStateSpinner.setAdapter(adapter2);
+        socialStateSpinner.setOnItemSelectedListener(this);
+
+        Button addEventBtn = dialog.findViewById(R.id.addMoodEvent);
+        addEventBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                EmojiEditText et = dialog.findViewById(R.id.reasonET);
+                String reason = et.getText().toString();
+
+                if(!feeling.equals("")) {
+                    Mood newMood;
+
+                    if (reason == null && image == null) {
+                        newMood = new Mood(feeling, socialState, System.currentTimeMillis());
+                    } else if(image == null) {
+                        newMood = new Mood(feeling, socialState, System.currentTimeMillis(), reason);
+                    } else {
+                        newMood = new Mood(feeling, socialState, System.currentTimeMillis(), reason, image);
+>>>>>>> parent of 31ddfa1... Merge branch 'yash09' into Andalib
                     }
                     moodHistory.add(0, newMood); //inserts new mood at the beginning of list
                     moodHistoryAdapter.notifyDataSetChanged();
@@ -349,7 +375,6 @@ public class HomeFragment extends Fragment implements AdapterView.OnItemSelected
     public void onNothingSelected(AdapterView<?> adapterView) {
 
     }
-     */
 
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -416,36 +441,28 @@ public class HomeFragment extends Fragment implements AdapterView.OnItemSelected
 
 
     private void init(){
-        /*btnMap.setOnClickListener(new View.OnClickListener() {
+        //FloatingActionButton btnMap = (FloatingActionButton) dialog.findViewById(R.id.btnMap);
+        btnMap.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                //initMap();
-                if(checkMapServices()) {
-                    if (mLocationPermissionGranted) {
+                if(checkMapServices()){
+                    if(mLocationPermissionGranted){
+                        //getChatrooms(); HEREEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE
                         Intent intent = new Intent(getActivity(), MapActivity.class);
                         startActivity(intent);
                         //getLastKnownLocation();
                         //getUserDetails();
-                    } else {
+                    }
+                    else{
                         getLocationPermission();
                     }
                 }
                 //Intent intent = new Intent(getActivity(), MapActivity.class);
                 //startActivity(intent);
             }
-        });*/
+        });
 
-        if(checkMapServices()) {
-            if (mLocationPermissionGranted) {
-                Intent intent = new Intent(getActivity(), MapActivity.class);
-                startActivity(intent);
-                getmap=false;
-                //getLastKnownLocation();
-                //getUserDetails();
-            } else {
-                getLocationPermission();
-            }
-        }
+
     }
 
     public boolean isServicesOK(){
@@ -468,6 +485,7 @@ public class HomeFragment extends Fragment implements AdapterView.OnItemSelected
         }
         return false;
     }
+
 
     private boolean checkMapServices(){
         if(isServicesOK()){
@@ -502,55 +520,17 @@ public class HomeFragment extends Fragment implements AdapterView.OnItemSelected
         return true;
     }
 
-    /*private void getLocationPermission() {
+    private void getLocationPermission() {
         if (ContextCompat.checkSelfPermission(getActivity().getApplicationContext(), android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             mLocationPermissionGranted = true;
             //getChatrooms(); HEREEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE
             //init();
             //getLastKnownLocation();
             //getUserDetails();
-            //Intent intent = new Intent(getActivity(), MapActivity.class);
-            //startActivity(intent);
-            Log.d(TAG, "getLocationPermission: " + mLocationPermissionGranted);
-            init();
-            getDeviceLocation();
+            Intent intent = new Intent(getActivity(), MapActivity.class);
+            startActivity(intent);
         } else {
-            Log.d(TAG, "getLocationPermission: NOTTTTTTTTTT getting the devices current location");
             ActivityCompat.requestPermissions(getActivity(),new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
-        }
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String permissions[], @NonNull int[] grantResults) {
-        mLocationPermissionGranted = false;
-        switch (requestCode) {
-            case PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION: {
-                // If request is cancelled, the result arrays are empty.
-                if (grantResults.length > 0
-                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    mLocationPermissionGranted = true;
-                }
-            }
-        }
-    }
-     */
-
-    private void getLocationPermission(){
-        Log.d(TAG, "getLocationPermission: getting location permissions");
-        String[] permissions = {Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION};
-
-        if(ContextCompat.checkSelfPermission(this.getContext(), FINE_LOCATION) == PackageManager.PERMISSION_GRANTED){
-            if(ContextCompat.checkSelfPermission(this.getContext(), COURSE_LOCATION) == PackageManager.PERMISSION_GRANTED){
-                mLocationPermissionGranted = true;
-                if(getmap){
-                init();
-                }
-                getDeviceLocation();
-            }else{
-                ActivityCompat.requestPermissions(getActivity(), permissions, PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
-            }
-        }else{
-            ActivityCompat.requestPermissions(getActivity(), permissions, PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
         }
     }
 
@@ -561,24 +541,21 @@ public class HomeFragment extends Fragment implements AdapterView.OnItemSelected
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(getActivity());
 
         try {
-            Log.d(TAG, "getDeviceLocation: " + mLocationPermissionGranted);
             if (mLocationPermissionGranted) {
+
                 final Task location = mFusedLocationClient.getLastLocation(); //mFusedLocationProviderClient.getLastLocation();
                 location.addOnCompleteListener(new OnCompleteListener() {
                     @Override
                     public void onComplete(@NonNull Task task) {
                         if (task.isSuccessful()) {
-                            Log.d(TAG, "getDeviceLocation: found location!");
+                            Log.d(TAG, "onComplete: found location!");
                             Location currentLocation = (Location) task.getResult();
-                            geoPoint = new GeoPoint(currentLocation.getLatitude(), currentLocation.getLongitude());
-                            Log.d(TAG, "getDeviceLocation: latitude: " + geoPoint.getLatitude());
-                            Log.d(TAG, "getDeviceLocation: longitude: " + geoPoint.getLongitude());
 
                             //moveCamera(new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude()),
                             //      DEFAULT_ZOOM);
 
                         } else {
-                            Log.d(TAG, "getDeviceLocation: current location is null");
+                            Log.d(TAG, "onComplete: current location is null");
                             Toast.makeText(getActivity(), "unable to get current location", Toast.LENGTH_SHORT).show();
                         }
                     }
@@ -610,27 +587,14 @@ public class HomeFragment extends Fragment implements AdapterView.OnItemSelected
     }*/
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        Log.d(TAG, "onRequestPermissionsResult: called.");
+    public void onRequestPermissionsResult(int requestCode, @NonNull String permissions[], @NonNull int[] grantResults) {
         mLocationPermissionGranted = false;
-
-        switch(requestCode){
-            case PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION:{
-                if(grantResults.length > 0){
-                    for(int i = 0; i < grantResults.length; i++){
-                        if(grantResults[i] != PackageManager.PERMISSION_GRANTED){
-                            mLocationPermissionGranted = false;
-                            Log.d(TAG, "onRequestPermissionsResult: permission failed");
-                            return;
-                        }
-                    }
-                    Log.d(TAG, "onRequestPermissionsResult: permission granted");
+        switch (requestCode) {
+            case PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION: {
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     mLocationPermissionGranted = true;
-                    //initialize our map
-                    if(getmap){
-                    init();
-                    }
-                    getDeviceLocation();
                 }
             }
         }
@@ -667,6 +631,7 @@ public class HomeFragment extends Fragment implements AdapterView.OnItemSelected
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
+<<<<<<< HEAD
 
                 }
 
@@ -825,6 +790,7 @@ public class HomeFragment extends Fragment implements AdapterView.OnItemSelected
                     } else if (feeling.equals("")) {
                         Toast.makeText(dialog.getContext(), "Please select how you feel", Toast.LENGTH_LONG).show();
                     }
+
                 }
             }
         }
