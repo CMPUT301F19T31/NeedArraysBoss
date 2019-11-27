@@ -81,6 +81,8 @@ public class HomeFragment extends Fragment implements AdapterView.OnItemSelected
     private User user;
     private FloatingActionButton actn_btn;
     private FloatingActionButton btnMap;
+    private FloatingActionButton button_search;
+
 
     //private static final String TAG = "HomeFragment";
     private static final String FINE_LOCATION = Manifest.permission.ACCESS_FINE_LOCATION;
@@ -95,6 +97,7 @@ public class HomeFragment extends Fragment implements AdapterView.OnItemSelected
     private UserLocation mUserLocation;
     boolean getmap=false;
     GeoPoint geoPoint;
+    private String image;
 
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_home, container, false);
