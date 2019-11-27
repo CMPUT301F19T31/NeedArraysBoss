@@ -31,7 +31,7 @@ public class FollowingMoods extends Fragment {
     private FirebaseAuth mAuth;
     private CollectionReference userRef;
     private User currentUser;
-    private ArrayList<String> friends;
+    private ArrayList<Following> friends;
 
     private RecyclerView rv;
     private ArrayList<Mood> friendMoodHistory;

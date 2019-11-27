@@ -78,7 +78,9 @@ public class search_userdata extends AppCompatActivity {
         public void onSuccess(DocumentSnapshot documentSnapshot) {
             user = documentSnapshot.toObject(User.class);
             textView1=findViewById(R.id.following_no);
+
             if(user.getFollowingList()==null || user.getFollowingList().isEmpty()) {
+
                 textView1.setText("0");
             }
             else {

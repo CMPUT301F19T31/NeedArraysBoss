@@ -40,8 +40,10 @@ public class SignUpActivity extends AppCompatActivity {
     TextView TextSignUp;
     FirebaseAuth mFirebaseAuth;
     String TAG = "";
+
     private FirebaseAuth.AuthStateListener mAuthStateListener;
     private ArrayList<User> users;
+    private boolean done = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,6 +58,7 @@ public class SignUpActivity extends AppCompatActivity {
         repassword = findViewById(R.id.confirmpword);
         SignUp = findViewById(R.id.signup);
         TextSignUp = findViewById(R.id.textView2);
+
 
     }
 
@@ -138,8 +141,8 @@ public class SignUpActivity extends AppCompatActivity {
                 .addOnSuccessListener(SignUpActivity.this, new OnSuccessListener<AuthResult>() {
                     @Override
                     public void onSuccess(AuthResult authResult) {
-                        Toast.makeText(SignUpActivity.this, "Login successful!", Toast.LENGTH_SHORT).show();
-                        commitUser();
+                        //Toast.makeText(SignUpActivity.this, "Login successful!", Toast.LENGTH_SHORT).show();
+                        getUsers();
                     }
                 }).addOnFailureListener(new OnFailureListener() {
             @Override
@@ -149,17 +152,19 @@ public class SignUpActivity extends AppCompatActivity {
         });
     }
 
+
     /**
      * commitUser
      * checks for requirments and adds user to database. This method returns the app to the
      * mainactivity if successful.
      */
-
     public void commitUser() {
+        //checks if username is unique
         if(!checkUsername()) {
-            Toast.makeText(SignUpActivity.this, "SignUpUnsuccessful. Username already exits!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(SignUpActivity.this, "Login unsuccessful! Username already exists.", Toast.LENGTH_SHORT).show();
             return;
         }
+
         DocumentReference userRef = FirebaseFirestore.getInstance().collection("users").document("user"+mFirebaseAuth.getCurrentUser().getEmail());
         User user;
         if(image == null) {
@@ -192,12 +197,15 @@ public class SignUpActivity extends AppCompatActivity {
     public void getUsers() {
         CollectionReference ref = FirebaseFirestore.getInstance().collection("users");
         users = new ArrayList<>();
+
         ref.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
                 if(task.isSuccessful()) {
-                    for(DocumentSnapshot doc: task.getResult())
+                    for(DocumentSnapshot doc: task.getResult()) {
                         users.add(doc.toObject(User.class));
+                    }
+                    commitUser();
                 }
             }
         });
@@ -209,11 +217,8 @@ public class SignUpActivity extends AppCompatActivity {
      * @return true if doesnt exist, else false
      */
     public boolean checkUsername() {
-        if(users == null)
-            getUsers();
-
         for(int i=0; i<users.size(); i++) {
-            if(users.get(i).getUserID().equals(uname))
+            if(users.get(i).getUserID().compareTo(uname)==0)
                 return false;
         }
         return true;
