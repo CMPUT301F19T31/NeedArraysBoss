@@ -5,7 +5,6 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.util.Base64;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -78,6 +77,10 @@ public class ProfileFragment extends Fragment {
     }
 
     public void loadDataFromDB() {
+        if(user == null) {
+            return;
+        }
+
         decodeImage(user.getProfilePic(), imageView);
         usernameTV.setText(user.getUserID());
         emailTV.setText(user.getEmail());

@@ -44,10 +44,6 @@ public class MainActivity extends AppCompatActivity {
                     fragment = new SearchFragment();
                     loadFragment(fragment);
                     return true;
-                case R.id.navigation_notifications:
-                    fragment = new NotificationsFragment();
-                    loadFragment(fragment);
-                    return true;
                 case R.id.navigation_profile:
                     fragment = new ProfileFragment();
                     loadFragment(fragment);
