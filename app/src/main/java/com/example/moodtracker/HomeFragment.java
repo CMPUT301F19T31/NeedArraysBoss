@@ -1,5 +1,6 @@
 package com.example.moodtracker;
 
+import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -52,11 +53,14 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.GeoPoint;
 
 import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 public class HomeFragment extends Fragment implements AdapterView.OnItemSelectedListener {
 
@@ -232,17 +236,20 @@ public class HomeFragment extends Fragment implements AdapterView.OnItemSelected
         super.onResume();
         currentUser = mAuth.getCurrentUser();
 
-        if(currentUser != null) {
+        if (currentUser != null) {
             userRef = FirebaseFirestore.getInstance().collection("users").document("user" + currentUser.getEmail());
             userRef.addSnapshotListener(new EventListener<DocumentSnapshot>() {
                 @Override
                 public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
-                    if (documentSnapshot == null) { return; }
+                    if (documentSnapshot == null) {
+                        return;
+                    }
                     user = documentSnapshot.toObject(User.class);
                     loadDataFromDB();
                 }
             });
         }
+    }
 
       /*public void createUser() {
         mAuth.createUserWithEmailAndPassword("ahnafon3@gmail.com", "123456")
@@ -275,41 +282,6 @@ public class HomeFragment extends Fragment implements AdapterView.OnItemSelected
         }
         moodHistoryAdapter.notifyDataSetChanged();
     }
-
-
-
-
-    public void createMoodEvent(View view) {
-        dialog.setContentView(R.layout.add_mood_event);
-
-        Spinner feelingSpinner = (Spinner) dialog.findViewById(R.id.feelingSpinner);
-        ArrayAdapter<CharSequence> adapter1 = ArrayAdapter.createFromResource(getContext(), R.array.feelings, R.layout.spinner_item);
-        adapter1.setDropDownViewResource(android.R.layout.simple_list_item_1);
-        feelingSpinner.setAdapter(adapter1);
-        feelingSpinner.setOnItemSelectedListener(this);
-
-        Spinner socialStateSpinner = (Spinner) dialog.findViewById(R.id.socialStateSpinner);
-        ArrayAdapter<CharSequence> adapter2 = ArrayAdapter.createFromResource(getContext(), R.array.socialStates, R.layout.spinner_item);
-        adapter2.setDropDownViewResource(android.R.layout.simple_list_item_1);
-        socialStateSpinner.setAdapter(adapter2);
-        socialStateSpinner.setOnItemSelectedListener(this);
-
-        Button addEventBtn = dialog.findViewById(R.id.addMoodEvent);
-        addEventBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                EmojiEditText et = dialog.findViewById(R.id.reasonET);
-                String reason = et.getText().toString();
-
-                if(!feeling.equals("")) {
-                    Mood newMood;
-
-                    if (reason == null && image == null) {
-                        newMood = new Mood(feeling, socialState, System.currentTimeMillis());
-                    } else if(image == null) {
-                        newMood = new Mood(feeling, socialState, System.currentTimeMillis(), reason);
-                    } else {
-                        newMood = new Mood(feeling, socialState, System.currentTimeMillis(), reason, image);
 
     /*public void signInUser() {
         mAuth.signInWithEmailAndPassword("ahnafon3@gmail.com", "123456")
@@ -671,18 +643,17 @@ public class HomeFragment extends Fragment implements AdapterView.OnItemSelected
 
         switch (requestCode) {
             case PERMISSIONS_REQUEST_ENABLE_GPS: {
-                if(mLocationPermissionGranted){
+                if (mLocationPermissionGranted) {
                     //getChatrooms(); HEREEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE
                     init();
                     //getLastKnownLocation();
                     //getUserDetails();
-                }
-                else{
+                } else {
                     getLocationPermission();
                 }
             }
             case 3: {
-                if(resultCode == Activity.RESULT_OK && data != null) {
+                if (resultCode == Activity.RESULT_OK && data != null) {
                     Uri image = data.getData();
                     try {
                         Bitmap temp = MediaStore.Images.Media.getBitmap(getActivity().getContentResolver(), image);
@@ -697,8 +668,10 @@ public class HomeFragment extends Fragment implements AdapterView.OnItemSelected
                         e.printStackTrace();
                     }
 
-        }
+                }
 
+            }
+        }
     }
 
 
