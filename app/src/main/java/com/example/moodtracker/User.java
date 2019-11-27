@@ -7,7 +7,6 @@ public class User {
 
     private String userID, email, password, phone, imageurl;
 
-    private int numFollwers;
     private ArrayList<Mood> moodHistory = new ArrayList<>();
     private ArrayList<String> friendList = new ArrayList<>();
 
@@ -29,7 +28,7 @@ public class User {
         imageurl="";
     }
 
-    public User(String userID,String imageurl, String id, String email, String password) {
+    public void User(String userID,String imageurl, String id, String email, String password) {
         this.userID = userID;
         this.imageurl=imageurl;
         this.email = email;
@@ -66,9 +65,9 @@ public class User {
         return userID;
     }
 
-    //public void setUserID(String userID) {
-      //  this.userID = userID;
-    //}
+    public void setUserID(String userID) {
+        this.userID = userID;
+    }
 
     public String getEmail() {
         return email;

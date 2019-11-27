@@ -11,13 +11,13 @@ import com.google.firebase.firestore.GeoPoint;
 
 public class Mood {
 
-    private String img;
+    private Bitmap img;
     private String feeling, socialState, reason;
     private long date_time;
     private GeoPoint geo_point;
     private String friend = null;
 
-    public Mood (String feeling, String socialState, long date_time, String reason, String image) {
+    public Mood (String feeling, String socialState, long date_time, String reason, Bitmap image) {
         this.feeling = feeling;
         this.socialState = socialState;
         this.date_time = date_time;
@@ -70,7 +70,6 @@ public class Mood {
     }
     public String getFriend() { return friend; }
     public long getDate_time() {  return date_time; }
-    public String getImg() {  return img; }
 
     public String getTimeAgo() {
         int second = 1000;
@@ -107,5 +106,5 @@ public class Mood {
     public void setReason(String reason) { this.reason = reason; }
     public void setGeo_point(GeoPoint geo_point) { this.geo_point = geo_point; }
     public void setFriend(String friend) { this.friend = friend; }
-    public void setImg(String img) { this.img = img; }
+    public void setImg(Bitmap img) { this.img = img; }
 }
