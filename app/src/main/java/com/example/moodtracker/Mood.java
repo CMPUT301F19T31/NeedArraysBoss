@@ -24,8 +24,8 @@ public class Mood {
         this.reason = reason;
         this.img = image;
     }
-
-    public Mood (String feeling, String socialState, long date_time, String reason) {
+  
+    /*public Mood (String feeling, String socialState, String date_time, String reason) {
         this.feeling = feeling;
         this.socialState = socialState;
         this.date_time = date_time;
@@ -39,7 +39,7 @@ public class Mood {
         this.date_time = date_time;
         this.reason = reason;
         this.geo_point=geo_point;
-    }
+    }*/
 
     public Mood (String feeling, String socialState, long date_time) {
         this.feeling = feeling;
