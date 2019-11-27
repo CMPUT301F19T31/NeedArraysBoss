@@ -53,6 +53,8 @@ public class MainActivity extends AppCompatActivity {
                     loadFragment(fragment);
                     return true;
                 }
+
+            }
             return false;
         }
     };
@@ -64,7 +66,6 @@ public class MainActivity extends AppCompatActivity {
         transaction.addToBackStack(null);
         transaction.commit();
     }
-}
 
     /*
     private void getUserDetails(){
@@ -271,3 +272,5 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 */
+*/
+}
