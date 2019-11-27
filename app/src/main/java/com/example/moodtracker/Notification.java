@@ -40,4 +40,11 @@ public class Notification {
     public void setUser2(String user2) {
         this.user2 = user2;
     }
+
+    String getString(){
+        if(type==1)
+            return user1+" has requested to follow your moods";
+        else
+            return "No type match";
+    }
 }

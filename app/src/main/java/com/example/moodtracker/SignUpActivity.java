@@ -141,7 +141,6 @@ public class SignUpActivity extends AppCompatActivity {
                 .addOnSuccessListener(SignUpActivity.this, new OnSuccessListener<AuthResult>() {
                     @Override
                     public void onSuccess(AuthResult authResult) {
-                        //Toast.makeText(SignUpActivity.this, "Login successful!", Toast.LENGTH_SHORT).show();
                         getUsers();
                     }
                 }).addOnFailureListener(new OnFailureListener() {
@@ -177,6 +176,8 @@ public class SignUpActivity extends AppCompatActivity {
             @Override
             public void onComplete(@NonNull Task<Void> task) {
                 if(task.isSuccessful()) {
+                    Toast.makeText(SignUpActivity.this, "Login successful!", Toast.LENGTH_SHORT).show();
+
                     Intent intent = new Intent(SignUpActivity.this, MainActivity.class);
                     intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                     intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
