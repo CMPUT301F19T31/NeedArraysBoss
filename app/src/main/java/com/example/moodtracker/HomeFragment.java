@@ -1,23 +1,30 @@
 package com.example.moodtracker;
 
 import android.Manifest;
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
 import android.location.Location;
 import android.location.LocationManager;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
+import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -49,6 +56,9 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.GeoPoint;
 
+import java.io.ByteArrayOutputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -209,47 +219,6 @@ public class HomeFragment extends Fragment implements AdapterView.OnItemSelected
         }
     }
 
-    /*public void createUser() {
-        mAuth.createUserWithEmailAndPassword("ahnafon3@gmail.com", "123456")
-                .addOnCompleteListener(getActivity(), new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        if (task.isSuccessful()) {
-                            // Sign in success, update UI with the signed-in user's information
-                            Log.d(TAG, "createUserWithEmail:success");
-                            signInUser();
-                        } else {
-                            // If sign in fails, display a message to the user.
-                            Log.w(TAG, "createUserWithEmail:failure", task.getException());
-                            Toast.makeText(getActivity().getApplicationContext(), "Authentication failed.",
-                                    Toast.LENGTH_SHORT).show();
-                        }
-                    }
-                });
-    }
-     */
-
-    /*public void signInUser() {
-        mAuth.signInWithEmailAndPassword("ahnafon3@gmail.com", "123456")
-                .addOnCompleteListener(getActivity(), new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        if (task.isSuccessful()) {
-                            // Sign in success, update UI with the signed-in user's information
-                            Log.d(TAG, "signInWithEmail:success");
-                            moodEventsDR = db.getReference("moodEvents");
-                            loadDataFromDB();
-                        } else {
-                            // If sign in fails, display a message to the user.
-                            Log.w(TAG, "signInWithEmail:failure", task.getException());
-                            Toast.makeText(getContext().getApplicationContext(), "Authentication failed.",
-                                    Toast.LENGTH_SHORT).show();
-                        }
-                    }
-                });
-    }
-     */
-
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     /*
@@ -354,6 +323,7 @@ public class HomeFragment extends Fragment implements AdapterView.OnItemSelected
                 getLocationPermission();
             }
         }
+
     }
 
     public boolean isServicesOK(){
@@ -376,6 +346,7 @@ public class HomeFragment extends Fragment implements AdapterView.OnItemSelected
         }
         return false;
     }
+
 
     private boolean checkMapServices(){
         if(isServicesOK()){
@@ -536,11 +507,6 @@ public class HomeFragment extends Fragment implements AdapterView.OnItemSelected
                     }
                     Log.d(TAG, "onRequestPermissionsResult: permission granted");
                     mLocationPermissionGranted = true;
-                    //initialize our map
-                    if(getmap){
-                    init();
-                    }
-                    getDeviceLocation();
                 }
             }
         }
@@ -550,6 +516,7 @@ public class HomeFragment extends Fragment implements AdapterView.OnItemSelected
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         Log.d(TAG, "onActivityResult: called.");
+
         switch (requestCode) {
             case PERMISSIONS_REQUEST_ENABLE_GPS: {
                 if(mLocationPermissionGranted){
@@ -562,10 +529,26 @@ public class HomeFragment extends Fragment implements AdapterView.OnItemSelected
                     getLocationPermission();
                 }
             }
+            case 3: {
+                if(resultCode == Activity.RESULT_OK && data != null) {
+                    Uri image = data.getData();
+                    try {
+                        Bitmap temp = MediaStore.Images.Media.getBitmap(getActivity().getContentResolver(), image);
+                        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+                        temp.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream);
+                        this.image = Base64.encodeToString(byteArrayOutputStream.toByteArray(), Base64.DEFAULT);
+                        Toast.makeText(dialog.getContext(), "Image Uploaded", Toast.LENGTH_SHORT).show();
+
+                    } catch (FileNotFoundException e) {
+                        e.printStackTrace();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
         }
 
     }
-
 
     public void onResume() {
         super.onResume();
@@ -586,46 +569,32 @@ public class HomeFragment extends Fragment implements AdapterView.OnItemSelected
 
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    /*
-   @Override
-    public void onResume() {
-        super.onResume();
-        loadDataFromDB();
-    }*/
-
     public void loadDataFromDB() {
         if(user == null || user.getMoodHistory() == null) { return; }
+        int size=user.getMoodHistory().size();
 
         moodHistory.clear();
-        for(int i=0; i<user.getMoodHistory().size(); i++)
+        for(int i=0; i<size; i++)
         {
             moodHistory.add(user.getMoodHistory().get(i));
         }
         moodHistoryAdapter.notifyDataSetChanged();
     }
 
-    public void oldSaveDataToDB() {
-        Map<String, Object> data = new HashMap<>();
-        data.put("user"+currentUser.getEmail(), user);
-        userRef.set(data).addOnCompleteListener(new OnCompleteListener<Void>() {
-            @Override
-            public void onComplete(@NonNull Task<Void> task) {
-                if(task.isSuccessful()) {
-                    Log.d(TAG, "DocumentSnapshot successfully written!");
-                } else {
-                    Log.w(TAG, "Error writing document", task.getException());
-                }
-            }
-        });
-    }
 
     public void createMoodEvent(View view) {
-        dialog.setContentView(R.layout.add_mood_event); //opens the pop window
+        dialog.setContentView(R.layout.add_mood_event);
 
         Spinner feelingSpinner = (Spinner) dialog.findViewById(R.id.feelingSpinner);
+        ArrayAdapter<CharSequence> adapter1 = ArrayAdapter.createFromResource(getContext(), R.array.feelings, R.layout.spinner_item);
+        adapter1.setDropDownViewResource(android.R.layout.simple_list_item_1);
+        feelingSpinner.setAdapter(adapter1);
         feelingSpinner.setOnItemSelectedListener(this);
 
         Spinner socialStateSpinner = (Spinner) dialog.findViewById(R.id.socialStateSpinner);
+        ArrayAdapter<CharSequence> adapter2 = ArrayAdapter.createFromResource(getContext(), R.array.socialStates, R.layout.spinner_item);
+        adapter2.setDropDownViewResource(android.R.layout.simple_list_item_1);
+        socialStateSpinner.setAdapter(adapter2);
         socialStateSpinner.setOnItemSelectedListener(this);
 
         final CheckBox enableMap = dialog.findViewById(R.id.enableMap);
@@ -667,10 +636,8 @@ public class HomeFragment extends Fragment implements AdapterView.OnItemSelected
                 } else {
                     EmojiEditText et = dialog.findViewById(R.id.reasonET);
                     String reason = et.getText().toString();
-                    SimpleDateFormat datetime = new SimpleDateFormat("(yyyy/MM/dd) 'at' HH:mm");
-                    String datetimeStr = datetime.format(new Date());
-                    /////////////////////////////////////////////////////////////////////////////////////////
-/*
+
+                    /*
                     if (checkMapServices()) {
                         Log.d(TAG, "createMoodEvent: mLocationPermission" + mLocationPermissionGranted);
                         if (mLocationPermissionGranted) {
@@ -680,14 +647,20 @@ public class HomeFragment extends Fragment implements AdapterView.OnItemSelected
                             getLocationPermission();
                         }
                     }
-*/
-                    //boolean mapon = enableMap.isChecked();
-                    //Log.d(TAG, "createMoodEvent: mapon" + mapon);
-
+                    */
                     if (!feeling.equals("")) {
                         Mood newMood;
 
-                        newMood = new Mood(feeling, socialState, datetimeStr);
+                        /*if (reason == null && image == null) {
+                            newMood = new Mood(feeling, socialState, System.currentTimeMillis());
+                        } else if (image == null) {
+                            newMood = new Mood(feeling, socialState, System.currentTimeMillis(), reason);
+                        } else {
+                            newMood = new Mood(feeling, socialState, System.currentTimeMillis(), reason, image);
+                        }*/
+                        //boolean mapon = enableMap.isChecked();
+                        //Log.d(TAG, "createMoodEvent: mapon" + mapon);
+                        newMood = new Mood(feeling, socialState, System.currentTimeMillis());
                         if (reason != null) {
                             newMood.setReason(reason);
                         }
@@ -699,12 +672,9 @@ public class HomeFragment extends Fragment implements AdapterView.OnItemSelected
                             newMood.setGeo_point(geoPoint);
                             //geoPoint=null;
                         }
-                    /*if (reason == null) {
-                        newMood = new Mood(feeling, socialState, datetimeStr);
-                    } else {
-                        newMood = new Mood(feeling, socialState, datetimeStr, reason);
-                    }
-                     */
+                        if (image != null) {
+                            newMood.setImg(image);
+                        }
 
                         moodHistory.add(0, newMood); //inserts new mood at the beginning of list
                         moodHistoryAdapter.notifyDataSetChanged();
@@ -713,12 +683,24 @@ public class HomeFragment extends Fragment implements AdapterView.OnItemSelected
 
                         feeling = "";
                         socialState = "";
+                        image = null;
+                        geoPoint=null;
                         dialog.dismiss();   //closes the pop up window
 
                     } else if (feeling.equals("")) {
                         Toast.makeText(dialog.getContext(), "Please select how you feel", Toast.LENGTH_LONG).show();
                     }
+
+
                 }
+            }
+        });
+
+        TextView imageTV = dialog.findViewById(R.id.imageTV);
+        imageTV.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivityForResult(new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.INTERNAL_CONTENT_URI), 3);
             }
         });
 
@@ -730,7 +712,7 @@ public class HomeFragment extends Fragment implements AdapterView.OnItemSelected
             }
         });
 
-        dialog.show();
+        dialog.show();  //opens the pop window
     }
 
 

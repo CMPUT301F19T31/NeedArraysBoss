@@ -62,25 +62,25 @@
         android:layout_margin="8dp"
         android:gravity="center"/>
 
-    <EditText
-        android:id="@+id/phone"
+    <TextView
+        android:id="@+id/uploadDP"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:layout_below="@id/signupemail"
-        android:ems="10"
-        android:hint="Phone No."
-        android:inputType="phone"
+        android:text="@string/uploadDP"
         android:textColor="@color/white"
-        android:textColorHint="@color/white"
-        android:layout_margin="8dp"
-        android:gravity="center"/>
+        android:background="@color/appBackgroundAccent"
+        android:textSize="17sp"
+        android:padding="5dp"
+        android:layout_below="@id/signupemail"
+        android:layout_centerHorizontal="true"
+        android:layout_margin="10dp"
+        android:onClick="uploadDP"/>
 
     <Button
         android:id="@+id/signup"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/phone"
+        android:layout_below="@id/uploadDP"
         android:layout_centerHorizontal="true"
         android:backgroundTint="@color/cardview_shadow_end_color"
         android:text="Sign Up"
