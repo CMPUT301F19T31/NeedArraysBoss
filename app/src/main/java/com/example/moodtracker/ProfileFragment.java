@@ -6,6 +6,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -27,9 +30,12 @@ public class ProfileFragment extends Fragment {
     String email;
     DocumentReference docRef;
     User user;
-    TextView profile_name;
+    TextView profile_name, address;
 
     FirebaseAuth mAuth;
+    EditText edit_profile_name;
+    String temporary;
+    Button save;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -59,10 +65,15 @@ public class ProfileFragment extends Fragment {
         });
 
         profile_name = root.findViewById(R.id.tv_name);
+        edit_profile_name = root.findViewById(R.id.tv_name_edit);
+        edit_profile_name.setVisibility(View.INVISIBLE);
+        address = root.findViewById(R.id.tv_address);
+        save = root.findViewById(R.id.save);
+        save.setVisibility(View.INVISIBLE);
 
         FirebaseUser currentFirebaseUser = FirebaseAuth.getInstance().getCurrentUser() ;
-        assert currentFirebaseUser != null;
         email = currentFirebaseUser.getEmail();
+
 
         docRef = FirebaseFirestore.getInstance().collection("users")
                 .document("user"+email);
@@ -70,11 +81,32 @@ public class ProfileFragment extends Fragment {
             @Override
             public void onSuccess(DocumentSnapshot documentSnapshot) {
                 user = documentSnapshot.toObject(User.class);
+
+                profile_name.setText(user.getUserID());
+                address.setText(user.getEmail());
+                temporary = user.getUserID();
+
             }
         });
-        String name = user.getEmail();
 
-        profile_name.setText(name);
+        ImageView edit = root.findViewById(R.id.edit);
+        edit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                edit_profile_name.setText(temporary);
+                profile_name.setVisibility(View.INVISIBLE);
+                edit_profile_name.setVisibility(View.VISIBLE);
+                save.setVisibility(View.VISIBLE);
+                save.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        user.setUserID(edit_profile_name.getText().toString());
+                        getFragmentManager().beginTransaction().detach(ProfileFragment.this).attach(ProfileFragment.this).commit();
+                    }
+                });
+            }
+        });
+
 
         return root;
     }
