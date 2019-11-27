@@ -1,6 +1,5 @@
 package com.example.moodtracker;
 
-import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -9,12 +8,12 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
-import android.graphics.ImageDecoder;
 import android.location.Location;
 import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -41,11 +40,9 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
@@ -53,16 +50,11 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
-import com.google.firebase.firestore.GeoPoint;
 
 import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 
 public class HomeFragment extends Fragment implements AdapterView.OnItemSelectedListener {
 
@@ -80,7 +72,8 @@ public class HomeFragment extends Fragment implements AdapterView.OnItemSelected
     private User user;
     private FloatingActionButton actn_btn;
     private FloatingActionButton btnMap;
-    private Bitmap image;
+    private FloatingActionButton button_search;
+    private String image;
 
     //private static final String TAG = "HomeFragment";
     private boolean mLocationPermissionGranted = false;
@@ -107,11 +100,19 @@ public class HomeFragment extends Fragment implements AdapterView.OnItemSelected
         dialog = new Dialog(getContext());
         moodHistory = new ArrayList<Mood>();
         actn_btn = root.findViewById(R.id.addMoodEvent);
-
+        button_search= root.findViewById(R.id.search);
         actn_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 createMoodEvent(v);
+            }
+        });
+
+        button_search.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(getActivity(), Search_activity.class);
+                startActivity(intent);
             }
         });
 
@@ -137,6 +138,8 @@ public class HomeFragment extends Fragment implements AdapterView.OnItemSelected
             }
         });
          */
+
+
 
         btnMap = root.findViewById(R.id.btnMap);
         init();
@@ -164,7 +167,6 @@ public class HomeFragment extends Fragment implements AdapterView.OnItemSelected
                     startActivity(intent);
                 }
             });
-
         }
          */
 
@@ -191,6 +193,7 @@ public class HomeFragment extends Fragment implements AdapterView.OnItemSelected
 
         return root;
     }
+
 
     @Override
     public void onStart() {
@@ -241,8 +244,11 @@ public class HomeFragment extends Fragment implements AdapterView.OnItemSelected
         moodHistoryAdapter.notifyDataSetChanged();
     }
 
+
+
+
     public void createMoodEvent(View view) {
-        dialog.setContentView(R.layout.add_mood_event); //opens the pop window
+        dialog.setContentView(R.layout.add_mood_event);
 
         Spinner feelingSpinner = (Spinner) dialog.findViewById(R.id.feelingSpinner);
         ArrayAdapter<CharSequence> adapter1 = ArrayAdapter.createFromResource(getContext(), R.array.feelings, R.layout.spinner_item);
@@ -306,7 +312,7 @@ public class HomeFragment extends Fragment implements AdapterView.OnItemSelected
             }
         });
 
-        dialog.show();
+        dialog.show();  //opens the pop window
     }
 
 
@@ -332,7 +338,6 @@ public class HomeFragment extends Fragment implements AdapterView.OnItemSelected
             mUserLocation = new UserLocation();
             DocumentReference userRef = db.collection("Users")
                     .document(FirebaseAuth.getInstance().getUid());
-
             userRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                 @Override
                 public void onComplete(@NonNull Task<DocumentSnapshot> task) {
@@ -349,8 +354,6 @@ public class HomeFragment extends Fragment implements AdapterView.OnItemSelected
             getLastKnownLocation();
         }
     }
-
-
     private void getLastKnownLocation() {
         Log.d(TAG, "getLastKnownLocation: called.");
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -364,23 +367,18 @@ public class HomeFragment extends Fragment implements AdapterView.OnItemSelected
                     GeoPoint geoPoint = new GeoPoint(location.getLatitude(), location.getLongitude());
                     Log.d(TAG, "onComplete: latitude: " + geoPoint.getLatitude());
                     Log.d(TAG, "onComplete: longitude: " + geoPoint.getLongitude());
-
                     mUserLocation.setGeo_point(geoPoint);
                     //mUserLocation.setTimestamp(null);
                     saveUserLocation();
                 }
             }
         });
-
     }
-
     private void saveUserLocation(){
-
         if(mUserLocation != null){
             DocumentReference locationRef = db
                     .collection("UserLocation")
                     .document(FirebaseAuth.getInstance().getUid());
-
             locationRef.set(mUserLocation).addOnCompleteListener(new OnCompleteListener<Void>() {
                 @Override
                 public void onComplete(@NonNull Task<Void> task) {
@@ -525,9 +523,7 @@ public class HomeFragment extends Fragment implements AdapterView.OnItemSelected
     /*
     public boolean isServicesOK(){
         Log.d(TAG, "isServicesOK: checking google services version");
-
         int available = GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(getActivity());
-
         if(available == ConnectionResult.SUCCESS){
             //everything is fine and the user can make map requests
             Log.d(TAG, "isServicesOK: Google Play Services is working");
@@ -579,7 +575,10 @@ public class HomeFragment extends Fragment implements AdapterView.OnItemSelected
                 if(resultCode == Activity.RESULT_OK && data != null) {
                     Uri image = data.getData();
                     try {
-                        this.image = MediaStore.Images.Media.getBitmap(getActivity().getContentResolver(), image);
+                        Bitmap temp = MediaStore.Images.Media.getBitmap(getActivity().getContentResolver(), image);
+                        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+                        temp.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream);
+                        this.image = Base64.encodeToString(byteArrayOutputStream.toByteArray(), Base64.DEFAULT);
                         Toast.makeText(dialog.getContext(), "Image Uploaded", Toast.LENGTH_SHORT).show();
 
                     } catch (FileNotFoundException e) {
