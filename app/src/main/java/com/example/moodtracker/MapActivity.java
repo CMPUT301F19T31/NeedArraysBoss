@@ -114,8 +114,18 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.GeoPoint;
+import com.google.maps.android.clustering.ClusterManager;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 public class MapActivity extends AppCompatActivity implements OnMapReadyCallback{
 
@@ -154,10 +164,21 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     private FusedLocationProviderClient mFusedLocationProviderClient;
     private UserLocation mUserLocation;
     ////////////////////////////////////////////////
+    private ClusterManager<ClusterMarker> mClusterManager;
+    private MyClusterManagerRenderer mClusterManagerRenderer;
+    private ArrayList<ClusterMarker> mClusterMarkers = new ArrayList<>();
 
     //vars
     //private Boolean mLocationPermissionsGranted = false;
     private GoogleMap mMap;
+    private User user;
+    private FirebaseUser currentUser;
+    private ArrayList<Mood> moodHistory;
+    private FirebaseAuth mAuth;
+    private DocumentReference docRef;
+    private ArrayList<Mood> moods;
+    private HashMap<String, String> moodEmojis;
+    //private Map moodEmojis=new HashMap();
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -167,6 +188,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         //getLocationPermission();
         //isMapsEnabled();
         initMap();
+        initEmoji();
     }
 
     private void initMap(){
@@ -293,6 +315,124 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     }
 */
 
+    private void addMapMarkers(){
+
+        if(mMap != null){
+
+            if(mClusterManager == null){
+                mClusterManager = new ClusterManager<ClusterMarker>(this, mMap);
+            }
+            if(mClusterManagerRenderer == null){
+                mClusterManagerRenderer = new MyClusterManagerRenderer(this,
+                        mMap,
+                        mClusterManager
+                );
+                mClusterManager.setRenderer(mClusterManagerRenderer);
+            }
+
+            ///////////////////////////////////////////////////////////////////
+            for(UserLocation userLocation: mUserLocations){
+
+                Log.d(TAG, "addMapMarkers: location: " + userLocation.getGeo_point().toString());
+                try{
+                    String snippet = "";
+                    if(userLocation.getUser().getUser_id().equals(FirebaseAuth.getInstance().getUid())){
+                        snippet = "This is you";
+                    }
+                    else{
+                        snippet = "Determine route to " + userLocation.getUser().getUsername() + "?";
+                    }
+
+                    int avatar = R.drawable.cartman_cop; // set the default avatar
+                    try{
+                        avatar = Integer.parseInt(userLocation.getUser().getAvatar());
+                    }catch (NumberFormatException e){
+                        Log.d(TAG, "addMapMarkers: no avatar for " + userLocation.getUser().getUsername() + ", setting default.");
+                    }
+                    ClusterMarker newClusterMarker = new ClusterMarker(
+                            new LatLng(userLocation.getGeo_point().getLatitude(), userLocation.getGeo_point().getLongitude()),
+                            userLocation.getUser().getUsername(),
+                            snippet,
+                            avatar,
+                            userLocation.getUser()
+                    );
+                    mClusterManager.addItem(newClusterMarker);
+                    mClusterMarkers.add(newClusterMarker);
+
+                }catch (NullPointerException e){
+                    Log.e(TAG, "addMapMarkers: NullPointerException: " + e.getMessage() );
+                }
+
+            }
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+            mAuth = FirebaseAuth.getInstance();
+            currentUser = mAuth.getCurrentUser();
+            docRef.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                @Override
+                public void onSuccess(DocumentSnapshot documentSnapshot) {
+                    user = documentSnapshot.toObject(User.class);
+                }
+            });
+            moods = user.getMoodHistory();
+
+            for(Mood mood : moods){
+
+                Log.d(TAG, "addMapMarkers: location: " + mood.getGeo_point().toString());
+                try{
+                    String snippet = mood.getFeeling() + ": ";
+                    if(mood.getReason()!=null){
+                        snippet = snippet + mood.getReason();
+                    }
+                    else{
+                        snippet=snippet+"no reason";
+                    }
+
+                    int avatar = moodEmojis.get(mood.getFeeling()); // set the default avatar
+
+                    try{
+                        avatar = Integer.parseInt(userLocation.getUser().getAvatar());
+                    }catch (NumberFormatException e){
+                        Log.d(TAG, "addMapMarkers: no avatar for " + userLocation.getUser().getUsername() + ", setting default.");
+                    }
+                    ClusterMarker newClusterMarker = new ClusterMarker(
+                            new LatLng(userLocation.getGeo_point().getLatitude(), userLocation.getGeo_point().getLongitude()),
+                            userLocation.getUser().getUsername(),
+                            snippet,
+                            avatar,
+                            userLocation.getUser()
+                    );
+                    mClusterManager.addItem(newClusterMarker);
+                    mClusterMarkers.add(newClusterMarker);
+
+                }catch (NullPointerException e){
+                    Log.e(TAG, "addMapMarkers: NullPointerException: " + e.getMessage() );
+                }
+
+            }
+
+            }
+            mClusterManager.cluster();
+
+            setCameraView();
+        }
+    }
+
+    public void initEmoji() {
+        //initializes emoji array
+        moodEmojis = new HashMap<>();
+        moodEmojis.put("happy", new String(Character.toChars(0x1F601)));
+        moodEmojis.put("excited", new String(Character.toChars(0x1F606)));
+        moodEmojis.put("hopeful", new String(Character.toChars(0x1F60A)));
+        moodEmojis.put("satisfied", new String(Character.toChars(0x1F60C)));
+        moodEmojis.put("sad", new String(Character.toChars(0x1F61E)));
+        moodEmojis.put("angry", new String(Character.toChars(0x1F621)));
+        moodEmojis.put("frustrated", new String(Character.toChars(0x1F623)));
+        moodEmojis.put("confused", new String(Character.toChars(0x1F635)));
+        moodEmojis.put("annoyed", new String(Character.toChars(0x1F620)));
+        moodEmojis.put("hopeless", new String(Character.toChars(0x1F625)));
+        moodEmojis.put("lonely", new String(Character.toChars(0x1F614)));
+    }
 
     private void getDeviceLocation() {
         Log.d(TAG, "getDeviceLocation: getting the devices current location");

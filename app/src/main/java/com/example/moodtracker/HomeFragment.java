@@ -718,7 +718,6 @@ public class HomeFragment extends Fragment implements AdapterView.OnItemSelected
         dialog.show();  //opens the pop window
     }
 
-
     @Override
     public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
         if(adapterView.getId() == R.id.feelingSpinner)
