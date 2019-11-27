@@ -17,6 +17,7 @@
     <string name="socialStateTV">Are you by yourself?</string>
 
     <string name="imageTV">Upload Image</string>
+    <string name="uploadDP">Upload Profile Photo</string>
     <string name="locationTV">Use Location</string>
 
     <string name="posts">Posts</string>
