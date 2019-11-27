@@ -1,28 +1,49 @@
 package com.example.moodtracker;
 
+import android.app.Activity;
+import android.app.Dialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.util.Base64;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 
 public class ProfileFragment extends Fragment {
 
@@ -31,8 +52,14 @@ public class ProfileFragment extends Fragment {
     private User user;
 
     private ImageView imageView;
-    private TextView usernameTV;
-    private TextView emailTV;
+    private TextView usernameTV, emailTV;
+
+    private Dialog dialog;
+    private EditText editUsername;
+    private ImageView editImage;
+    private ArrayList<String> listOfUsers;
+    private String profilePic;
+    private boolean profilePicChanged = false;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -44,9 +71,9 @@ public class ProfileFragment extends Fragment {
         emailTV = root.findViewById(R.id.tv_address);
 
         docRef = FirebaseFirestore.getInstance().collection("users").document("user"+mAuth.getCurrentUser().getEmail());
-        docRef.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+        docRef.addSnapshotListener(new EventListener<DocumentSnapshot>() {
             @Override
-            public void onSuccess(DocumentSnapshot documentSnapshot) {
+            public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
                 user = documentSnapshot.toObject(User.class);
                 loadDataFromDB();
             }
@@ -73,17 +100,123 @@ public class ProfileFragment extends Fragment {
             }
         });
 
+        ImageView edit = root.findViewById(R.id.edit);
+        edit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                editProfile();
+            }
+        });
+
         return root;
     }
 
+    /**
+     *
+     */
     public void loadDataFromDB() {
         if(user == null) {
             return;
         }
-
         decodeImage(user.getProfilePic(), imageView);
         usernameTV.setText(user.getUserID());
         emailTV.setText(user.getEmail());
+        getUsers();
+    }
+
+    public void editProfile() {
+        dialog = new Dialog(getContext());
+        dialog.setContentView(R.layout.edit_profile);
+
+        editUsername = dialog.findViewById(R.id.tv_uname);
+        TextView editEmail = dialog.findViewById(R.id.tv_address);
+        editImage = dialog.findViewById(R.id.imgUser);
+
+        editUsername.setText(user.getUserID());
+        editEmail.setText(user.getEmail());
+        editEmail.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(getContext(), "Email cannot be changed.", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        decodeImage(user.getProfilePic(), editImage);
+
+        TextView save = dialog.findViewById(R.id.save_edit);
+        save.setOnClickListener(new View.OnClickListener() {    // save changes
+            @Override
+            public void onClick(View v) {
+                String username = editUsername.getText().toString();
+                if(username.equals("")) {
+                    Toast.makeText(getContext(), "Username cannot be null", Toast.LENGTH_SHORT).show();
+                    return;
+                } else if (!checkUsername(username)) {
+                    Toast.makeText(getContext(), "Username already exists", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                user.setUserID(username);
+                if(profilePicChanged) {
+                    user.setProfilePic(profilePic);
+                    profilePic = null;
+                    profilePicChanged = false;
+                }
+                docRef.set(user);
+                dialog.dismiss();
+            }
+        });
+
+        editImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivityForResult(new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.INTERNAL_CONTENT_URI), 3);
+            }
+        });
+
+        TextView cancel = dialog.findViewById(R.id.cancel_edit);
+        cancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();   // cancel changes
+            }
+        });
+
+        dialog.show();
+        dialog.getWindow().setLayout(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
+    }
+
+    /**
+     * getUsers
+     * This is a helper function to loadDataFromDB. It retrieves all the users from the database.
+     */
+    public void getUsers() {
+        CollectionReference ref = FirebaseFirestore.getInstance().collection("users");
+        listOfUsers = new ArrayList<>();
+
+        ref.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                if(task.isSuccessful()) {
+                    for(DocumentSnapshot doc: task.getResult()) {
+                        listOfUsers.add(doc.toObject(User.class).getUserID());
+                    }
+                    listOfUsers.remove(user.getUserID());
+                }
+            }
+        });
+    }
+
+    /**
+     * checkUsername
+     * This function checks if the username entered already exists
+     * @return true if doesnt exist, else false
+     */
+    public boolean checkUsername(String username) {
+        for(int i=0; i<listOfUsers.size(); i++) {
+            if(listOfUsers.get(i).compareTo(username)==0)
+                return false;
+        }
+        return true;
     }
 
     /**
@@ -100,5 +233,32 @@ public class ProfileFragment extends Fragment {
         InputStream stream = new ByteArrayInputStream(Base64.decode(imageDataBytes.getBytes(), Base64.DEFAULT));
         Bitmap bitmap = BitmapFactory.decodeStream(stream);
         imageView.setImageBitmap(bitmap);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        switch (requestCode) {
+            case 3: {
+                if (resultCode == Activity.RESULT_OK && data != null) {
+                    Uri image = data.getData();
+                    try {
+                        Bitmap temp = MediaStore.Images.Media.getBitmap(getActivity().getContentResolver(), image);
+                        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+                        temp.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream);
+                        this.profilePic = Base64.encodeToString(byteArrayOutputStream.toByteArray(), Base64.DEFAULT);
+                        profilePicChanged = true;
+                        Toast.makeText(dialog.getContext(), "Image Uploaded", Toast.LENGTH_SHORT).show();
+
+                    } catch (FileNotFoundException e) {
+                        e.printStackTrace();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }
+
     }
 }
