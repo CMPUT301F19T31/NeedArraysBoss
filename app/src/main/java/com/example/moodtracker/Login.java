@@ -43,7 +43,6 @@ public class Login extends AppCompatActivity {
 
     }
 
-
     public void signInUser (View v) {
         final String emailID = email.getText().toString();
         final String pwd = password.getText().toString();
@@ -63,7 +62,12 @@ public class Login extends AppCompatActivity {
                     .addOnSuccessListener(Login.this, new OnSuccessListener<AuthResult>() {
                         @Override
                         public void onSuccess(AuthResult authResult) {
-                            commitUser();
+                            Intent intent = new Intent(Login.this, MainActivity.class);
+                            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                            startActivity(intent);
+                            finish();
                         }
                     }).addOnFailureListener(new OnFailureListener() {
                 @Override
@@ -78,20 +82,5 @@ public class Login extends AppCompatActivity {
     public void createUser(View v) {
         Intent i = new Intent(Login.this,SignUpActivity.class);
         startActivity(i);
-    }
-
-    public void commitUser() {
-        userRef = FirebaseFirestore.getInstance().collection("users").document("user"+mFirebaseAuth.getCurrentUser().getEmail());
-        //Map<String, Object> data = new HashMap<>();
-        User user = new User("0", mFirebaseAuth.getCurrentUser().getEmail(),"000000");
-        //data.put("user"+user.getEmail(), user);
-        userRef.set(user).addOnCompleteListener(new OnCompleteListener<Void>() {
-            @Override
-            public void onComplete(@NonNull Task<Void> task) {
-                if(task.isSuccessful()) {
-                    finish();
-                }
-            }
-        });
     }
 }
