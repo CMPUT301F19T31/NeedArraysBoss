@@ -26,7 +26,7 @@ import java.util.List;
 import static java.sql.Types.NULL;
 
 public class search_userdata extends AppCompatActivity {
-    private TextView textView1, tv;
+    private TextView textView1, tv, tv_uid;
     private DocumentReference docRef;
     private FirebaseAuth mAuth;
     private String text;
@@ -78,6 +78,11 @@ public class search_userdata extends AppCompatActivity {
             if(user.getFriendList()==null || user.getFriendList().isEmpty()) {
                 textView1.setText("0");
             }
+            else {
+                textView1.setText(user.getFriendList().size());
+            }
+            tv_uid=findViewById(R.id.tv_name);
+            tv_uid.setText(user.getUserID());
         }
     });
 
