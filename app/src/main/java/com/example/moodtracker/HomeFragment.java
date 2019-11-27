@@ -342,6 +342,7 @@ public class HomeFragment extends Fragment implements AdapterView.OnItemSelected
             }
         });*/
 
+        Log.d(TAG, "init: mLocationPermissionGranted " + mLocationPermissionGranted);
         if(checkMapServices()) {
             if (mLocationPermissionGranted) {
                 Intent intent = new Intent(getActivity(), MapActivity.class);
@@ -655,6 +656,7 @@ public class HomeFragment extends Fragment implements AdapterView.OnItemSelected
             @Override
             public void onClick(View view) {
                 //boolean mapon = enableMap.isChecked();
+                Log.d(TAG, "createMoodEvent: mLocationPermissionGranted " + mLocationPermissionGranted);
                 if (enableMap.isChecked() && !mLocationPermissionGranted) {
                     Toast.makeText(getContext(), "Permission not Granted", Toast.LENGTH_SHORT).show();
                     enableMap.setChecked(false);
