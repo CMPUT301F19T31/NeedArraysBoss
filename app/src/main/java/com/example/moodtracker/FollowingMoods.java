@@ -31,7 +31,7 @@ public class FollowingMoods extends Fragment {
     private FirebaseAuth mAuth;
     private CollectionReference userRef;
     private User currentUser;
-    private ArrayList<String> friends;
+    private ArrayList<Following> friends;
 
     private RecyclerView rv;
     private ArrayList<Mood> friendMoodHistory;
@@ -77,7 +77,7 @@ public class FollowingMoods extends Fragment {
                 currentUser = documentSnapshot.toObject(User.class);
 
                 for(int i=0; i<currentUser.getFollowingList().size(); i++)
-                    friends.add(currentUser.getFollowingList().get(i).getUser());
+                    friends.add(currentUser.getFollowingList().get(i));
                 refreshList();
             }
         });
@@ -92,7 +92,7 @@ public class FollowingMoods extends Fragment {
                 friendMoodHistory.clear();
                 for(DocumentSnapshot doc: data) {
                     User user = doc.toObject(User.class);
-                    if(friends.contains(user.getEmail())) {
+                    if(friends.contains(user.getUserID())) {
                         for(int i=0; i<user.getMoodHistory().size(); i++) {
                             Mood mood = user.getMoodHistory().get(i);
                             mood.setFriend(user.getUserID());

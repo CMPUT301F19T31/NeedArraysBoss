@@ -5,15 +5,7 @@ import java.util.ArrayList;
 public class User {
 
     private String userID, email, password, profilePic;
-    private int numFollwers=0;
-
-    public int getNumFollwers() {
-        return numFollwers;
-    }
-
-    public void setNumFollwers(int numFollwers) {
-        this.numFollwers = numFollwers;
-    }
+    private int numFollwers = 0;
 
     private ArrayList<Mood> moodHistory = new ArrayList<>();
     private ArrayList<Following> followingList = new ArrayList<>();
