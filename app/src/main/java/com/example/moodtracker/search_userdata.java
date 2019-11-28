@@ -1,8 +1,12 @@
 package com.example.moodtracker;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
+import android.util.Base64;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -14,6 +18,9 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+
 public class search_userdata extends AppCompatActivity {
     private TextView textView1, tv, tv_uid;
     private DocumentReference docRef;
@@ -21,8 +28,10 @@ public class search_userdata extends AppCompatActivity {
     private String text;
     private User user;
     private User user2;
+    private ImageView editImage;
     private DocumentReference documentReference;
     private DocumentReference documentReference2;
+    private ImageView imageView;
     int flag;
     TextView followerstv;
     TextView followingtv;
@@ -36,7 +45,7 @@ public class search_userdata extends AppCompatActivity {
         final Button testButton = (Button) findViewById(R.id.button1);
         testButton.setTag(1);
 
-
+        imageView = findViewById(R.id.imgUser);
         tv=findViewById(R.id.emailaddress);
         tv.setText(getIntent().getStringExtra("email"));
 
@@ -51,11 +60,14 @@ public class search_userdata extends AppCompatActivity {
             @Override
             public void onSuccess(DocumentSnapshot documentSnapshot) {
                 user=documentSnapshot.toObject(User.class);
+                decodeImage(user.getProfilePic(), imageView);
                 followerstv.setText(Integer.toString(user.getNumFollwers()));
                 followingtv.setText(Integer.toString(user.getFollowingList().size()));
                 tv_uid.setText(user.getUserID());
             }
         });
+
+
 
 
         testButton.setOnClickListener(new View.OnClickListener() {
@@ -151,6 +163,15 @@ public class search_userdata extends AppCompatActivity {
 
 
 
+    }
+    public void decodeImage(String completeImageData, ImageView imageView) {
+        if (completeImageData == null) { return; }
+
+        // Incase you're storing into aws or other places where we have extension stored in the starting.
+        String imageDataBytes = completeImageData.substring(completeImageData.indexOf(",")+1);
+        InputStream stream = new ByteArrayInputStream(Base64.decode(imageDataBytes.getBytes(), Base64.DEFAULT));
+        Bitmap bitmap = BitmapFactory.decodeStream(stream);
+        imageView.setImageBitmap(bitmap);
     }
 }
 

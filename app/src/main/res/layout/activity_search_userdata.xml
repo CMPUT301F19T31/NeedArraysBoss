@@ -13,11 +13,12 @@
         android:paddingBottom="20dp">
 
         <RelativeLayout
-            android:id="@+id/imgUser"
+
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
             <ImageView
+                android:id="@+id/imgUser"
                 android:layout_width="120dp"
                 android:layout_height="120dp"
                 android:layout_margin="9dp"
