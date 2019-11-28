@@ -144,11 +144,23 @@
         </RelativeLayout>
     </LinearLayout>
 
+    <TextView
+        android:id="@+id/notificationsTV"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Notifications"
+        android:textStyle="bold"
+        android:textColor="@color/appBackground"
+        android:textSize="17sp"
+        android:background="@color/grey"
+        android:padding="5dp"
+        android:layout_below="@id/linearlayout"/>
+
     <ListView
         android:id="@+id/notificationsLV"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@id/linearlayout"
+        android:layout_below="@id/notificationsTV"
         android:background="@color/white"/>
 
     <Button
