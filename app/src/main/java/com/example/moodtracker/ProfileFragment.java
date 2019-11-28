@@ -1,7 +1,10 @@
 package com.example.moodtracker;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
+import android.util.Base64;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,6 +26,8 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.util.Objects;
 
 public class ProfileFragment extends Fragment {
@@ -87,6 +92,10 @@ public class ProfileFragment extends Fragment {
                 profile_name.setText(user.getUserID());
                 address.setText(user.getEmail());
                 temporary = user.getUserID();
+                String imageDataBytes = user.getImageurl().substring(user.getImageurl().indexOf(",")+1);
+                InputStream stream = new ByteArrayInputStream(Base64.decode(imageDataBytes.getBytes(), Base64.DEFAULT));
+                Bitmap bitmap = BitmapFactory.decodeStream(stream);
+                profile_image.setImageBitmap(bitmap);
 
             }
         });
@@ -108,6 +117,8 @@ public class ProfileFragment extends Fragment {
                 });
             }
         });
+
+
 
 
         return root;

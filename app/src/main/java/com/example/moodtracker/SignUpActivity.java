@@ -53,7 +53,6 @@ public class SignUpActivity extends AppCompatActivity {
     private FirebaseAuth.AuthStateListener mAuthStateListener;
     private ArrayList<User> users;
     GoogleSignInClient mGoogleSignInClient;
-    //int RC_SIGN_IN = 0;
     private FirebaseAuth mAuth;
     private int permissions = 0;
     ImageView picture;
@@ -127,6 +126,7 @@ public class SignUpActivity extends AppCompatActivity {
             Uri imageUri = data.getData();
             try {
                 Bitmap temp = MediaStore.Images.Media.getBitmap(getContentResolver(), imageUri);
+                picture.setImageBitmap(temp);
                 ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
                 temp.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream);
                 this.imageUri = Base64.encodeToString(byteArrayOutputStream.toByteArray(), Base64.DEFAULT);
