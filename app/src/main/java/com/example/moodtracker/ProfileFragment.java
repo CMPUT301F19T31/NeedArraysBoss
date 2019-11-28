@@ -105,6 +105,7 @@ public class ProfileFragment extends Fragment {
                     intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                     startActivity(intent);
+                    getActivity().finish();
                 }
             }
         });
@@ -174,7 +175,8 @@ public class ProfileFragment extends Fragment {
     }
 
     /**
-     *
+     * loadDataFromDB
+     * Uses data from database to fill in the fields in the layout.
      */
     public void loadDataFromDB() {
         if(user == null) {
@@ -192,6 +194,11 @@ public class ProfileFragment extends Fragment {
         getUsers();
     }
 
+    /**
+     * editProfile
+     * Is called when the user presses the edit button. It handles the dialog window that allows
+     * the user to change their profile picture and username.
+     */
     public void editProfile() {
         dialog = new Dialog(getContext());
         dialog.setContentView(R.layout.edit_profile);
