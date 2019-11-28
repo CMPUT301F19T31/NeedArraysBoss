@@ -102,9 +102,9 @@ public class Search_activity extends AppCompatActivity {
 
                     String email= list1.get(position);
                     //String email=username.getE
-                    Intent intent= new Intent(Search_activity.this, search_userdata.class);
-                    intent.putExtra("email",email);
-                    startActivity(intent);
+                   // Intent intent= new Intent(Search_activity.this, search_userdata.class);
+                    //intent.putExtra("email",email);
+                    //startActivity(intent);
                 }
             });
         }
