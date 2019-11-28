@@ -10,8 +10,7 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@+id/relativeLayout"
-        android:padding="10dp">
+        android:id="@+id/relativeLayout">
 
         <androidx.emoji.widget.EmojiTextView
             android:id="@+id/feelingVH"
@@ -19,6 +18,9 @@
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
             android:layout_alignParentLeft="true"
+            android:layout_marginTop="10dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
             android:textColor="@android:color/black"
             android:textSize="20sp"
             android:textStyle="bold"
@@ -29,6 +31,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@+id/feelingVH"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
             android:layout_alignParentLeft="true"
             android:textSize="15sp"
             android:textColorHint="@color/white"/>
@@ -39,6 +43,8 @@
             android:layout_height="wrap_content"
             android:layout_below="@+id/reasonVH"
             android:layout_alignParentLeft="true"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
             android:textSize="15sp"
             android:textStyle="italic"
             android:textColorHint="@color/white"/>
@@ -47,7 +53,8 @@
             android:id="@+id/displayMoodImage"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="5dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
             android:layout_below="@id/socialStateVH"/>
 
         <RelativeLayout
@@ -62,7 +69,8 @@
                 android:layout_height="wrap_content"
                 android:textColor="@color/darkGrey"
                 android:textStyle="bold"
-                android:textSize="12sp"/>
+                android:textSize="12sp"
+                android:layout_margin="5dp"/>
 
             <TextView
                 android:id="@+id/timeTV"
@@ -71,7 +79,8 @@
                 android:layout_alignParentRight="true"
                 android:textColor="@color/darkGrey"
                 android:textStyle="italic"
-                android:textSize="12sp"/>
+                android:textSize="12sp"
+                android:layout_margin="5dp"/>
 
         </RelativeLayout>
     </RelativeLayout>

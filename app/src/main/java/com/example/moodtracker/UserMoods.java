@@ -84,7 +84,7 @@ public class UserMoods extends Fragment implements AdapterView.OnItemSelectedLis
     private static final String FINE_LOCATION = Manifest.permission.ACCESS_FINE_LOCATION;
     private static final String COURSE_LOCATION = Manifest.permission.ACCESS_COARSE_LOCATION;
     //private static final int LOCATION_PERMISSION_REQUEST_CODE = 1234;
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
     private boolean mLocationPermissionGranted = false;
     public static final int ERROR_DIALOG_REQUEST = 9001;
     public static final int PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 9002;
@@ -248,6 +248,18 @@ public class UserMoods extends Fragment implements AdapterView.OnItemSelectedLis
     }
 
 
+    @Override
+    public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+        if (adapterView.getId() == R.id.feelingSpinner)
+            feeling = adapterView.getItemAtPosition(i).toString();
+        else if (adapterView.getId() == R.id.socialStateSpinner)
+            socialState = adapterView.getItemAtPosition(i).toString();
+
+    }
+
+    @Override
+    public void onNothingSelected(AdapterView<?> adapterView) { }
+
     public void createMoodEvent(View view) {
         dialog.setContentView(R.layout.add_mood_event);
 
@@ -287,42 +299,11 @@ public class UserMoods extends Fragment implements AdapterView.OnItemSelectedLis
 
 
         Button addEventBtn = dialog.findViewById(R.id.addMoodEvent);
+
         addEventBtn.setOnClickListener(new View.OnClickListener() {
-
-            /*@Override
-            public void onClick(View view) {
-                EmojiEditText et = dialog.findViewById(R.id.reasonET);
-                String reason = et.getText().toString();
-
-                if(!feeling.equals("")) {
-                    Mood newMood;
-
-                    if (reason == null && image == null && geo) {
-                        newMood = new Mood(feeling, socialState, System.currentTimeMillis());
-                    } else if(image == null) {
-                        newMood = new Mood(feeling, socialState, System.currentTimeMillis(), reason);
-                    } else {
-                        newMood = new Mood(feeling, socialState, System.currentTimeMillis(), reason, image);
-                    }
-                    moodHistory.add(0, newMood); //inserts new mood at the beginning of list
-                    moodHistoryAdapter.notifyDataSetChanged();
-                    user.setMoodHistory(moodHistory);
-                    userRef.set(user);  // save to db
-
-                    feeling = "";
-                    socialState = "";
-                    image = null;
-                    dialog.dismiss();   //closes the pop up window
-
-                } else if (feeling.equals("")) {
-                    Toast.makeText(dialog.getContext(), "Please select how you feel", Toast.LENGTH_LONG).show();
-                }
-            }
-        });*/
-
             @Override
             public void onClick(View view) {
-                //boolean mapon = enableMap.isChecked();
+
                 Log.d(TAG, "createMoodEvent: mLocationPermissionGranted " + mLocationPermissionGranted);
                 if (enableMap.isChecked() && !mLocationPermissionGranted) {
                     Toast.makeText(getContext(), "Permission not Granted", Toast.LENGTH_SHORT).show();
@@ -413,20 +394,6 @@ public class UserMoods extends Fragment implements AdapterView.OnItemSelectedLis
     }
 
 
-    @Override
-    public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-        if (adapterView.getId() == R.id.feelingSpinner)
-            feeling = adapterView.getItemAtPosition(i).toString();
-        else if (adapterView.getId() == R.id.socialStateSpinner)
-            socialState = adapterView.getItemAtPosition(i).toString();
-
-    }
-
-    @Override
-    public void onNothingSelected(AdapterView<?> adapterView) {
-
-    }
-
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     /*
@@ -490,7 +457,10 @@ public class UserMoods extends Fragment implements AdapterView.OnItemSelectedLis
     }
 */
 
-
+    /**
+     * init
+     * Initializes the map if map services are working, and location permission is granted.
+     */
     private void init() {
         /*btnMap.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -526,6 +496,11 @@ public class UserMoods extends Fragment implements AdapterView.OnItemSelectedLis
 
     }
 
+    /**
+     * isServicesOk
+     * Checks if google services are installed/up-to-date.
+     * @return true if up-to-date
+     */
     public boolean isServicesOK() {
         Log.d(TAG, "isServicesOK: checking google services version");
 
@@ -716,7 +691,8 @@ public class UserMoods extends Fragment implements AdapterView.OnItemSelectedLis
         switch (requestCode) {
             case PERMISSIONS_REQUEST_ENABLE_GPS: {
                 if (mLocationPermissionGranted) {
-                    init();
+                    if(getmap)
+                        init();
                     getDeviceLocation();
                     //getLastKnownLocation();
                     //getUserDetails();
@@ -731,6 +707,11 @@ public class UserMoods extends Fragment implements AdapterView.OnItemSelectedLis
                         Bitmap temp = MediaStore.Images.Media.getBitmap(getActivity().getContentResolver(), image);
                         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
                         temp.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream);
+                        int num = 50;
+                        while (byteArrayOutputStream.toByteArray().length > 10000 && num != 0) {
+                            temp.compress(Bitmap.CompressFormat.JPEG, num, byteArrayOutputStream);
+                            num = num / 2;
+                        }
                         this.image = Base64.encodeToString(byteArrayOutputStream.toByteArray(), Base64.DEFAULT);
                         Toast.makeText(dialog.getContext(), "Image Uploaded", Toast.LENGTH_SHORT).show();
 
@@ -744,7 +725,11 @@ public class UserMoods extends Fragment implements AdapterView.OnItemSelectedLis
         }
 
     }
+
+
 }
+
+
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
