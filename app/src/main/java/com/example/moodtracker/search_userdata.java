@@ -45,7 +45,7 @@ public class search_userdata extends AppCompatActivity {
         final Button testButton = (Button) findViewById(R.id.button1);
         testButton.setTag(1);
 
-        //imageView = findViewById(R.id.imgUser);
+        imageView = findViewById(R.id.imgUser);
         tv=findViewById(R.id.emailaddress);
         tv.setText(getIntent().getStringExtra("email"));
 
@@ -60,7 +60,7 @@ public class search_userdata extends AppCompatActivity {
             @Override
             public void onSuccess(DocumentSnapshot documentSnapshot) {
                 user=documentSnapshot.toObject(User.class);
-                //decodeImage(user.getProfilePic(), imageView);
+                decodeImage(user.getProfilePic(), imageView);
                 followerstv.setText(Integer.toString(user.getNumFollwers()));
                 followingtv.setText(Integer.toString(user.getFollowingList().size()));
                 tv_uid.setText(user.getUserID());
@@ -164,7 +164,7 @@ public class search_userdata extends AppCompatActivity {
 
 
     }
-    /*public void decodeImage(String completeImageData, ImageView imageView) {
+    public void decodeImage(String completeImageData, ImageView imageView) {
         if (completeImageData == null) { return; }
 
         // Incase you're storing into aws or other places where we have extension stored in the starting.
@@ -173,7 +173,7 @@ public class search_userdata extends AppCompatActivity {
         Bitmap bitmap = BitmapFactory.decodeStream(stream);
         imageView.setImageBitmap(bitmap);
     }
-    */
+    
 
 }
 
