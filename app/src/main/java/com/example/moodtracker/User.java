@@ -43,6 +43,14 @@ public class User {
         imageurl="";
         //moodHistory = null;
     }
+    public User(String userID, String email, String password, String imageurl) {
+        this.userID = userID;
+        this.email = email;
+        this.password = password;
+        this.phone = "";
+        this.imageurl= imageurl;
+        //moodHistory = null;
+    }
     public User(String userID, String email, String password, String id, String phone, String imageurl) {
         this.userID = userID;
         this.email = email;

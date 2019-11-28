@@ -31,6 +31,7 @@ public class ProfileFragment extends Fragment {
     DocumentReference docRef;
     User user;
     TextView profile_name, address;
+    ImageView profile_image;
 
     FirebaseAuth mAuth;
     EditText edit_profile_name;
@@ -65,6 +66,7 @@ public class ProfileFragment extends Fragment {
         });
 
         profile_name = root.findViewById(R.id.tv_name);
+        profile_image = root.findViewById(R.id.image_profile);
         edit_profile_name = root.findViewById(R.id.tv_name_edit);
         edit_profile_name.setVisibility(View.INVISIBLE);
         address = root.findViewById(R.id.tv_address);

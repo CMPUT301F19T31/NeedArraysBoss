@@ -5,6 +5,7 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -36,6 +37,8 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
 
+import java.io.ByteArrayOutputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -55,7 +58,7 @@ public class SignUpActivity extends AppCompatActivity {
     private int permissions = 0;
     ImageView picture;
     private static final int PICK_IMAGE = 1;
-    Uri imageUri;
+    String imageUri;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -120,13 +123,17 @@ public class SignUpActivity extends AppCompatActivity {
                 Toast.makeText(this, "Sign-in failed, try again later.", Toast.LENGTH_LONG).show();
             }
         }
-        if (requestCode == PICK_IMAGE && resultCode == RESULT_OK) {
-            imageUri = data.getData();
+        if (requestCode == PICK_IMAGE && resultCode == RESULT_OK && data != null) {
+            Uri imageUri = data.getData();
             try {
-                Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(),imageUri);
-                picture.setImageBitmap(bitmap);
-            }
-            catch (IOException e) {
+                Bitmap temp = MediaStore.Images.Media.getBitmap(getContentResolver(), imageUri);
+                ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+                temp.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream);
+                this.imageUri = Base64.encodeToString(byteArrayOutputStream.toByteArray(), Base64.DEFAULT);
+                Toast.makeText(this, "Image Uploaded", Toast.LENGTH_SHORT).show();
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
                 e.printStackTrace();
             }
         }
@@ -166,61 +173,6 @@ public class SignUpActivity extends AppCompatActivity {
                 });
     }
 
-
-
-//    @Override
-//    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-//        super.onActivityResult(requestCode, resultCode, data);
-//
-//        // Result returned from launching the Intent from GoogleSignInClient.getSignInIntent(...);
-//        if (requestCode == 0) {
-//            // The Task returned from this call is always completed, no need to attach
-//            // a listener.
-//            Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
-//            handleSignInResult(task);
-//        }
-//    }
-//
-//    private void handleSignInResult(Task<GoogleSignInAccount> completedTask) {
-//        try {
-//            GoogleSignInAccount account = completedTask.getResult(ApiException.class);
-//
-//            // Signed in successfully, show authenticated UI.
-//            uname = account.getDisplayName();
-//            emailID = account.getEmail();
-//            pwd = account.getId();
-//
-//
-//            if(mFirebaseAuth.getCurrentUser() != null) {
-//                commitUser();
-//            }
-//
-//            mFirebaseAuth.createUserWithEmailAndPassword(emailID, pwd).addOnCompleteListener(SignUpActivity.this, new OnCompleteListener<AuthResult>() {
-//                @Override
-//                public void onComplete(@NonNull Task<AuthResult> task) {
-//                    if(!task.isSuccessful()){
-//                        Toast.makeText(SignUpActivity.this, "SignUp Unsuccessful.\n Please change your email try again!", Toast.LENGTH_LONG);
-//                    } else {
-//                        signInUser();
-//                    }
-//                }
-//            });
-//
-//           *//* GoogleSignInAccount acct = GoogleSignIn.getLastSignedInAccount(this);
-//            if (acct != null) {
-//                uname = acct.getDisplayName();
-//                emailID = acct.getEmail();
-//                pwd = acct.getId();
-//
-//            }*//*
-//
-//
-//        } catch (ApiException e) {
-//            // The ApiException status code indicates the detailed failure reason.
-//            // Please refer to the GoogleSignInStatusCodes class reference for more information.
-//            Log.w(TAG, "signInResult:failed code=" + e.getStatusCode());
-//        }
-//    }*/
 
     public void signUpUser(View v) {
         uname = username.getText().toString();
@@ -306,23 +258,34 @@ public class SignUpActivity extends AppCompatActivity {
      * mainactivity if successful.
      */
     public void commitUser() {
+        //checks if username is unique
         if(!checkUsername()) {
-            Toast.makeText(SignUpActivity.this, "SignUpUnsuccessful. Username already exits!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(SignUpActivity.this, "Login unsuccessful! Username already exists.", Toast.LENGTH_SHORT).show();
             return;
         }
+
         DocumentReference userRef = FirebaseFirestore.getInstance().collection("users").document("user"+mFirebaseAuth.getCurrentUser().getEmail());
-        User user = new User(uname, emailID,pwd);
+        User user;
+        if(imageUri == null) {
+            user = new User(uname, emailID, pwd);
+        } else {
+            user = new User(uname, emailID, pwd, imageUri);
+        }
 
         userRef.set(user).addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override
             public void onComplete(@NonNull Task<Void> task) {
                 if(task.isSuccessful()) {
+                    Toast.makeText(SignUpActivity.this, "Login successful!", Toast.LENGTH_SHORT).show();
+
                     Intent intent = new Intent(SignUpActivity.this, MainActivity.class);
                     intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                     intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                     startActivity(intent);
                     finish();
+                } else {
+                    imageUri = null;
                 }
             }
         });
