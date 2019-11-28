@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/cardview_dark_background"
+    android:layout_gravity="center_vertical">
+
+    <RelativeLayout
+        android:id="@+id/imgUserView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <ImageView
+            android:id="@+id/imgUser"
+            android:layout_width="120dp"
+            android:layout_height="wrap_content"
+            android:layout_margin="9dp"
+            android:padding="3dp"
+            android:layout_centerHorizontal="true"/>
+
+    </RelativeLayout>
+
+    <EditText
+        android:id="@+id/tv_uname"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/imgUserView"
+        android:layout_centerHorizontal="true"
+        android:fontFamily="sans-serif-light"
+        android:hint="Username"
+        android:layout_marginTop="15sp"
+        android:textSize="32sp"
+        android:textColor="@color/white"
+        android:textColorHint="@color/white"/>
+
+    <TextView
+        android:id="@+id/tv_address"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/tv_uname"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="20dp"
+        android:fontFamily="sans-serif"
+        android:text="Address"
+        android:layout_marginTop="15sp"
+        android:textSize="15sp"
+        android:textColor="@color/address"
+        android:textColorHint="@color/address" />
+
+    <LinearLayout
+        android:id="@+id/linearlayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_below="@id/tv_address">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@color/white">
+
+            <TextView
+                android:id="@+id/cancel_edit"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="@color/white"
+                android:fontFamily="sans-serif-light"
+                android:padding="5dp"
+                android:text="@string/cancel_edit"
+                android:textColor="@color/angry"
+                android:textSize="32sp"
+                android:layout_centerHorizontal="true"/>
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@color/white">
+
+            <TextView
+                android:id="@+id/save_edit"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/save_edit"
+                android:textColor="@color/sad"
+                android:background="@color/white"
+                android:fontFamily="sans-serif-light"
+                android:padding="5dp"
+                android:textSize="32sp"
+                android:layout_centerHorizontal="true"/>
+
+        </RelativeLayout>
+    </LinearLayout>
+
+
+</RelativeLayout>
+

@@ -1,7 +1,12 @@
 package com.example.moodtracker;
 
+import android.app.Activity;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
+import android.util.Base64;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -23,17 +28,22 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
 
+import java.io.ByteArrayOutputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
 
 public class SignUpActivity extends AppCompatActivity {
     EditText username, password, repassword, email, phone;
-    String uname, emailID, pwd;
+    String uname, emailID, pwd, image;
     Button SignUp;
     TextView TextSignUp;
     FirebaseAuth mFirebaseAuth;
     String TAG = "";
+
     private FirebaseAuth.AuthStateListener mAuthStateListener;
     private ArrayList<User> users;
+    private boolean done = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,10 +56,38 @@ public class SignUpActivity extends AppCompatActivity {
         email = findViewById(R.id.signupemail);
         password = findViewById(R.id.signuppassword);
         repassword = findViewById(R.id.confirmpword);
-        phone = findViewById(R.id.phone);
         SignUp = findViewById(R.id.signup);
         TextSignUp = findViewById(R.id.textView2);
 
+
+    }
+
+    public void uploadDP (View v) {
+        startActivityForResult(new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.INTERNAL_CONTENT_URI), 3);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        switch (requestCode) {
+            case 3: {
+                if (resultCode == Activity.RESULT_OK && data != null) {
+                    Uri image = data.getData();
+                    try {
+                        Bitmap temp = MediaStore.Images.Media.getBitmap(getContentResolver(), image);
+                        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+                        temp.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream);
+                        this.image = Base64.encodeToString(byteArrayOutputStream.toByteArray(), Base64.DEFAULT);
+                        Toast.makeText(this, "Image Uploaded", Toast.LENGTH_SHORT).show();
+                    } catch (FileNotFoundException e) {
+                        e.printStackTrace();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }
     }
 
     public void signUpUser(View v) {
@@ -57,7 +95,6 @@ public class SignUpActivity extends AppCompatActivity {
         emailID = email.getText().toString();
         pwd = password.getText().toString();
         String repwd = repassword.getText().toString();
-        String pno = phone.getText().toString();
 
         if (uname.isEmpty()) {
             password.setError("Please enter your username");
@@ -75,14 +112,10 @@ public class SignUpActivity extends AppCompatActivity {
             password.setError("Please re-enter your password ");
             password.requestFocus();
         }
-        else if (pno.isEmpty()) {
-            password.setError("Please enter your password");
-            password.requestFocus();
-        }
-        else if (emailID.isEmpty() && pwd.isEmpty() && uname.isEmpty() && repwd.isEmpty() && pno.isEmpty()){
+        else if (emailID.isEmpty() && pwd.isEmpty() && uname.isEmpty() && repwd.isEmpty()){
             Toast.makeText(SignUpActivity.this, "Fields Are Empty!", Toast.LENGTH_LONG);
         }
-        else if(!(emailID.isEmpty() && pwd.isEmpty() && uname.isEmpty() && repwd.isEmpty() && pno.isEmpty())){
+        else if(!(emailID.isEmpty() && pwd.isEmpty() && uname.isEmpty() && repwd.isEmpty())){
             if(mFirebaseAuth.getCurrentUser() != null) {
                 commitUser();
             }
@@ -108,8 +141,7 @@ public class SignUpActivity extends AppCompatActivity {
                 .addOnSuccessListener(SignUpActivity.this, new OnSuccessListener<AuthResult>() {
                     @Override
                     public void onSuccess(AuthResult authResult) {
-                        Toast.makeText(SignUpActivity.this, "Login successful!", Toast.LENGTH_SHORT).show();
-                        commitUser();
+                        getUsers();
                     }
                 }).addOnFailureListener(new OnFailureListener() {
             @Override
@@ -119,29 +151,41 @@ public class SignUpActivity extends AppCompatActivity {
         });
     }
 
+
     /**
      * commitUser
      * checks for requirments and adds user to database. This method returns the app to the
      * mainactivity if successful.
      */
     public void commitUser() {
+        //checks if username is unique
         if(!checkUsername()) {
-            Toast.makeText(SignUpActivity.this, "SignUpUnsuccessful. Username already exits!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(SignUpActivity.this, "Login unsuccessful! Username already exists.", Toast.LENGTH_SHORT).show();
             return;
         }
+
         DocumentReference userRef = FirebaseFirestore.getInstance().collection("users").document("user"+mFirebaseAuth.getCurrentUser().getEmail());
-        User user = new User(uname, emailID,pwd);
+        User user;
+        if(image == null) {
+            user = new User(uname, emailID, pwd);
+        } else {
+            user = new User(uname, emailID, pwd, image);
+        }
 
         userRef.set(user).addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override
             public void onComplete(@NonNull Task<Void> task) {
                 if(task.isSuccessful()) {
+                    Toast.makeText(SignUpActivity.this, "Login successful!", Toast.LENGTH_SHORT).show();
+
                     Intent intent = new Intent(SignUpActivity.this, MainActivity.class);
                     intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                     intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                     startActivity(intent);
                     finish();
+                } else {
+                    image = null;
                 }
             }
         });
@@ -154,12 +198,15 @@ public class SignUpActivity extends AppCompatActivity {
     public void getUsers() {
         CollectionReference ref = FirebaseFirestore.getInstance().collection("users");
         users = new ArrayList<>();
+
         ref.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
                 if(task.isSuccessful()) {
-                    for(DocumentSnapshot doc: task.getResult())
+                    for(DocumentSnapshot doc: task.getResult()) {
                         users.add(doc.toObject(User.class));
+                    }
+                    commitUser();
                 }
             }
         });
@@ -171,11 +218,8 @@ public class SignUpActivity extends AppCompatActivity {
      * @return true if doesnt exist, else false
      */
     public boolean checkUsername() {
-        if(users == null)
-            getUsers();
-
         for(int i=0; i<users.size(); i++) {
-            if(users.get(i).getUserID().equals(uname))
+            if(users.get(i).getUserID().compareTo(uname)==0)
                 return false;
         }
         return true;

@@ -1,25 +1,18 @@
 package com.example.moodtracker;
 
 
-        import android.content.Context;
-        import android.graphics.Bitmap;
-        import android.view.LayoutInflater;
-        import android.view.View;
-        import android.view.ViewGroup;
-        import android.widget.ImageView;
+import android.content.Context;
+import android.graphics.Bitmap;
+import android.view.ViewGroup;
+import android.widget.ImageView;
 
-
-        import com.example.moodtracker.R;
-        import com.example.moodtracker.ClusterMarker;
-        import com.google.android.gms.maps.GoogleMap;
-        import com.google.android.gms.maps.model.BitmapDescriptorFactory;
-        import com.google.android.gms.maps.model.Marker;
-        import com.google.android.gms.maps.model.MarkerOptions;
-        import com.google.maps.android.clustering.Cluster;
-
-        import com.google.maps.android.clustering.ClusterManager;
-        import com.google.maps.android.clustering.view.DefaultClusterRenderer;
-        import com.google.maps.android.ui.IconGenerator;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.maps.android.clustering.Cluster;
+import com.google.maps.android.clustering.ClusterManager;
+import com.google.maps.android.clustering.view.DefaultClusterRenderer;
+import com.google.maps.android.ui.IconGenerator;
 
 
 public class MyClusterManagerRenderer extends DefaultClusterRenderer<ClusterMarker>

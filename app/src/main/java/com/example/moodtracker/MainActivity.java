@@ -8,18 +8,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
-import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 public class MainActivity extends AppCompatActivity {
-
-    private static final String TAG = "MainActivity";
-    private boolean mLocationPermissionGranted = false;
-    public static final int ERROR_DIALOG_REQUEST = 9001;
-    public static final int PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 9002;
-    public static final int PERMISSIONS_REQUEST_ENABLE_GPS = 9003;
-    private FusedLocationProviderClient mFusedLocationClient;
-    private UserLocation mUserLocation;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,10 +33,6 @@ public class MainActivity extends AppCompatActivity {
                     return true;
                 case R.id.navigation_search:
                     fragment = new SearchFragment();
-                    loadFragment(fragment);
-                    return true;
-                case R.id.navigation_notifications:
-                    fragment = new NotificationsFragment();
                     loadFragment(fragment);
                     return true;
                 case R.id.navigation_profile:

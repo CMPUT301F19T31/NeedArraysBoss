@@ -12,7 +12,7 @@
     <SearchView
         android:id="@+id/searchView"
         android:layout_width="match_parent"
-        android:layout_height="131dp"
+        android:layout_height="78dp"
         android:layout_gravity="top"
         android:iconifiedByDefault="false"
         android:queryHint="Search here">
