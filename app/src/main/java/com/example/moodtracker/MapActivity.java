@@ -83,7 +83,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     private FirebaseAuth mAuth;
     private DocumentReference docRef;
     private ArrayList<Mood> moods;
-    private HashMap<String, String> moodEmojis;
+    private HashMap<String, Integer> moodEmojis;
     //private Map<String,String> moodEmojis=new HashMap<String, String>();
     //HashMap<String, String> moodEmojis = new HashMap<String, String>();
 
@@ -258,7 +258,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
         for (Mood mood : moods) {
 
-            Log.d(TAG, "addMapMarkers: location: " + mood.getGeo_point().toString());
+            //Log.d(TAG, "addMapMarkers: location: " + mood.getGeo_point().toString());
             try {
                 String snippet = mood.getFeeling() + ": ";
                 if (mood.getReason() != null) {
@@ -267,7 +267,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                     snippet = snippet + "no reason";
                 }
 
-                int avatar = Integer.parseInt(moodEmojis.get(mood.getFeeling()));
+                int avatar = moodEmojis.get(mood.getFeeling());
 
                 ClusterMarker newClusterMarker = new ClusterMarker(
                         new LatLng(mood.getGeo_point().getLatitude(), mood.getGeo_point().getLongitude()),
@@ -296,17 +296,17 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     public void initEmoji() {
         //initializes emoji array
         moodEmojis = new HashMap<>();
-        moodEmojis.put("happy", new String(Character.toChars(0x1F601)));
-        moodEmojis.put("excited", new String(Character.toChars(0x1F606)));
-        moodEmojis.put("hopeful", new String(Character.toChars(0x1F60A)));
-        moodEmojis.put("satisfied", new String(Character.toChars(0x1F60C)));
-        moodEmojis.put("sad", new String(Character.toChars(0x1F61E)));
-        moodEmojis.put("angry", new String(Character.toChars(0x1F621)));
-        moodEmojis.put("frustrated", new String(Character.toChars(0x1F623)));
-        moodEmojis.put("confused", new String(Character.toChars(0x1F635)));
-        moodEmojis.put("annoyed", new String(Character.toChars(0x1F620)));
-        moodEmojis.put("hopeless", new String(Character.toChars(0x1F625)));
-        moodEmojis.put("lonely", new String(Character.toChars(0x1F614)));
+        moodEmojis.put("happy", 0x1F601);
+        moodEmojis.put("excited", 0x1F606);
+        moodEmojis.put("hopeful", 0x1F60A);
+        moodEmojis.put("satisfied", 0x1F60C);
+        moodEmojis.put("sad", 0x1F61E);
+        moodEmojis.put("angry", 0x1F621);
+        moodEmojis.put("frustrated", 0x1F623);
+        moodEmojis.put("confused", 0x1F635);
+        moodEmojis.put("annoyed", 0x1F620);
+        moodEmojis.put("hopeless",0x1F625);
+        moodEmojis.put("lonely", 0x1F614);
     }
 
     /**
