@@ -82,6 +82,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/uploadDP"
         android:layout_centerHorizontal="true"
+        android:background="@drawable/roundbutton"
         android:backgroundTint="@color/cardview_shadow_end_color"
         android:text="Sign Up"
         android:textColor="@color/white"
@@ -96,6 +97,7 @@
         android:layout_below="@id/signup"
         android:text="Already have an account? Sign In"
         android:textColor="@color/white"
+        android:textStyle="bold"
         android:onClick="cancel"
         android:layout_margin="24dp"/>
 </RelativeLayout>
