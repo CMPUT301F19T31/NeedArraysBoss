@@ -106,13 +106,29 @@ public class SignUpActivity extends AppCompatActivity {
     private void firebaseAuthWithGoogle(GoogleSignInAccount acct) {
         Log.d("AUTH", "firebaseAuthWithGoogle:" + acct.getId());
         AuthCredential credential = GoogleAuthProvider.getCredential(acct.getIdToken(), null);
+        emailID = acct.getEmail();
+        pwd = acct.getId();
+        uname = acct.getDisplayName();
         mAuth.signInWithCredential(credential)
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
                             Log.d("AUTH", "signInWithCredential:success");
-                            startActivity(new Intent(SignUpActivity.this, MainActivity.class));
+                            if(mAuth.getCurrentUser() != null) {
+                                commitUser();
+                            }
+                            mAuth.createUserWithEmailAndPassword(emailID,pwd ).addOnCompleteListener(SignUpActivity.this, new OnCompleteListener<AuthResult>() {
+                                @Override
+                                public void onComplete(@NonNull Task<AuthResult> task) {
+                                    if(!task.isSuccessful()){
+                                        Toast.makeText(SignUpActivity.this, "SignUp Unsuccessful.\n Please change your email try again!", Toast.LENGTH_LONG);
+                                    } else {
+                                        signInUser();
+                                    }
+                                }
+                            });
+                            //startActivity(new Intent(SignUpActivity.this, MainActivity.class));
                         } else {
                             Log.w("AUTH", "signInWithCredential:failure", task.getException());
 
