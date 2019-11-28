@@ -27,6 +27,7 @@ import com.google.firebase.firestore.QuerySnapshot;
 import java.util.ArrayList;
 import java.util.List;
 
+
 public class SearchFragment extends Fragment {
 
     SearchView mySearchView;
@@ -122,7 +123,5 @@ public class SearchFragment extends Fragment {
             }
         });
     }
-
-
 
 }

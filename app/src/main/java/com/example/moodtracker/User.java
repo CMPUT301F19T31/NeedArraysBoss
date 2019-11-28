@@ -7,13 +7,6 @@ public class User {
     private String userID, email, password, profilePic;
     private int numFollwers=0;
 
-    public int getNumFollwers() {
-        return numFollwers;
-    }
-
-    public void setNumFollwers(int numFollwers) {
-        this.numFollwers = numFollwers;
-    }
 
     private ArrayList<Mood> moodHistory = new ArrayList<>();
     private ArrayList<Following> followingList = new ArrayList<>();
@@ -76,4 +69,11 @@ public class User {
     public void setFollowingList(ArrayList<Following> friends) { followingList = friends; }
     public ArrayList<Notification> getNotification() { return notification; }
     public void setNotification(ArrayList<Notification> notification) { this.notification = notification; }
+
+    public int getNumFollwers() {
+        return numFollwers;
+    }
+    public void setNumFollwers(int numFollwers) {
+        this.numFollwers = numFollwers;
+    }
 }
