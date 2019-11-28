@@ -707,12 +707,17 @@ public class UserMoods extends Fragment implements AdapterView.OnItemSelectedLis
                         Bitmap temp = MediaStore.Images.Media.getBitmap(getActivity().getContentResolver(), image);
                         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
                         temp.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream);
+                        byte[] byteArray = byteArrayOutputStream.toByteArray();
                         int num = 50;
-                        while (byteArrayOutputStream.toByteArray().length > 10000 && num != 0) {
+                        while (byteArray.length > 10000 && num > 0) {   // compress image to not more than 10 kb
+                            byteArrayOutputStream.flush();
+                            byteArrayOutputStream.reset();
+
                             temp.compress(Bitmap.CompressFormat.JPEG, num, byteArrayOutputStream);
                             num = num / 2;
+                            byteArray = byteArrayOutputStream.toByteArray();
                         }
-                        this.image = Base64.encodeToString(byteArrayOutputStream.toByteArray(), Base64.DEFAULT);
+                        this.image = Base64.encodeToString(byteArray, Base64.DEFAULT);
                         Toast.makeText(dialog.getContext(), "Image Uploaded", Toast.LENGTH_SHORT).show();
 
                     } catch (FileNotFoundException e) {

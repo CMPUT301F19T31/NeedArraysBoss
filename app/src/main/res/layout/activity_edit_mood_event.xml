@@ -115,7 +115,8 @@
         android:padding="5dp"
         android:background="@color/appBackgroundAccent"
         android:layout_margin="16dp"
-        android:layout_below="@id/socialStateSpinner2"/>
+        android:layout_below="@id/socialStateSpinner2"
+        android:onClick="editMoodImage"/>
 
     <ImageView
         android:id="@+id/moodImage"
