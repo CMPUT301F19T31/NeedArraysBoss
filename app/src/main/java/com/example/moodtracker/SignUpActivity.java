@@ -1,12 +1,15 @@
 package com.example.moodtracker;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -33,6 +36,7 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
 
+import java.io.IOException;
 import java.util.ArrayList;
 
 public class SignUpActivity extends AppCompatActivity {
@@ -49,6 +53,9 @@ public class SignUpActivity extends AppCompatActivity {
     //int RC_SIGN_IN = 0;
     private FirebaseAuth mAuth;
     private int permissions = 0;
+    ImageView picture;
+    private static final int PICK_IMAGE = 1;
+    Uri imageUri;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,6 +70,7 @@ public class SignUpActivity extends AppCompatActivity {
         repassword = findViewById(R.id.confirmpword);
         SignUp = findViewById(R.id.signup);
         TextSignUp = findViewById(R.id.textView2);
+        picture = findViewById(R.id.image_profile);
 
         GoogleSign = findViewById(R.id.sign_in_button);
 
@@ -74,6 +82,17 @@ public class SignUpActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 signIn();
+            }
+        });
+
+        picture.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent gallery = new Intent();
+                gallery.setType("image/*");
+                gallery.setAction(Intent.ACTION_GET_CONTENT);
+
+                startActivityForResult(Intent.createChooser(gallery,"Select Picture"), PICK_IMAGE);
             }
         });
     }
@@ -99,6 +118,16 @@ public class SignUpActivity extends AppCompatActivity {
             } catch (ApiException e) {
                 Log.w("AUTH", "Google sign in failed", e);
                 Toast.makeText(this, "Sign-in failed, try again later.", Toast.LENGTH_LONG).show();
+            }
+        }
+        if (requestCode == PICK_IMAGE && resultCode == RESULT_OK) {
+            imageUri = data.getData();
+            try {
+                Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(),imageUri);
+                picture.setImageBitmap(bitmap);
+            }
+            catch (IOException e) {
+                e.printStackTrace();
             }
         }
     }
@@ -200,9 +229,10 @@ public class SignUpActivity extends AppCompatActivity {
         String repwd = repassword.getText().toString();
 
         if (uname.isEmpty()) {
-            password.setError("Please enter your username");
-            password.requestFocus();
+            username.setError("Please enter your username");
+            username.requestFocus();
         }
+
         else if(emailID.isEmpty()){
             email.setError("Please enter email");
             email.requestFocus();
@@ -211,9 +241,21 @@ public class SignUpActivity extends AppCompatActivity {
             password.setError("Please enter your password");
             password.requestFocus();
         }
-        else if (repwd.isEmpty()) {
-            password.setError("Please re-enter your password ");
+        else if (pwd.length() < 5) {
+            password.setError("Password length less than 6");
             password.requestFocus();
+        }
+        else if (repwd.isEmpty()) {
+            repassword.setError("Please re-enter your password ");
+            repassword.requestFocus();
+        }
+        else if (!(repwd.equals(pwd))) {
+            repassword.setError("Passwords don't match");
+            repassword.requestFocus();
+        }
+        else if (checkUsername() == false) {
+            username.setError("Username already exists");
+            username.requestFocus();
         }
 
         else if (emailID.isEmpty() && pwd.isEmpty() && uname.isEmpty() && repwd.isEmpty()){
@@ -255,6 +297,8 @@ public class SignUpActivity extends AppCompatActivity {
             }
         });
     }
+
+
 
     /**
      * commitUser
