@@ -48,7 +48,7 @@ import java.util.ArrayList;
 public class SignUpActivity extends AppCompatActivity {
 
     EditText username, password, repassword, email, phone;
-    String uname, emailID, pwd, image;
+    String uname, emailID, pwd, imageUri;
     Button SignUp;
     SignInButton GoogleSign;
     TextView TextSignUp;
@@ -63,7 +63,6 @@ public class SignUpActivity extends AppCompatActivity {
 
     private FirebaseAuth.AuthStateListener mAuthStateListener;
     private ArrayList<User> users;
-    private boolean done = false;
 
 
     @Override
@@ -112,9 +111,7 @@ public class SignUpActivity extends AppCompatActivity {
 
     }
 
-    public void uploadDP (View v) {
-        startActivityForResult(new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.INTERNAL_CONTENT_URI), 3);
-    }
+
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -141,7 +138,7 @@ public class SignUpActivity extends AppCompatActivity {
                 picture.setImageBitmap(temp);
                 ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
                 temp.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream);
-                this.image = Base64.encodeToString(byteArrayOutputStream.toByteArray(), Base64.DEFAULT);
+                this.imageUri = Base64.encodeToString(byteArrayOutputStream.toByteArray(), Base64.DEFAULT);
                 Toast.makeText(this, "Image Uploaded", Toast.LENGTH_SHORT).show();
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
@@ -275,10 +272,10 @@ public class SignUpActivity extends AppCompatActivity {
 
         DocumentReference userRef = FirebaseFirestore.getInstance().collection("users").document("user"+mFirebaseAuth.getCurrentUser().getEmail());
         User user;
-        if(image == null) {
+        if(imageUri == null) {
             user = new User(uname, emailID, pwd);
         } else {
-            user = new User(uname, emailID, pwd, image);
+            user = new User(uname, emailID, pwd, imageUri);
         }
 
         userRef.set(user).addOnCompleteListener(new OnCompleteListener<Void>() {
@@ -294,7 +291,7 @@ public class SignUpActivity extends AppCompatActivity {
                     startActivity(intent);
                     finish();
                 } else {
-                    image = null;
+                    imageUri = null;
                 }
             }
         });
