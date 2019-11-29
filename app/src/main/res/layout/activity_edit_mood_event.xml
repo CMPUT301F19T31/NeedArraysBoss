@@ -128,6 +128,18 @@
         android:layout_centerHorizontal="true"
         android:layout_below="@id/locationCB2"/>
 
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+
+        android:id="@+id/deleteEntryBtn"
+        android:text="@string/deleteEntryBtn"
+        android:background="@drawable/roundbutton"
+        android:backgroundTint="@color/white"
+        android:layout_margin="16dp"
+        android:onClick="deleteMood"
+        android:layout_alignParentBottom="true">
+
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -141,18 +153,7 @@
         android:layout_alignParentBottom="true"
         android:layout_alignParentRight="true"/>
 
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/deleteEntryBtn"
-        android:text="@string/editEntryBtn"
-        android:layout_margin="16dp"
-        android:layout_gravity="right"
-        android:background="@drawable/roundbutton"
-        android:backgroundTint="@color/white"
-        android:onClick="editMoodEvent"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentRight="true"/>
 
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
 </RelativeLayout>
