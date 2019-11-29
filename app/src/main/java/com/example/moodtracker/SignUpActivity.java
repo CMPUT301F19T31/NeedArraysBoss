@@ -109,7 +109,6 @@ public class SignUpActivity extends AppCompatActivity {
                     Uri image = data.getData();
                     try {
                         Bitmap temp = MediaStore.Images.Media.getBitmap(getContentResolver(), image);
-                        picture.setImageBitmap(temp);
                         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
                         temp.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream);
                         this.image = Base64.encodeToString(byteArrayOutputStream.toByteArray(), Base64.DEFAULT);
@@ -150,7 +149,6 @@ public class SignUpActivity extends AppCompatActivity {
         emailID = acct.getEmail();
         uname = acct.getDisplayName();
         pwd = acct.getId();
-        image = acct.getPhotoUrl().toString();
 
         mFirebaseAuth.signInWithCredential(credential)
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
@@ -180,16 +178,11 @@ public class SignUpActivity extends AppCompatActivity {
             username.setError("Please enter your username");
             username.requestFocus();
         }
-        else if (checkUsername() == false) {
+        /*else if (checkUsername() == false) {
             username.setError("Username not unique");
-            username.requestFocus();
-        }
+            username.requestFocus();*/
         else if(emailID.isEmpty()){
             email.setError("Please enter email");
-            email.requestFocus();
-        }
-        else if (checkEmail() == false) {
-            email.setError("Username not unique");
             email.requestFocus();
         }
         else if (pwd.isEmpty()) {
@@ -229,7 +222,7 @@ public class SignUpActivity extends AppCompatActivity {
             });
         }
         else {
-            Toast.makeText(SignUpActivity.this, "Error Ocurred!", Toast.LENGTH_SHORT);
+            Toast.makeText(SignUpActivity.this, "Error Ocurred!", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -324,12 +317,5 @@ public class SignUpActivity extends AppCompatActivity {
 
     public void cancel(View v) { finish(); }
 
-    public boolean checkEmail() {
-        for(int i=0; i<users.size(); i++) {
-            if(users.get(i).getEmail().compareTo(emailID)==0)
-                return false;
-        }
-        return true;
-    }
 
 }
