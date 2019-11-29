@@ -9,7 +9,6 @@ import android.widget.ImageView;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.maps.android.clustering.Cluster;
 import com.google.maps.android.clustering.ClusterManager;
 import com.google.maps.android.clustering.view.DefaultClusterRenderer;
 import com.google.maps.android.ui.IconGenerator;
@@ -54,8 +53,8 @@ public class MyClusterManagerRenderer extends DefaultClusterRenderer<ClusterMark
     }
 
 
-    @Override
-    protected boolean shouldRenderAsCluster(Cluster cluster) {
-        return false;
-    }
+    //@Override
+    //protected boolean shouldRenderAsCluster(Cluster cluster) {
+      //  return false;
+    //}
 }
