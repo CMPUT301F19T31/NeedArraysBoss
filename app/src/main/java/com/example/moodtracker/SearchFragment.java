@@ -30,6 +30,8 @@ public class SearchFragment extends Fragment {
     ListView myList;
     private CollectionReference collectionReference;
     private FirebaseAuth mAuth;
+    public String set;
+    public String email;
 
     ArrayList<String> list;
     ArrayList<String> list1;
@@ -41,6 +43,13 @@ public class SearchFragment extends Fragment {
         setRetainInstance(true);
     }
 
+    /**
+     *
+     * @param inflater - inflates the layout
+     * @param container - uses the container as bg
+     * @param savedInstanceState - uses the saved instance
+     * @return
+     */
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -60,7 +69,6 @@ public class SearchFragment extends Fragment {
         return view;
 
     }
-
 
     @Override
     public void onStart() {
@@ -89,6 +97,8 @@ public class SearchFragment extends Fragment {
         mySearchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String s) {
+                set=s;
+                adapter.notifyDataSetChanged();
                 return false;
             }
 
@@ -96,13 +106,21 @@ public class SearchFragment extends Fragment {
             public boolean onQueryTextChange(String s) {
 
                 adapter.getFilter().filter(s);
+               
+
+                adapter.notifyDataSetChanged();
                 return false;
             }
 
         });
+        //search(mySearchView.getQuery().toString());
+
         myList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+
+
 
                 String email= list1.get(position);
                 Intent intent= new Intent(getContext(), search_userdata.class);
