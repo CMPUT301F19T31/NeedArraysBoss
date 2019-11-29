@@ -20,7 +20,7 @@
         android:supportsRtl="true">
 
 
-    //android:theme="@style/AppBaseTheme">
+    android:theme="@style/AppBaseTheme">
         <activity android:name=".search_userdata"></activity>
         <activity android:name=".SignUpActivity" />
         <activity android:name=".Login" />
