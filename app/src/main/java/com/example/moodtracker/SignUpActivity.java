@@ -1,12 +1,15 @@
 package com.example.moodtracker;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Base64;
+
 import android.util.Log;
+
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -43,21 +46,25 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 public class SignUpActivity extends AppCompatActivity {
-    EditText username, password, repassword, email;
-    String uname, emailID, pwd;
+
+    EditText username, password, repassword, email, phone;
+    String uname, emailID, pwd, image;
     Button SignUp;
     SignInButton GoogleSign;
     TextView TextSignUp;
     FirebaseAuth mFirebaseAuth;
-    String TAG = "Error";
-    private FirebaseAuth.AuthStateListener mAuthStateListener;
-    private ArrayList<User> users;
     GoogleSignInClient mGoogleSignInClient;
     private FirebaseAuth mAuth;
     private int permissions = 0;
     ImageView picture;
     private static final int PICK_IMAGE = 1;
-    String imageUri;
+
+    String TAG = "";
+
+    private FirebaseAuth.AuthStateListener mAuthStateListener;
+    private ArrayList<User> users;
+    private boolean done = false;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -102,6 +109,11 @@ public class SignUpActivity extends AppCompatActivity {
     private void signIn() {
         Intent signInIntent = mGoogleSignInClient.getSignInIntent();
         startActivityForResult(signInIntent, 0);
+
+    }
+
+    public void uploadDP (View v) {
+        startActivityForResult(new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.INTERNAL_CONTENT_URI), 3);
     }
 
     @Override
@@ -239,8 +251,7 @@ public class SignUpActivity extends AppCompatActivity {
                 .addOnSuccessListener(SignUpActivity.this, new OnSuccessListener<AuthResult>() {
                     @Override
                     public void onSuccess(AuthResult authResult) {
-                        Toast.makeText(SignUpActivity.this, "Login successful!", Toast.LENGTH_SHORT).show();
-                        commitUser();
+                        getUsers();
                     }
                 }).addOnFailureListener(new OnFailureListener() {
             @Override
@@ -249,8 +260,6 @@ public class SignUpActivity extends AppCompatActivity {
             }
         });
     }
-
-
 
     /**
      * commitUser
@@ -266,10 +275,10 @@ public class SignUpActivity extends AppCompatActivity {
 
         DocumentReference userRef = FirebaseFirestore.getInstance().collection("users").document("user"+mFirebaseAuth.getCurrentUser().getEmail());
         User user;
-        if(imageUri == null) {
+        if(image == null) {
             user = new User(uname, emailID, pwd);
         } else {
-            user = new User(uname, emailID, pwd, imageUri);
+            user = new User(uname, emailID, pwd, image);
         }
 
         userRef.set(user).addOnCompleteListener(new OnCompleteListener<Void>() {
@@ -285,7 +294,7 @@ public class SignUpActivity extends AppCompatActivity {
                     startActivity(intent);
                     finish();
                 } else {
-                    imageUri = null;
+                    image = null;
                 }
             }
         });
@@ -298,12 +307,15 @@ public class SignUpActivity extends AppCompatActivity {
     public void getUsers() {
         CollectionReference ref = FirebaseFirestore.getInstance().collection("users");
         users = new ArrayList<>();
+
         ref.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
                 if(task.isSuccessful()) {
-                    for(DocumentSnapshot doc: task.getResult())
+                    for(DocumentSnapshot doc: task.getResult()) {
                         users.add(doc.toObject(User.class));
+                    }
+                    commitUser();
                 }
             }
         });
@@ -315,11 +327,8 @@ public class SignUpActivity extends AppCompatActivity {
      * @return true if doesnt exist, else false
      */
     public boolean checkUsername() {
-        if(users == null)
-            getUsers();
-
         for(int i=0; i<users.size(); i++) {
-            if(users.get(i).getUserID().equals(uname))
+            if(users.get(i).getUserID().compareTo(uname)==0)
                 return false;
         }
         return true;

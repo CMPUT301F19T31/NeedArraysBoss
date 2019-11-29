@@ -52,5 +52,6 @@
         android:layout_margin="32dp"
         android:onClick="createUser"
         android:text="Don't have an account?  Sign Up here"
-        android:textColor="@color/white" />
+        android:textColor="@color/white"
+        android:textStyle="bold"/>
 </RelativeLayout>
