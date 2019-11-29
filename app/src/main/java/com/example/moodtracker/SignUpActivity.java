@@ -7,21 +7,32 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Base64;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.common.SignInButton;
+import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.GoogleAuthProvider;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -34,12 +45,16 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 public class SignUpActivity extends AppCompatActivity {
-    EditText username, password, repassword, email, phone;
+    EditText username, password, repassword, email;
     String uname, emailID, pwd, image;
     Button SignUp;
+    SignInButton GoogleSign;
     TextView TextSignUp;
     FirebaseAuth mFirebaseAuth;
     String TAG = "";
+    GoogleSignInClient mGoogleSignInClient;
+    private int permissions = 0;
+    ImageView picture;
 
     private FirebaseAuth.AuthStateListener mAuthStateListener;
     private ArrayList<User> users;
@@ -59,6 +74,28 @@ public class SignUpActivity extends AppCompatActivity {
         SignUp = findViewById(R.id.signup);
         TextSignUp = findViewById(R.id.textView2);
 
+        picture = findViewById(R.id.image_profile);
+
+        GoogleSign = findViewById(R.id.sign_in_button);
+
+        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestIdToken("160821997145-dhq5opf0nfn16qlq1s90fsr6ajd68mm7.apps.googleusercontent.com").requestEmail().build();
+
+        mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
+        GoogleSign.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                signIn();
+            }
+        });
+
+
+
+    }
+
+    private void signIn() {
+        Intent signInIntent = mGoogleSignInClient.getSignInIntent();
+        startActivityForResult(signInIntent, 0);
 
     }
 
@@ -76,6 +113,7 @@ public class SignUpActivity extends AppCompatActivity {
                     Uri image = data.getData();
                     try {
                         Bitmap temp = MediaStore.Images.Media.getBitmap(getContentResolver(), image);
+                        //picture.setImageBitmap(temp);
                         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
                         temp.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream);
                         this.image = Base64.encodeToString(byteArrayOutputStream.toByteArray(), Base64.DEFAULT);
@@ -87,7 +125,64 @@ public class SignUpActivity extends AppCompatActivity {
                     }
                 }
             }
+            case 0: {
+                Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
+                try {
+                    GoogleSignInAccount account = task.getResult(ApiException.class);
+                    if (account != null) {
+
+                        //firebaseAuthWithGoogle(account);
+                    } else{
+                        Log.w("AUTH", "Account is NULL");
+                        Toast.makeText(this, "Sign-in failed, try again later.", Toast.LENGTH_LONG).show();
+                    }
+                } catch (ApiException e) {
+                    e.printStackTrace();
+                    Log.w("AUTH", "Google sign in failed", e);
+                    Toast.makeText(this, "Sign-in failed, try again later.", Toast.LENGTH_LONG).show();
+                }
+            }
+
         }
+    }
+
+
+
+    private void firebaseAuthWithGoogle(GoogleSignInAccount acct) {
+        Log.d("AUTH", "firebaseAuthWithGoogle:" + acct.getId());
+        AuthCredential credential = GoogleAuthProvider.getCredential(acct.getIdToken(), null);
+        emailID = acct.getEmail();
+        uname = acct.getDisplayName();
+        pwd = acct.getId();
+
+        mFirebaseAuth.signInWithCredential(credential)
+                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<AuthResult> task) {
+                        if (task.isSuccessful()) {
+                            Log.d("AUTH", "signInWithCredential:success");
+                            FirebaseUser you = mFirebaseAuth.getCurrentUser();
+                            if(you != null) {
+
+                                commitUser();
+                            }
+                            mFirebaseAuth.createUserWithEmailAndPassword(emailID,pwd ).addOnCompleteListener(SignUpActivity.this, new OnCompleteListener<AuthResult>() {
+                                @Override
+                                public void onComplete(@NonNull Task<AuthResult> task) {
+                                    if(!task.isSuccessful()){
+                                        Toast.makeText(SignUpActivity.this, "SignUp Unsuccessful.\n Please change your email try again!", Toast.LENGTH_LONG).show();
+                                    } else {
+                                        signInUser();
+                                    }
+                                }
+                            });
+                            //startActivity(new Intent(SignUpActivity.this, MainActivity.class));
+                        } else {
+                            Log.w("AUTH", "signInWithCredential:failure", task.getException());
+
+                        }
+                    }
+                });
     }
 
     public void signUpUser(View v) {
