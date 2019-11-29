@@ -93,6 +93,7 @@ public class ProfileFragment extends Fragment {
                     return;
                 user = documentSnapshot.toObject(User.class);
                 loadDataFromDB();
+                adapter.notifyDataSetChanged();
             }
         });
 
@@ -132,26 +133,57 @@ public class ProfileFragment extends Fragment {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
 
-                            docRef2 = FirebaseFirestore.getInstance().collection("users").document("user"+notification.getUser1());
-                            docRef2.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-                                @Override
-                                public void onSuccess(DocumentSnapshot documentSnapshot) {
-                                    following = new Following(1, user.getEmail());
-                                    user2 = documentSnapshot.toObject(User.class);
-                                    user2.getFollowingList().add(following);
-                                    Notification notification2 = new Notification(2, user.getEmail(), user2.getEmail());
-                                    user2.getNotification().add(notification2);
-                                    docRef2.set(user2);
-                                    user.setNumFollwers(user.getNumFollwers()+1);
-                                    user.getNotification().remove(fid);
-                                    docRef.set(user);
 
+                            AlertDialog.Builder builder1 = new AlertDialog.Builder(getContext());
+                            builder1.setMessage("Allow user to follow all moods?");
+                            builder1.setPositiveButton("Yes", new DialogInterface.OnClickListener(){
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    docRef2 = FirebaseFirestore.getInstance().collection("users").document("user"+notification.getUser1());
+                                    docRef2.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                                        @Override
+                                        public void onSuccess(DocumentSnapshot documentSnapshot) {
+                                            following = new Following(1, user.getEmail());
+                                            user2 = documentSnapshot.toObject(User.class);
+                                            user2.getFollowingList().add(following);
+                                            Notification notification2 = new Notification(2, user.getEmail(), user2.getEmail());
+                                            user2.getNotification().add(notification2);
+                                            docRef2.set(user2);
+                                            user.setNumFollwers(user.getNumFollwers()+1);
+                                            user.getNotification().remove(fid);
+                                            docRef.set(user);
+
+                                        }
+                                    });
                                 }
                             });
+                            builder1.setNeutralButton("Only Recent Moods", new DialogInterface.OnClickListener(){
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    docRef2 = FirebaseFirestore.getInstance().collection("users").document("user"+notification.getUser1());
+                                    docRef2.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                                        @Override
+                                        public void onSuccess(DocumentSnapshot documentSnapshot) {
+                                            following = new Following(2, user.getEmail());
+                                            user2 = documentSnapshot.toObject(User.class);
+                                            user2.getFollowingList().add(following);
+                                            Notification notification2 = new Notification(2, user.getEmail(), user2.getEmail());
+                                            user2.getNotification().add(notification2);
+                                            docRef2.set(user2);
+                                            user.setNumFollwers(user.getNumFollwers()+1);
+                                            user.getNotification().remove(fid);
+                                            docRef.set(user);
+
+                                        }
+                                    });
+                                }
+                            });
+                            AlertDialog dialog1 = builder1.create();
+                            dialog1.show();
 
                         }
                     });
-                    builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
+                    builder.setNeutralButton("No", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             docRef2 = FirebaseFirestore.getInstance().collection("users").document("user"+notification.getUser1());
@@ -167,29 +199,6 @@ public class ProfileFragment extends Fragment {
 
                                 }
                             });
-                        }
-                    });
-                    builder.setNeutralButton("Only Recent", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-
-                            docRef2 = FirebaseFirestore.getInstance().collection("users").document("user"+notification.getUser1());
-                            docRef2.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-                                @Override
-                                public void onSuccess(DocumentSnapshot documentSnapshot) {
-                                    following = new Following(2, user.getEmail());
-                                    user2 = documentSnapshot.toObject(User.class);
-                                    user2.getFollowingList().add(following);
-                                    Notification notification2 = new Notification(2, user.getEmail(), user2.getEmail());
-                                    user2.getNotification().add(notification2);
-                                    docRef2.set(user2);
-                                    user.setNumFollwers(user.getNumFollwers()+1);
-                                    user.getNotification().remove(fid);
-                                    docRef.set(user);
-
-                                }
-                            });
-
                         }
                     });
 
@@ -259,6 +268,7 @@ public class ProfileFragment extends Fragment {
         emailTV.setText(user.getEmail());
         followingTV.setText(Integer.toString(user.getFollowingList().size()));
         followerTV.setText(Integer.toString(user.getNumFollwers()));
+        list.clear();
         for (int i = 0; i < user.getNotification().size(); i++) {
             list.add(user.getNotification().get(i).getString());
         }
