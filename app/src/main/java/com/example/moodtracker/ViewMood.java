@@ -5,6 +5,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.util.Base64;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,6 +22,8 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.util.HashMap;
+
+import static androidx.constraintlayout.widget.Constraints.TAG;
 
 
 public class ViewMood extends Fragment {
@@ -80,12 +83,12 @@ public class ViewMood extends Fragment {
                             intent.putExtra("reason", mood.getReason());
                             //intent.putExtra("socialstate", mood.getSocialState);
                             intent.putExtra("lat", mood.getGeo_point().getLatitude());
+                            Log.d(TAG, "ViewMood: onCreate f2 geopoint Latitude: " + mood.getGeo_point().getLatitude());
                             intent.putExtra("long", mood.getGeo_point().getLongitude());
                             startActivity(intent);
                         }
                     });
                 }
-
             }
         });
 

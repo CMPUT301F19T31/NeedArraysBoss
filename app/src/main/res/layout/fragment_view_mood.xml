@@ -77,15 +77,16 @@
         android:layout_below="@id/socialStateSpinner2"/>
 
     <TextView
+        android:id="@+id/location"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/location"
         android:layout_alignParentBottom="true"
-        android:layout_margin="70dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginBottom="116dp"
         android:text="Location Attached"
-        android:textStyle="italic"
+        android:textColor="@color/happy"
         android:textSize="20sp"
-        android:textColor="@color/happy"/>
+        android:textStyle="italic" />
 
 
 </RelativeLayout>
