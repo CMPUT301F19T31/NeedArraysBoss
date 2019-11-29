@@ -1,5 +1,8 @@
 package com.example.moodtracker;
 
+/**
+ * Its an object that connects to the user they are following
+ */
 public class Following {
 
     private int type;
@@ -19,10 +22,6 @@ public class Following {
 
     public int getType() {
         return type;
-    }
-
-    public void setType(int type) {
-        this.type = type;
     }
 
     public String getUser() {

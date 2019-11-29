@@ -23,17 +23,26 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.GeoPoint;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.google.maps.android.clustering.ClusterManager;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 public class MapActivity extends AppCompatActivity implements OnMapReadyCallback {
 
+    /**
+     * onMapReady
+     * @param googleMap gets this as parameter and creates the map
+     */
     @Override
     public void onMapReady(GoogleMap googleMap) {
         Toast.makeText(this, "Map is Ready", Toast.LENGTH_SHORT).show();
@@ -43,7 +52,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
         if (mLocationPermissionGranted) {
             getDeviceLocation();
-            //getLastKnownLocation();
 
             if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
                     != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this,
@@ -57,46 +65,47 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
     private static final String TAG = "MapActivity";
 
-    private static final String FINE_LOCATION = Manifest.permission.ACCESS_FINE_LOCATION;
-    private static final String COURSE_LOCATION = Manifest.permission.ACCESS_COARSE_LOCATION;
-    private static final int LOCATION_PERMISSION_REQUEST_CODE = 1234;
-    ////////////////////////////////////////////////
     private boolean mLocationPermissionGranted = true; //false;
-    public static final int ERROR_DIALOG_REQUEST = 9001;
-    public static final int PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 9002;
-    public static final int PERMISSIONS_REQUEST_ENABLE_GPS = 9003;
     private static final float DEFAULT_ZOOM = 15f;
-    private FusedLocationProviderClient mFusedLocationClient;
     private FusedLocationProviderClient mFusedLocationProviderClient;
-    ////////////////////////////////////////////////
     private ClusterManager<ClusterMarker> mClusterManager;
     private MyClusterManagerRenderer mClusterManagerRenderer;
     private ArrayList<ClusterMarker> mClusterMarkers = new ArrayList<>();
 
     //vars
-    //private Boolean mLocationPermissionsGranted = false;
     private GoogleMap mMap;
-    private User user;
-    private FirebaseUser currentUser;
-    private ArrayList<Mood> moodHistory;
+    private ArrayList<String> friends;
+    private User currentUser;
+    private ArrayList<Mood> friendMoodHistory;
+    private ArrayList<Mood> userMoods;
     private FirebaseAuth mAuth;
+    private CollectionReference userRef;
     private DocumentReference docRef;
     private ArrayList<Mood> moods;
     private HashMap<String, Integer> moodEmojis;
-    //private Map<String,String> moodEmojis=new HashMap<String, String>();
-    //HashMap<String, String> moodEmojis = new HashMap<String, String>();
+    private int flag;
+    private String userId;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_map);
 
-        //getLocationPermission();
-        //isMapsEnabled();
         initMap();
         initEmoji();
+
+        String str = getIntent().getStringExtra("flag");
+        flag = Integer.parseInt(str); //1 is for friends mood and 0 is for the users mood
+        Log.d(TAG, "MapActivity: flag = "+flag);
+
+        friendMoodHistory = new ArrayList<>();
+        friends = new ArrayList<>();
     }
 
+    /**
+     * initMap
+     * initializes the map
+     */
     private void initMap() {
         Log.d(TAG, "initMap: initializing map");
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
@@ -104,6 +113,10 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         mapFragment.getMapAsync(MapActivity.this);
     }
 
+    /**
+     * addMapMarkers
+     * adds markers from the current users mood or the people the user follows, depending upon which tab the user is in
+     */
     private void addMapMarkers() {
 
         if (mMap != null) {
@@ -117,19 +130,27 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             }
             mMap.setOnCameraIdleListener(mClusterManager);
             mMap.setOnMarkerClickListener(mClusterManager);
+
             mAuth = FirebaseAuth.getInstance();
-            currentUser = mAuth.getCurrentUser();
-            docRef = FirebaseFirestore.getInstance().collection("users").document("user" + mAuth.getCurrentUser().getEmail());
+            userRef=FirebaseFirestore.getInstance().collection("users");
+            docRef = userRef.document("user" + mAuth.getCurrentUser().getEmail());
             docRef.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
                 @Override
                 public void onSuccess(DocumentSnapshot documentSnapshot) {
-                    user = documentSnapshot.toObject(User.class);
-                    helpingAddMapMarker();
+                    currentUser = documentSnapshot.toObject(User.class);
+                    //helpingAddMapMarker();
+                    if(flag==0) {
+                        userMoods = currentUser.getMoodHistory();
+                        userId =currentUser.getUserID();
+                        moods = userMoods;
+                        helpingAddMapMarker();
+                    }else if (flag==1){
+                        getFriendList();
+                    }else{
+                        helpingAddMapMarker();
+                    }
                 }
             });
-            //helpingAddMapMarker();
-
-            //moveCamera();
         }
     }
 
@@ -138,28 +159,52 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
      * Helper function called when the firebase returns the userdata. It
      */
     void helpingAddMapMarker(){
-        moods = user.getMoodHistory();
+        Log.d(TAG, "MapActivity: helpingAddMapMarker started");
+
+        if(flag==2){
+            moods = new ArrayList<>();
+            userId = getIntent().getStringExtra("username");
+            String feeling = getIntent().getStringExtra("feeling");
+            String reason = getIntent().getStringExtra("reason");
+            double lat = getIntent().getDoubleExtra("lat", 0);
+            Log.d(TAG, "MapActivity: helpingAddMapMarker f2 int Latitude: " + lat);
+            double lng = getIntent().getDoubleExtra("long", 0);
+            GeoPoint geoPoint = new GeoPoint(lat, lng);
+            Log.d(TAG, "MapActivity: helpingAddMapMarker f2 geopoint Latitude: " + geoPoint.getLatitude());
+            Log.d(TAG, "MapActivity: helpingAddMapMarker f2 geopoint: Latitude: " + geoPoint.getLatitude());
+
+            Mood newMood;
+            newMood = new Mood(feeling, "", System.currentTimeMillis());
+            newMood.setReason(reason);
+            newMood.setGeo_point(geoPoint);
+
+            moveCamera(new LatLng(geoPoint.getLatitude(), geoPoint.getLongitude()), DEFAULT_ZOOM);
+
+            moods.add(newMood);
+        }
 
         for (Mood mood : moods) {
-
-            //Log.d(TAG, "addMapMarkers: location: " + mood.getGeo_point().toString());
-            if(mood.getGeo_point()!=null) {
+            if(mood.getGeo_point()!= null) {
                 try {
-                    String snippet = mood.getFeeling() + ": ";
-                    if (mood.getReason() != null) {
-                        snippet = snippet + mood.getReason();
-                    } else {
-                        snippet = snippet + "no reason";
+                    String snippet = mood.getFeeling();
+                    if (mood.getReason() != "") {
+                        snippet = snippet + ": " + mood.getReason();
                     }
 
                     int avatar = moodEmojis.get(mood.getFeeling());
 
+                    Log.d(TAG, "MapActivity: flag (helpingAddMapMarker) = "+flag);
+                    if(flag==1){
+                        userId=mood.getFriend();
+                        Log.d(TAG, "MapActivity: helpingAddMapMarker friends latitude: " + mood.getGeo_point().getLatitude());
+                        Log.d(TAG, "MapActivity: helpingAddMapMarker friends longitude: " + mood.getGeo_point().getLongitude());
+                    }
+
                     ClusterMarker newClusterMarker = new ClusterMarker(
                             new LatLng(mood.getGeo_point().getLatitude(), mood.getGeo_point().getLongitude()),
-                            user.getUserID(),
+                            userId,
                             snippet,
-                            avatar,
-                            user
+                            avatar
                     );
                     mClusterManager.addItem(newClusterMarker);
                     mClusterMarkers.add(newClusterMarker);
@@ -175,6 +220,39 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     }
 
     /**
+     * Helper function to addMapMarkers. It connects to the database and retrieves the list
+     * of users present in the database that the current user is friends with.
+     */
+    public void getFriendList() {
+        for(int i=0; i<currentUser.getFollowingList().size(); i++)
+            friends.add(currentUser.getFollowingList().get(i).getUser());
+        refreshList();
+    }
+
+    public void refreshList() {
+        userRef.addSnapshotListener(new EventListener<QuerySnapshot>() {
+            @Override
+            public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
+                List<DocumentSnapshot> data = queryDocumentSnapshots.getDocuments();
+                friendMoodHistory.clear();
+                for(DocumentSnapshot doc: data) {
+                    User user = doc.toObject(User.class);
+                    if(friends.contains(user.getEmail())) {
+                        for(int i=0; i<user.getMoodHistory().size(); i++) {
+                            Mood mood = user.getMoodHistory().get(i);
+                            mood.setFriend(user.getUserID());
+                            friendMoodHistory.add(mood);
+                        }
+                    }
+                }
+                moods = friendMoodHistory;
+                helpingAddMapMarker();
+            }
+        });
+
+    }
+
+    /**
      * initEmoji
      * Initialises the emoji hashmap moodemojis. moodEmojis is a global variable that will be
      * used by other functions.
@@ -182,17 +260,17 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     public void initEmoji() {
         //initializes emoji array
         moodEmojis = new HashMap<>();
-        moodEmojis.put("happy", 0x1F601);
-        moodEmojis.put("excited", 0x1F606);
-        moodEmojis.put("hopeful", 0x1F60A);
-        moodEmojis.put("satisfied", 0x1F60C);
-        moodEmojis.put("sad", 0x1F61E);
-        moodEmojis.put("angry", 0x1F621);
-        moodEmojis.put("frustrated", 0x1F623);
-        moodEmojis.put("confused", 0x1F635);
-        moodEmojis.put("annoyed", 0x1F620);
-        moodEmojis.put("hopeless",0x1F625);
-        moodEmojis.put("lonely", 0x1F614);
+        moodEmojis.put("happy", R.drawable.happy);
+        moodEmojis.put("excited", R.drawable.excited);
+        moodEmojis.put("hopeful", R.drawable.hopeful);
+        moodEmojis.put("satisfied", R.drawable.satisfied);
+        moodEmojis.put("sad", R.drawable.sad);
+        moodEmojis.put("angry", R.drawable.angry);
+        moodEmojis.put("frustrated", R.drawable.frustrated);
+        moodEmojis.put("confused", R.drawable.confused);
+        moodEmojis.put("annoyed", R.drawable.annoyed);
+        moodEmojis.put("hopeless", R.drawable.hopeless);
+        moodEmojis.put("lonely", R.drawable.lonely);
     }
 
     /**
@@ -215,8 +293,9 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                             Log.d(TAG, "onComplete: found location!");
                             Location currentLocation = (Location) task.getResult();
 
-                            moveCamera(new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude()),
-                                    DEFAULT_ZOOM);
+                            if(flag!=2) {
+                                moveCamera(new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude()), DEFAULT_ZOOM);
+                            }
 
                         } else {
                             Log.d(TAG, "onComplete: current location is null");

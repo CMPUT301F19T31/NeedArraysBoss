@@ -147,10 +147,6 @@ public class MoodListAdapter extends RecyclerView.Adapter<MoodListAdapter.MoodVH
         imageView.setImageBitmap(bitmap);
     }
 
-
-    public ArrayList<Mood> getList () {
-        return moodHistory;
-    }
     public void setList(ArrayList<Mood> moodHistory) { this.moodHistory = moodHistory; }
 
     /**

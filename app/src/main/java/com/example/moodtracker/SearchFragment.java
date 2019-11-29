@@ -30,6 +30,8 @@ public class SearchFragment extends Fragment {
     ListView myList;
     private CollectionReference collectionReference;
     private FirebaseAuth mAuth;
+    public String set;
+    public String email;
 
     ArrayList<String> list;
     ArrayList<String> list1;
@@ -41,6 +43,13 @@ public class SearchFragment extends Fragment {
         setRetainInstance(true);
     }
 
+    /**
+     *
+     * @param inflater - inflates the layout
+     * @param container - uses the container as bg
+     * @param savedInstanceState - uses the saved instance
+     * @return
+     */
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -48,23 +57,18 @@ public class SearchFragment extends Fragment {
 
         mySearchView = view.findViewById(R.id.searchView);
         myList = view.findViewById((R.id.myList));
-        list = new ArrayList<String>();
-        list1 = new ArrayList<String>();
+        list = new ArrayList<>();
+        list1 = new ArrayList<>();
 
         mAuth = FirebaseAuth.getInstance();
         collectionReference = null;
 
-        adapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_1, list);
+        adapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_list_item_1, list);
         myList.setAdapter(adapter);
-
-
-        //list.add("hello");
-        //list.add("good morning");
 
         return view;
 
     }
-
 
     @Override
     public void onStart() {
@@ -75,19 +79,15 @@ public class SearchFragment extends Fragment {
                 @Override
                 public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
                     List<DocumentSnapshot> data = queryDocumentSnapshots.getDocuments();
-                    //Toast.makeText(getApplicationContext(),mAuth.getCurrentUser().getEmail(), Toast.LENGTH_SHORT).show();
                     list.clear();
                     list1.clear();
                     for (int i = 0; i < data.size(); i++) {
                         if(mAuth.getCurrentUser().getEmail().compareTo(data.get(i).toObject(User.class).getEmail())!=0) {
                             list.add(data.get(i).toObject(User.class).getUserID());
                             list1.add(data.get(i).toObject(User.class).getEmail());
-                            //list.add(data.get(i).toObject(User.class));
-                            //Toast.makeText(getActivity(), "", Toast.LENGTH_SHORT).show();
                         }
                     }
 
-                    //Toast.makeText(getActivity(), myList.get(0).getEmail(), Toast.LENGTH_SHORT).show();
                     adapter.notifyDataSetChanged();
                 }
             });
@@ -97,6 +97,8 @@ public class SearchFragment extends Fragment {
         mySearchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String s) {
+                set=s;
+                adapter.notifyDataSetChanged();
                 return false;
             }
 
@@ -104,17 +106,23 @@ public class SearchFragment extends Fragment {
             public boolean onQueryTextChange(String s) {
 
                 adapter.getFilter().filter(s);
+               
+
+                adapter.notifyDataSetChanged();
                 return false;
             }
 
         });
-        EditText editText;
+        //search(mySearchView.getQuery().toString());
+
         myList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
+
+
+
                 String email= list1.get(position);
-                //String email=username.getE
                 Intent intent= new Intent(getContext(), search_userdata.class);
                 intent.putExtra("email",email);
                 startActivity(intent);

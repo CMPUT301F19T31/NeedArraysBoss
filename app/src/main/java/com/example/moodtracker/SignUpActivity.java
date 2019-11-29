@@ -257,9 +257,9 @@ public class SignUpActivity extends AppCompatActivity {
         DocumentReference userRef = FirebaseFirestore.getInstance().collection("users").document("user"+mFirebaseAuth.getCurrentUser().getEmail());
         User user;
         if(image == null) {
-            user = new User(uname, emailID, pwd);
+            user = new User(uname, emailID);
         } else {
-            user = new User(uname, emailID, pwd, image);
+            user = new User(uname, emailID,image);
         }
 
         userRef.set(user).addOnCompleteListener(new OnCompleteListener<Void>() {

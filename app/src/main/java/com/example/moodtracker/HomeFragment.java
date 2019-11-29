@@ -38,7 +38,11 @@ public class HomeFragment extends Fragment {
         return view;
     }
 
-    // Add Fragments to Tabs
+    /**
+     * Helper function to the onCreateView. Creates the ViewPager object where the fragments will
+     * be displayed as tabs.
+     * @param viewPager is a ViewPager object on which the fragments will be displayed.
+     */
     private void setupViewPager(ViewPager viewPager) {
 
         myAdapter adapter = new myAdapter(getChildFragmentManager());
@@ -47,6 +51,9 @@ public class HomeFragment extends Fragment {
         viewPager.setAdapter(adapter);
     }
 
+    /**
+     * The myAdapter is a custom adapter that is required by the view pager to display the fragments
+     */
     static class myAdapter extends FragmentPagerAdapter {
         private final List<Fragment> mFragmentList = new ArrayList<>();
         private final List<String> mFragmentTitleList = new ArrayList<>();

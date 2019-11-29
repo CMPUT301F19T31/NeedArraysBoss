@@ -60,7 +60,9 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 
-
+/**
+ * A fragment that displays a list of mood events created by the user
+ */
 public class UserMoods extends Fragment implements AdapterView.OnItemSelectedListener {
 
     private Dialog dialog;
@@ -78,13 +80,7 @@ public class UserMoods extends Fragment implements AdapterView.OnItemSelectedLis
     private User user;
     private FloatingActionButton actn_btn;
     private FloatingActionButton btnMap;
-    private FloatingActionButton button_search;
     private String image;
-
-    //private static final String TAG = "HomeFragment";
-    private static final String FINE_LOCATION = Manifest.permission.ACCESS_FINE_LOCATION;
-    private static final String COURSE_LOCATION = Manifest.permission.ACCESS_COARSE_LOCATION;
-    //private static final int LOCATION_PERMISSION_REQUEST_CODE = 1234;
 
     private boolean mLocationPermissionGranted = false;
     public static final int ERROR_DIALOG_REQUEST = 9001;
@@ -92,8 +88,7 @@ public class UserMoods extends Fragment implements AdapterView.OnItemSelectedLis
     public static final int PERMISSIONS_REQUEST_ENABLE_GPS = 9003;
     private FusedLocationProviderClient mFusedLocationClient;
     private boolean getmap = false;
-    GeoPoint geoPoint;
-    //boolean gotRecentLocation=false;
+    private GeoPoint geoPoint;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -110,7 +105,7 @@ public class UserMoods extends Fragment implements AdapterView.OnItemSelectedLis
         actn_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                createMoodEvent(v);
+                createMoodEvent();
             }
         });
 
@@ -130,6 +125,8 @@ public class UserMoods extends Fragment implements AdapterView.OnItemSelectedLis
             }
         });
 
+        if(checkMapServices()){ getLocationPermission(); }
+
         //initialize recyclerview
         rv = root.findViewById(R.id.moodList);
         moodHistoryLM = new LinearLayoutManager(getContext());
@@ -137,7 +134,7 @@ public class UserMoods extends Fragment implements AdapterView.OnItemSelectedLis
         rv.setLayoutManager(moodHistoryLM);
         rv.setAdapter(moodHistoryAdapter);
 
-        //start login activity
+        //start edit mood activity
         moodHistoryAdapter.setOnClickListener(new MoodListAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(int index) {
@@ -154,6 +151,10 @@ public class UserMoods extends Fragment implements AdapterView.OnItemSelectedLis
         return root;
     }
 
+    /**
+     * Called by the onItemSelected function when the filter spinner is used.
+     * @param feeling is a string that contains the value of the spinner item selected by the user
+     */
     public void filterMoodList(String feeling) {
         filterMoodHistory = new ArrayList<>();
         if(feeling.equals("")) {
@@ -169,40 +170,25 @@ public class UserMoods extends Fragment implements AdapterView.OnItemSelectedLis
         }
     }
 
-
+    /**
+     * Checks if the app is logged in, then calls onResume.
+     */
     @Override
     public void onStart() {
         super.onStart();
         // Check if user is signed in (non-null) and update UI accordingly.
         currentUser = mAuth.getCurrentUser();
 
-        if(currentUser == null) { // not signed in
-            //start login activity
-            Intent intent = new Intent(getActivity().getApplicationContext(), Login.class);
-            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
-            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            startActivity(intent);
-
-        } else {
+        if(currentUser != null)// not signed in
             onResume();
-        }
     }
 
+    /**
+     * Refreshes the data from the database
+     */
     @Override
     public void onResume() {
         super.onResume();
-        if(checkMapServices()) {
-            if(mLocationPermissionGranted) {
-                if (getmap) {
-                    init();
-                }
-                getDeviceLocation();
-            }
-        }else{
-            getLocationPermission();
-        }
-
         currentUser = mAuth.getCurrentUser();
 
         if (currentUser != null) {
@@ -220,7 +206,10 @@ public class UserMoods extends Fragment implements AdapterView.OnItemSelectedLis
         }
     }
 
-
+    /**
+     * This is a helper function to onResume. It uses the global user variable and fills UI
+     * with the appropriate information
+     */
     public void loadDataFromDB() {
         if(user == null || user.getMoodHistory() == null) { return; }
         int size=user.getMoodHistory().size();
@@ -233,7 +222,15 @@ public class UserMoods extends Fragment implements AdapterView.OnItemSelectedLis
         moodHistoryAdapter.notifyDataSetChanged();
     }
 
-
+    /**
+     * This is a required method for implementing AdapterView.OnItemClickListener. This function
+     * recieves the item that was selected by the user, and chooses the appropriate action to save
+     * the result.
+     * @param adapterView is the object that notifies the progrom which spinner widget was used
+     * @param view returns the view object
+     * @param i is the index of the spinner item that was selected
+     * @param l returns a long number
+     */
     @Override
     public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
         if (adapterView.getId() == R.id.feelingSpinner)
@@ -245,10 +242,19 @@ public class UserMoods extends Fragment implements AdapterView.OnItemSelectedLis
 
     }
 
+    /**
+     * This is a required method for implementing AdapterView.OnItemClickListener. This function
+     * empty and has no function
+     * @param adapterView
+     */
     @Override
     public void onNothingSelected(AdapterView<?> adapterView) { }
 
-    public void createMoodEvent(View view) {
+    /**
+     * Is called when the user wants to create a mood event. It infaltes a dialog window in which
+     * the user enters the details they want.
+     */
+    public void createMoodEvent() {
         dialog.setContentView(R.layout.add_mood_event);
 
         Spinner feelingSpinner = (Spinner) dialog.findViewById(R.id.feelingSpinner);
@@ -266,6 +272,8 @@ public class UserMoods extends Fragment implements AdapterView.OnItemSelectedLis
         final CheckBox enableMap = dialog.findViewById(R.id.enableMap);
 
         Button addEventBtn = dialog.findViewById(R.id.addMoodEvent);
+
+        if(checkMapServices()){ getLocationPermission(); }
 
         addEventBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -352,6 +360,7 @@ public class UserMoods extends Fragment implements AdapterView.OnItemSelectedLis
         if (checkMapServices()) {
             if (mLocationPermissionGranted) {
                 Intent intent = new Intent(getActivity(), MapActivity.class);
+                intent.putExtra("flag","0");
                 startActivity(intent);
                 getmap = false;
             } else {
@@ -482,6 +491,13 @@ public class UserMoods extends Fragment implements AdapterView.OnItemSelectedLis
         return false;
     }
 
+    /**
+     * onRequestPermissionsResult
+     * it looks at the result of the request to access location and makes changes accordingly
+     * @param requestCode
+     * @param permissions
+     * @param grantResults
+     */
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String permissions[], @NonNull int[] grantResults) {
         mLocationPermissionGranted = false;
@@ -492,10 +508,18 @@ public class UserMoods extends Fragment implements AdapterView.OnItemSelectedLis
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     mLocationPermissionGranted = true;
                 }
+                //getLocationPermission();
             }
         }
     }
 
+    /**
+     * This function is called when an intent is created that has to interact with another API
+     * directly.
+     * @param requestCode Indicates which action the function must take
+     * @param resultCode Indicates if the action is safe to carry out
+     * @param data Gives the data that the Activity returned
+     */
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -503,7 +527,6 @@ public class UserMoods extends Fragment implements AdapterView.OnItemSelectedLis
         switch (requestCode) {
             case PERMISSIONS_REQUEST_ENABLE_GPS: {
                 if(mLocationPermissionGranted){
-                    //getChatrooms();
                     if(getmap){
                         init();
                     }
