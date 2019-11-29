@@ -1,22 +1,17 @@
 package com.example.moodtracker;
 
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.emoji.widget.EmojiTextView;
-import androidx.fragment.app.FragmentTransaction;
-
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.util.Base64;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.emoji.widget.EmojiTextView;
-import androidx.fragment.app.Fragment;
 
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -83,7 +78,6 @@ public class ViewFriendMood extends AppCompatActivity {
                             intent.putExtra("username", mood.getFriend());
                             intent.putExtra("feeling", mood.getFeeling());
                             intent.putExtra("reason", mood.getReason());
-                            //intent.putExtra("socialstate", mood.getSocialState);
                             intent.putExtra("lat", mood.getGeo_point().getLatitude());
                             Log.d(TAG, "ViewMood: onCreate f2 geopoint Latitude: " + mood.getGeo_point().getLatitude());
                             intent.putExtra("long", mood.getGeo_point().getLongitude());

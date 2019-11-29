@@ -8,11 +8,13 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Base64;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
@@ -33,6 +35,8 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+
+import static androidx.constraintlayout.widget.Constraints.TAG;
 
 
 /**
@@ -72,7 +76,9 @@ public class EditMoodEvent extends AppCompatActivity implements AdapterView.OnIt
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(EditMoodEvent.this, MapActivity.class);
-                intent.putExtra("username", mood.getFriend());
+                intent.putExtra("flag", "2");
+                intent.putExtra("username", user.getUserID());
+                Log.d(TAG, "EditMoodEvent: onCreate f2 username: " + user.getUserID());
                 intent.putExtra("feeling", mood.getFeeling());
                 intent.putExtra("reason", mood.getReason());
                 intent.putExtra("lat", mood.getGeo_point().getLatitude());
