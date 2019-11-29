@@ -148,26 +148,15 @@
             android:background="@drawable/roundbutton"
             android:backgroundTint="@color/grey"
             android:id="@+id/button1"
-            android:layout_marginTop="16dp"
-            android:layout_marginBottom="16dp"
-            android:layout_marginLeft="40dp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:clickable="true"
-            android:text="Follow" />
+            android:layout_marginTop="5dp"
+            android:layout_marginBottom="5dp"
 
-        <Button
-            android:background="@drawable/roundbutton"
-            android:backgroundTint="@color/grey"
-            android:id="@+id/button2"
-            android:layout_marginTop="16dp"
-            android:layout_marginBottom="16dp"
-            android:layout_marginRight="40dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
             android:clickable="true"
-            android:text="Unfollow"
-            android:layout_alignParentRight="true" />
+            android:gravity="end"
+            android:text="Follow" />
 
     </RelativeLayout>
 
