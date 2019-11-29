@@ -34,6 +34,10 @@ public class search_userdata extends AppCompatActivity {
     TextView followerstv;
     TextView followingtv;
 
+    /**
+     * Inflates the activity
+     * @param savedInstanceState
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -158,6 +162,12 @@ public class search_userdata extends AppCompatActivity {
         });
 
     }
+
+    /**
+     *
+     * @param completeImageData - will use the image data to decode it
+     * @param imageView - uses the image veiw to view the image
+     */
     public void decodeImage(String completeImageData, ImageView imageView) {
         if (completeImageData == null) { return; }
 
