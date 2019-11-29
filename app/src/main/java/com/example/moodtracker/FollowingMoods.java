@@ -8,12 +8,14 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.FrameLayout;
 import android.widget.Spinner;
 
 import androidx.annotation.Nullable;
 import androidx.emoji.bundled.BundledEmojiCompatConfig;
 import androidx.emoji.text.EmojiCompat;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -56,6 +58,8 @@ public class FollowingMoods extends Fragment implements AdapterView.OnItemSelect
         EmojiCompat.Config config = new BundledEmojiCompatConfig(getContext());
         EmojiCompat.init(config);
 
+        FrameLayout frame = root.findViewById(R.id.socialStateSpinner2);
+
         // initialise variables
         mAuth = FirebaseAuth.getInstance();
         if(mAuth.getCurrentUser() == null)
@@ -82,22 +86,25 @@ public class FollowingMoods extends Fragment implements AdapterView.OnItemSelect
         friendMoodHistoryAdapter.setOnClickListener(new MoodListAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(int index) {
-                String friendEmail = friendMoodHistory.get(index).getFriend();
-                User friend = null;
+                String friendUsername = friendMoodHistory.get(index).getFriend();
+                String email = null;
+                int i = -1;
                 for(User user: allUsers) {
-                    if(user.getEmail().equals(friendEmail)) {
-                        friend = user;
-                        break;
+                    if(user.getUserID().equals(friendUsername)) {
+                        email = user.getEmail();
+                        i = user.getMoodHistory().indexOf(friendMoodHistory.get(index));
                     }
                 }
-                if(friend == null)
-                    return;
-                int i = friend.getMoodHistory().indexOf(friend);
 
-                Intent intent = new Intent(getActivity().getApplicationContext(), EditMoodEvent.class);
-                intent.putExtra("friend", friendEmail);
-                intent.putExtra("index", i);
-                startActivity(intent);
+                //Start fragment
+                Bundle args = new Bundle();
+                args.putString("email", email);
+                args.putInt("index", i);
+                Fragment fragment = new ViewMood();
+                fragment.setArguments(args);
+                FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
+                transaction.replace(R.id.container, fragment).addToBackStack(null);
+                transaction.commit();
             }
         });
 

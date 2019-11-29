@@ -19,6 +19,7 @@
         android:textColor="@color/white"/>
 
     <TextView
+        android:id="@+id/cancel"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="X"
@@ -26,8 +27,7 @@
         android:textColor="@color/white"
         android:layout_alignParentRight="true"
         android:layout_marginTop="26dp"
-        android:layout_marginRight="30dp"
-        android:onClick="cancel"/>
+        android:layout_marginRight="30dp"/>
 
     <androidx.emoji.widget.EmojiTextView
         android:layout_width="wrap_content"
@@ -37,7 +37,10 @@
         android:layout_marginTop="16dp"
         android:layout_marginLeft="16dp"
         android:textColor="@color/white"
-        android:textSize="20sp"/>
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:hint="feeling"
+        android:textColorHint="@color/white"/>
 
     <androidx.emoji.widget.EmojiTextView
         android:layout_width="wrap_content"
@@ -49,14 +52,20 @@
         android:layout_below="@id/feelingTV2"
         android:layout_marginTop="16dp"
         android:layout_marginLeft="16dp"
-        android:layout_marginRight="16dp"/>
+        android:layout_marginRight="16dp"
+        android:hint="reason"
+        android:textColorHint="@color/white"/>
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/socialStateSpinner2"
         android:layout_below="@id/reasonTV2"
-        android:layout_margin="16dp"/>
+        android:layout_margin="16dp"
+        android:textColor="@color/white"
+        android:textSize="20sp"
+        android:hint="social state"
+        android:textColorHint="@color/white"/>
 
 
     <ImageView
@@ -68,6 +77,17 @@
         android:layout_marginRight="50dp"
         android:layout_centerHorizontal="true"
         android:layout_below="@id/socialStateSpinner2"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/location"
+        android:layout_alignParentBottom="true"
+        android:layout_margin="20dp"
+        android:text="Location Attached"
+        android:textStyle="italic"
+        android:textSize="20sp"
+        android:textColor="@color/happy"/>
 
 
 </RelativeLayout>
