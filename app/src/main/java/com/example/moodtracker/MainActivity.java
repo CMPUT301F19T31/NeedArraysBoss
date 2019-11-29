@@ -12,6 +12,7 @@ import androidx.fragment.app.FragmentTransaction;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 
+
 public class MainActivity extends AppCompatActivity {
 
     @Override
@@ -57,6 +58,10 @@ public class MainActivity extends AppCompatActivity {
         }
     };
 
+    /**
+     * Helper function to MainActivity. MainActivity uses it to manage the fragments
+     * @param fragment is a fragment object that the function will inflate
+     */
     private void loadFragment(Fragment fragment) {
         // load fragment
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();

@@ -135,7 +135,7 @@ public class UserMoods extends Fragment implements AdapterView.OnItemSelectedLis
         rv.setLayoutManager(moodHistoryLM);
         rv.setAdapter(moodHistoryAdapter);
 
-        //start login activity
+        //start edit mood activity
         moodHistoryAdapter.setOnClickListener(new MoodListAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(int index) {
