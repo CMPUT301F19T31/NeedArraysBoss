@@ -160,7 +160,7 @@ public class EditMoodEvent extends AppCompatActivity implements AdapterView.OnIt
                 change = true;
                 mood.setSocialState(socialState);
             }
-            if(!image.equals(mood.getImg())) {
+            if(image != null && !image.equals(mood.getImg())) {
                 change = true;
                 mood.setImg(image);
             }
