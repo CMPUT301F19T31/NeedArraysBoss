@@ -105,6 +105,8 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         initEmoji();
         String str = getIntent().getStringExtra("flag");
         flag = Integer.parseInt(str); //1 is for friends mood and 0 is for the users mood
+        Log.d(TAG, "MapActivity: flag = "+flag);
+
         friendMoodHistory = new ArrayList<>();
         friends = new ArrayList<>();
     }
@@ -138,7 +140,15 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                 @Override
                 public void onSuccess(DocumentSnapshot documentSnapshot) {
                     currentUser = documentSnapshot.toObject(User.class);
-                    helpingAddMapMarker();
+                    //helpingAddMapMarker();
+                    if(flag==0) {
+                        userMoods = currentUser.getMoodHistory();
+                        userId =currentUser.getUserID();
+                        moods = userMoods;
+                        helpingAddMapMarker();
+                    }else{
+                        getFriendList();
+                    }
                 }
             });
             //helpingAddMapMarker();
@@ -152,19 +162,12 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
      * Helper function called when the firebase returns the userdata. It
      */
     void helpingAddMapMarker(){
-        if(flag==0) {
-            userMoods = currentUser.getMoodHistory();
-            userId =currentUser.getUserID();
-            moods = userMoods;
-        }else{
-            getFriendList();
-            moods = friendMoodHistory;
-        }
+        Log.d(TAG, "MapActivity: helpingAddMapMarker started");
 
         for (Mood mood : moods) {
 
-            //Log.d(TAG, "addMapMarkers: location: " + mood.getGeo_point().toString());
-            if(mood.getGeo_point()!=null) {
+            //Log.d(TAG, "addMapMarkers: helpingAddMapMarker location: " + mood.getGeo_point().toString());
+            if(mood.getGeo_point()!= null) {
                 try {
                     String snippet = mood.getFeeling() + ": ";
                     if (mood.getReason() != null) {
@@ -176,8 +179,11 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                     //int avatar = moodEmojis.get(mood.getFeeling());
                     int avatar = R.drawable.ogre;
 
+                    Log.d(TAG, "MapActivity: flag (helpingAddMapMarker) = "+flag);
                     if(flag==1){
                         userId=mood.getFriend();
+                        Log.d(TAG, "MapActivity: helpingAddMapMarker friends latitude: " + mood.getGeo_point().getLatitude());
+                        Log.d(TAG, "MapActivity: helpingAddMapMarker friends longitude: " + mood.getGeo_point().getLongitude());
                     }
 
                     ClusterMarker newClusterMarker = new ClusterMarker(
@@ -231,8 +237,11 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                         }
                     }
                 }
+                moods = friendMoodHistory;
+                helpingAddMapMarker();
             }
         });
+
     }
 
     /**
