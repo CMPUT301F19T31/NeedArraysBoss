@@ -51,6 +51,33 @@ class UserTest {
         return user;
     }
 
+    private User mockUserWithPic() {
+        User user = new User("test", "test@mood.com", "IMGURL");
+        user.getFollowingList().add(mockFollowing());
+        user.getMoodHistory().add(mockMood());
+        user.getNotification().add(followRequestNotification());
+        user.getNotification().add(acceptedNotification());
+        user.getNotification().add(deniedNotification());
+        user.getNotification().add(unfollowedNotification());
+        user.setNumFollwers(1);
+        return user;
+    }
+
+    private User mockUserNoArgs() {
+        User user = new User();
+        user.setUserID("test");
+        user.setProfilePic("IMGURL");
+        user.getFollowingList().add(mockFollowing());
+        user.getMoodHistory().add(mockMood());
+        user.getNotification().add(followRequestNotification());
+        user.getNotification().add(acceptedNotification());
+        user.getNotification().add(deniedNotification());
+        user.getNotification().add(unfollowedNotification());
+        user.setNumFollwers(1);
+        return user;
+    }
+
+
     @Test
     void testMoodHistory() {
         User user = mockUser();
@@ -60,7 +87,7 @@ class UserTest {
 
     @Test
     void testNotification() {
-        User user = mockUser();
+        User user = mockUserNoArgs();
         assertEquals(4, user.getNotification().size());
         assertEquals("ridwan@mood.com has requested to follow your moods", user.getNotification().get(0).getString());
         assertEquals("ridwan@mood.com has accepted your follow request", user.getNotification().get(1).getString());
@@ -70,10 +97,23 @@ class UserTest {
 
     @Test
     void testFollowing() {
-        User user = mockUser();
+        User user = mockUserWithPic();
         assertEquals(1, user.getFollowingList().size());
         assertEquals("ridwan@mood.com", user.getFollowingList().get(0).getUser());
         assertEquals(1, user.getFollowingList().get(0).getType());
+    }
+
+    @Test
+    void testPicUser() {
+        User user = mockUserWithPic();
+        user.setMoodHistory(new ArrayList<Mood>());
+        assertEquals(0, user.getMoodHistory().size());
+        user.setUserID("testID");
+        assertEquals("testID", user.getUserID());
+        assertEquals("test@mood.com", user.getEmail());
+        user.setNumFollwers(8);
+        assertEquals(8, user.getNumFollwers());
+        assertEquals("IMGURL", user.getProfilePic());
     }
 
 }

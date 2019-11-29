@@ -24,6 +24,13 @@ public class Notification {
         return type;
     }
 
+    public void setType(int type) {
+        this.type = type;
+    }
+
+    public void setUser1(String user1) {
+        this.user1 = user1;
+    }
 
     public String getUser1() {
         return user1;
