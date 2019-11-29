@@ -350,6 +350,7 @@ public class UserMoods extends Fragment implements AdapterView.OnItemSelectedLis
         if (checkMapServices()) {
             if (mLocationPermissionGranted) {
                 Intent intent = new Intent(getActivity(), MapActivity.class);
+                intent.putExtra("flag","0");
                 startActivity(intent);
                 getmap = false;
             } else {

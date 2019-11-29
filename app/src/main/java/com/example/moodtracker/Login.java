@@ -37,6 +37,9 @@ public class Login extends AppCompatActivity {
         SignIn = findViewById(R.id.loginBtn);
         TextSignIn = findViewById(R.id.textView);
 
+        if(mFirebaseAuth.getCurrentUser() != null)
+            mFirebaseAuth.signOut();
+
     }
 
     public void signInUser (View v) {
