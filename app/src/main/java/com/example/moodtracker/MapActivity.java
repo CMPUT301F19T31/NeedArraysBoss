@@ -65,24 +65,14 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
     private static final String TAG = "MapActivity";
 
-    private static final String FINE_LOCATION = Manifest.permission.ACCESS_FINE_LOCATION;
-    private static final String COURSE_LOCATION = Manifest.permission.ACCESS_COARSE_LOCATION;
-    private static final int LOCATION_PERMISSION_REQUEST_CODE = 1234;
-    ////////////////////////////////////////////////
     private boolean mLocationPermissionGranted = true; //false;
-    public static final int ERROR_DIALOG_REQUEST = 9001;
-    public static final int PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 9002;
-    public static final int PERMISSIONS_REQUEST_ENABLE_GPS = 9003;
     private static final float DEFAULT_ZOOM = 15f;
-    private FusedLocationProviderClient mFusedLocationClient;
     private FusedLocationProviderClient mFusedLocationProviderClient;
-    ////////////////////////////////////////////////
     private ClusterManager<ClusterMarker> mClusterManager;
     private MyClusterManagerRenderer mClusterManagerRenderer;
     private ArrayList<ClusterMarker> mClusterMarkers = new ArrayList<>();
 
     //vars
-    //private Boolean mLocationPermissionsGranted = false;
     private GoogleMap mMap;
     private ArrayList<String> friends;
     private User currentUser;
@@ -95,8 +85,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     private HashMap<String, Integer> moodEmojis;
     private int flag;
     private String userId;
-    //private Map<String,String> moodEmojis=new HashMap<String, String>();
-    //HashMap<String, String> moodEmojis = new HashMap<String, String>();
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {

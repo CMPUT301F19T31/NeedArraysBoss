@@ -69,11 +69,6 @@ public class FollowingMoods extends Fragment implements AdapterView.OnItemSelect
     private MoodListAdapter friendMoodHistoryAdapter;
     private RecyclerView.LayoutManager rvLM;
 
-    //private static final String TAG = "HomeFragment";
-    private static final String FINE_LOCATION = Manifest.permission.ACCESS_FINE_LOCATION;
-    private static final String COURSE_LOCATION = Manifest.permission.ACCESS_COARSE_LOCATION;
-    //private static final int LOCATION_PERMISSION_REQUEST_CODE = 1234;
-
     private boolean mLocationPermissionGranted = false;
     public static final int ERROR_DIALOG_REQUEST = 9001;
     public static final int PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 9002;
@@ -81,7 +76,6 @@ public class FollowingMoods extends Fragment implements AdapterView.OnItemSelect
     private FusedLocationProviderClient mFusedLocationClient;
     private boolean getmap = false;
     GeoPoint geoPoint;
-    //boolean gotRecentLocation=false;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
