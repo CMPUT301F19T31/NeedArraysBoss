@@ -83,6 +83,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     private DocumentReference docRef;
     private ArrayList<Mood> moods;
     private HashMap<String, Integer> moodEmojis;
+    private int flag;
     //private Map<String,String> moodEmojis=new HashMap<String, String>();
     //HashMap<String, String> moodEmojis = new HashMap<String, String>();
 
@@ -95,6 +96,8 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         //isMapsEnabled();
         initMap();
         initEmoji();
+        String str = getIntent().getStringExtra("flag");
+        flag = Integer.parseInt(str);
     }
 
     private void initMap() {
@@ -117,6 +120,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             }
             mMap.setOnCameraIdleListener(mClusterManager);
             mMap.setOnMarkerClickListener(mClusterManager);
+
             mAuth = FirebaseAuth.getInstance();
             currentUser = mAuth.getCurrentUser();
             docRef = FirebaseFirestore.getInstance().collection("users").document("user" + mAuth.getCurrentUser().getEmail());
@@ -153,6 +157,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                     }
 
                     int avatar = moodEmojis.get(mood.getFeeling());
+                    avatar = R.drawable.ogre;
 
                     ClusterMarker newClusterMarker = new ClusterMarker(
                             new LatLng(mood.getGeo_point().getLatitude(), mood.getGeo_point().getLongitude()),
