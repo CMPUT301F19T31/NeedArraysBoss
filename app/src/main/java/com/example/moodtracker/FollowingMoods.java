@@ -1,6 +1,8 @@
 package com.example.moodtracker;
 
 
+
+import android.Manifest;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
@@ -33,6 +35,11 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
@@ -154,6 +161,8 @@ public class FollowingMoods extends Fragment implements AdapterView.OnItemSelect
         userRef.document("user"+mAuth.getCurrentUser().getEmail()).addSnapshotListener(new EventListener<DocumentSnapshot>() {
             @Override
             public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
+                if(mAuth.getCurrentUser()==null)
+                    return;
                 currentUser = documentSnapshot.toObject(User.class);
                 for(int i=0; i<currentUser.getFollowingList().size(); i++)
                     friends.add(currentUser.getFollowingList().get(i).getUser());
@@ -167,9 +176,9 @@ public class FollowingMoods extends Fragment implements AdapterView.OnItemSelect
      * with the appropriate information
      */
     public void refreshList() {
-        userRef.addSnapshotListener(new EventListener<QuerySnapshot>() {
+        userRef.get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
             @Override
-            public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
+            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
                 List<DocumentSnapshot> data = queryDocumentSnapshots.getDocuments();
                 friendMoodHistory.clear();
                 allUsers.clear();
@@ -244,7 +253,6 @@ public class FollowingMoods extends Fragment implements AdapterView.OnItemSelect
 
     }
 
-    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     /**
      * init

@@ -7,6 +7,15 @@
     android:background= "@color/cardview_dark_background"
     tools:context=".SignUpActivity">
 
+    <ImageView
+        android:id="@+id/image_profile"
+        android:layout_width="120dp"
+        android:layout_height="120dp"
+        android:layout_margin="9dp"
+        android:padding="3dp"
+        android:src="@drawable/ic_account_circle_black_24dp"
+        android:layout_centerHorizontal="true"/>
+
     <EditText
         android:id="@+id/username"
         android:layout_width="wrap_content"
@@ -100,4 +109,12 @@
         android:textStyle="bold"
         android:onClick="cancel"
         android:layout_margin="24dp"/>
+
+    <com.google.android.gms.common.SignInButton
+        android:id="@+id/sign_in_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/textView2"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="25dp" />
 </RelativeLayout>

@@ -179,16 +179,8 @@ public class UserMoods extends Fragment implements AdapterView.OnItemSelectedLis
         // Check if user is signed in (non-null) and update UI accordingly.
         currentUser = mAuth.getCurrentUser();
 
-        if(currentUser == null) { // not signed in
-            //start login activity
-            Intent intent = new Intent(getActivity().getApplicationContext(), Login.class);
-            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
-            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            startActivity(intent);
-        } else {
+        if(currentUser != null)// not signed in
             onResume();
-        }
     }
 
     /**
