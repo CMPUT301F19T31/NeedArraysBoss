@@ -1,6 +1,7 @@
 package com.example.moodtracker;
 
 
+
 import android.Manifest;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -8,8 +9,8 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.location.Location;
 import android.location.LocationManager;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -46,7 +47,6 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
-import com.google.firebase.firestore.GeoPoint;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
@@ -56,7 +56,7 @@ import static androidx.constraintlayout.widget.Constraints.TAG;
 
 
 /**
- * A simple {@link Fragment} subclass.
+ * A fragment that displays a list of mood events created by the user's following list
  */
 public class FollowingMoods extends Fragment implements AdapterView.OnItemSelectedListener {
 
@@ -73,23 +73,14 @@ public class FollowingMoods extends Fragment implements AdapterView.OnItemSelect
     private MoodListAdapter friendMoodHistoryAdapter;
     private RecyclerView.LayoutManager rvLM;
 
-    //private static final String TAG = "HomeFragment";
-    private static final String FINE_LOCATION = Manifest.permission.ACCESS_FINE_LOCATION;
-    private static final String COURSE_LOCATION = Manifest.permission.ACCESS_COARSE_LOCATION;
-    //private static final int LOCATION_PERMISSION_REQUEST_CODE = 1234;
-
     private boolean mLocationPermissionGranted = false;
     public static final int ERROR_DIALOG_REQUEST = 9001;
     public static final int PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 9002;
     public static final int PERMISSIONS_REQUEST_ENABLE_GPS = 9003;
-    private FusedLocationProviderClient mFusedLocationClient;
     private boolean getmap = false;
-    GeoPoint geoPoint;
-    //boolean gotRecentLocation=false;
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View root = inflater.inflate(R.layout.fragment_following_moods, container, false);
 
@@ -144,15 +135,10 @@ public class FollowingMoods extends Fragment implements AdapterView.OnItemSelect
                     }
                 }
 
-                //Start fragment
-                Bundle args = new Bundle();
-                args.putString("email", email);
-                args.putInt("index", i);
-                Fragment fragment = new ViewMood();
-                fragment.setArguments(args);
-                FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
-                transaction.replace(R.id.container, fragment).addToBackStack(null);
-                transaction.commit();
+                Intent intent = new Intent(getActivity().getApplicationContext(), ViewFriendMood.class);
+                intent.putExtra("email", email);
+                intent.putExtra("index", i);
+                startActivity(intent);
             }
         });
 
@@ -180,6 +166,10 @@ public class FollowingMoods extends Fragment implements AdapterView.OnItemSelect
         });
     }
 
+    /**
+     * This is a helper function to getFriendList. It uses the global user variable and fills UI
+     * with the appropriate information
+     */
     public void refreshList() {
         userRef.get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
             @Override
@@ -189,12 +179,26 @@ public class FollowingMoods extends Fragment implements AdapterView.OnItemSelect
                 allUsers.clear();
                 for(DocumentSnapshot doc: data) {
                     User user = doc.toObject(User.class);
-                    if(friends.contains(user.getEmail())) {
+                    if(friends.contains(user.getEmail())) { //if user is a friend
                         allUsers.add(user);
-                        for(int i=0; i<user.getMoodHistory().size(); i++) {
-                            Mood mood = user.getMoodHistory().get(i);
+                        int permission = -1;
+                        for(int i=0; i<currentUser.getFollowingList().size(); i++) {
+                            if(currentUser.getFollowingList().get(i).getUser().equals(user.getEmail())) {
+                                permission = currentUser.getFollowingList().get(i).getType();
+                                break;
+                            }
+                        }
+                        if(permission == 2) {    // if only most recent mood is allowed
+                            Mood mood = user.getMoodHistory().get(0);
                             mood.setFriend(user.getUserID());
                             friendMoodHistory.add(mood);
+                        }
+                        else {                  // if all moods are allowed
+                            for (int i = 0; i < user.getMoodHistory().size(); i++) {
+                                Mood mood = user.getMoodHistory().get(i);
+                                mood.setFriend(user.getUserID());
+                                friendMoodHistory.add(mood);
+                            }
                         }
                     }
                 }
@@ -213,6 +217,10 @@ public class FollowingMoods extends Fragment implements AdapterView.OnItemSelect
 
     }
 
+    /**
+     * Called by the onItemSelected function when the filter spinner is used.
+     * @param feeling is a string that contains the value of the spinner item selected by the user
+     */
     public void filterMoodList(String feeling) {
         filterFriendMoodHistory = new ArrayList<>();
         if(feeling.equals("")) {
@@ -228,12 +236,26 @@ public class FollowingMoods extends Fragment implements AdapterView.OnItemSelect
         }
     }
 
+    /**
+     * This is a required method for implementing AdapterView.OnItemClickListener. This function
+     * recieves the item that was selected by the user, and chooses the appropriate action to save
+     * the result.
+     * @param parent is the object that notifies the progrom which spinner widget was used
+     * @param view returns the view object
+     * @param position is the index of the spinner item that was selected
+     * @param id returns a long number
+     */
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
         if (parent.getId() == R.id.filterSpinner)
             filterMoodList(parent.getItemAtPosition(position).toString());
     }
 
+    /**
+     * This is a required method for implementing AdapterView.OnItemClickListener. This function
+     * empty and has no function
+     * @param parent
+     */
     @Override
     public void onNothingSelected(AdapterView<?> parent) {
 
@@ -257,30 +279,6 @@ public class FollowingMoods extends Fragment implements AdapterView.OnItemSelect
             }
         }
 
-    }
-
-    /**
-     * getDeviceLocation
-     * gets the current device location
-     */
-    private void getDeviceLocation() {
-        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(getActivity());
-
-        Log.d(TAG, "getLastKnownLocation: called.");
-        if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            return;
-        }
-        mFusedLocationClient.getLastLocation().addOnCompleteListener(new OnCompleteListener<Location>() {
-            @Override
-            public void onComplete(@NonNull Task<Location> task) {
-                if (task.isSuccessful()) {
-                    Location location = task.getResult();
-                    geoPoint = new GeoPoint(location.getLatitude(), location.getLongitude());
-                    Log.d(TAG, "onComplete: latitude: " + geoPoint.getLatitude());
-                    Log.d(TAG, "onComplete: longitude: " + geoPoint.getLongitude());
-                }
-            }
-        });
     }
 
     /**
@@ -332,14 +330,11 @@ public class FollowingMoods extends Fragment implements AdapterView.OnItemSelect
 
     /**
      * getLocationPermission
-     * gets Location permission from the user
+     * Request location permission, so that we can get the location of the
+     * device. The result of the permission request is handled by a callback,
+     * onRequestPermissionsResult.
      */
     private void getLocationPermission() {
-        /*
-         * Request location permission, so that we can get the location of the
-         * device. The result of the permission request is handled by a callback,
-         * onRequestPermissionsResult.
-         */
         if (ContextCompat.checkSelfPermission(getContext(),
                 android.Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED) {
@@ -347,7 +342,6 @@ public class FollowingMoods extends Fragment implements AdapterView.OnItemSelect
             if(getmap){
                 init();
             }
-            getDeviceLocation();
         } else {
             ActivityCompat.requestPermissions(getActivity(), new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},
                     PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
@@ -380,9 +374,16 @@ public class FollowingMoods extends Fragment implements AdapterView.OnItemSelect
         return false;
     }
 
+    /**
+     * onRequestPermissionsResult
+     * it looks at the result of the request to access location and makes changes accordingly
+     * @param requestCode
+     * @param permissions
+     * @param grantResults
+     */
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String permissions[], @NonNull int[] grantResults) {
-        mLocationPermissionGranted = false;
+        //mLocationPermissionGranted = false;
         switch (requestCode) {
             case PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION: {
                 // If request is cancelled, the result arrays are empty.
@@ -401,11 +402,9 @@ public class FollowingMoods extends Fragment implements AdapterView.OnItemSelect
         switch (requestCode) {
             case PERMISSIONS_REQUEST_ENABLE_GPS: {
                 if(mLocationPermissionGranted){
-                    //getChatrooms();
                     if(getmap){
                         init();
                     }
-                    getDeviceLocation();
                 }
                 else{
                     getLocationPermission();
@@ -415,4 +414,3 @@ public class FollowingMoods extends Fragment implements AdapterView.OnItemSelect
 
     }
 }
-

@@ -17,12 +17,11 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-
-    android:theme="@style/AppBaseTheme">
-        <activity android:name=".search_userdata"></activity>
+        android:theme="@style/AppBaseTheme">
+        <activity android:name=".ViewFriendMood"></activity>
+        <activity android:name=".search_userdata" />
         <activity android:name=".SignUpActivity" />
         <activity android:name=".Login" />
-
         <activity
             android:name=".MainActivity"
             android:label="@string/app_name">
@@ -36,15 +35,15 @@
         <activity android:name=".HomeFragment" />
         <activity android:name=".Search_activity" />
 
-
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/google_maps_api_key" />
         <meta-data
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
-
-        <meta-data android:name="android.max_aspect" android:value="2.1" />
+        <meta-data
+            android:name="android.max_aspect"
+            android:value="2.1" />
 
         <uses-library
             android:name="org.apache.http.legacy"
