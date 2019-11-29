@@ -271,7 +271,7 @@ public class HomeFragment extends Fragment implements AdapterView.OnItemSelected
                     } else if(image == null) {
                         newMood = new Mood(feeling, socialState, System.currentTimeMillis(), reason);
                     } else {
-                        newMood = new Mood(feeling, socialState, System.currentTimeMillis(), reason, image);
+                        newMood = new Mood(feeling, socialState, System.currentTimeMillis(), reason, image.toString());
 
                     }
                     moodHistory.add(0, newMood); //inserts new mood at the beginning of list

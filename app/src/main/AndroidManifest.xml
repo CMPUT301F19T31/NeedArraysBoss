@@ -17,10 +17,10 @@
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
-        android:supportsRtl="true"
+        android:supportsRtl="true">
 
 
-    android:theme="@style/AppBaseTheme">
+    //android:theme="@style/AppBaseTheme">
         <activity android:name=".search_userdata"></activity>
         <activity android:name=".SignUpActivity" />
         <activity android:name=".Login" />
