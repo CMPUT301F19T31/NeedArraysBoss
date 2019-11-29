@@ -118,6 +118,10 @@ public class EditMoodEvent extends AppCompatActivity implements AdapterView.OnIt
         imageView.setImageBitmap(bitmap);
     }
 
+    /**
+     * This is a helper function to onResume. It uses the global user variable and fills UI
+     * with the appropriate information
+     */
     public void loadDataFromDB() {
         mAuth = FirebaseAuth.getInstance();
         docRef = FirebaseFirestore.getInstance().collection("users").document("user"+mAuth.getCurrentUser().getEmail());
@@ -139,6 +143,9 @@ public class EditMoodEvent extends AppCompatActivity implements AdapterView.OnIt
         });
     }
 
+    /**
+     * Initialises the array lists
+     */
     public void initializeArrays() {
         moods = new ArrayList<>();
         moods.add("happy");
@@ -160,6 +167,11 @@ public class EditMoodEvent extends AppCompatActivity implements AdapterView.OnIt
         socialStates.add("with a crowd");
     }
 
+    /**
+     * This function handles all the changes the user wishes to make and commits them to the
+     * database
+     * @param v is a View object
+     */
     public void editMoodEvent(View v) {
         boolean change = false;
         String reason = et.getText().toString();
@@ -196,10 +208,18 @@ public class EditMoodEvent extends AppCompatActivity implements AdapterView.OnIt
             Toast.makeText(getApplicationContext(), "Please select how you feel", Toast.LENGTH_LONG).show();
     }
 
+    /**
+     * This function starts an intent that allows the user to upload an image
+     * @param v is a View object
+     */
     public void editMoodImage(View v) {
         startActivityForResult(new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.INTERNAL_CONTENT_URI), 3);
     }
 
+    /**
+     * This function handles the case where the user wants to remove their mood from their history
+     * @param v is a View object
+     */
     public void deleteMood(View v) {
         user.getMoodHistory().remove(index);
         docRef.set(user).addOnSuccessListener(new OnSuccessListener<Void>() {
@@ -210,8 +230,19 @@ public class EditMoodEvent extends AppCompatActivity implements AdapterView.OnIt
         });
     }
 
+    /**
+     * This function closes the activity and goes back to the previous activity
+     * @param v is a View object
+     */
     public void cancel(View v) { finish(); }
 
+    /**
+     * This function is called when an intent is created that has to interact with another API
+     * directly.
+     * @param requestCode Indicates which action the function must take
+     * @param resultCode Indicates if the action is safe to carry out
+     * @param data Gives the data that the Activity returned
+     */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -243,6 +274,15 @@ public class EditMoodEvent extends AppCompatActivity implements AdapterView.OnIt
         }
     }
 
+    /**
+     * This is a required method for implementing AdapterView.OnItemClickListener. This function
+     * recieves the item that was selected by the user, and chooses the appropriate action to save
+     * the result.
+     * @param parent is the object that notifies the progrom which spinner widget was used
+     * @param view returns the view object
+     * @param position is the index of the spinner item that was selected
+     * @param id returns a long number
+     */
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
         if(parent.getId() == R.id.editMoodFeelingSpinner)
@@ -251,6 +291,11 @@ public class EditMoodEvent extends AppCompatActivity implements AdapterView.OnIt
             socialState = parent.getItemAtPosition(position).toString();
     }
 
+    /**
+     * This is a required method for implementing AdapterView.OnItemClickListener. This function
+     * empty and has no function
+     * @param parent
+     */
     @Override
     public void onNothingSelected(AdapterView<?> parent) {
 

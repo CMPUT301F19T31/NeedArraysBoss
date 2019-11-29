@@ -102,8 +102,6 @@ public class FollowingMoods extends Fragment implements AdapterView.OnItemSelect
                 startActivity(intent);
             }
         });
-
-
         getFriendList();
 
         return root;

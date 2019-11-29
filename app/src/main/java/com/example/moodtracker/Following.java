@@ -1,5 +1,8 @@
 package com.example.moodtracker;
 
+/**
+ * Its an object that connects to the user they are following
+ */
 public class Following {
 
     private int type;
