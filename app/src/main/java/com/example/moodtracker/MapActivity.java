@@ -165,19 +165,14 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         Log.d(TAG, "MapActivity: helpingAddMapMarker started");
 
         for (Mood mood : moods) {
-
-            //Log.d(TAG, "addMapMarkers: helpingAddMapMarker location: " + mood.getGeo_point().toString());
             if(mood.getGeo_point()!= null) {
                 try {
-                    String snippet = mood.getFeeling() + ": ";
-                    if (mood.getReason() != null) {
-                        snippet = snippet + mood.getReason();
-                    } else {
-                        snippet = snippet + "no reason";
+                    String snippet = mood.getFeeling();
+                    if (mood.getReason() != "") {
+                        snippet = snippet + ": " + mood.getReason();
                     }
 
-                    //int avatar = moodEmojis.get(mood.getFeeling());
-                    int avatar = R.drawable.ogre;
+                    int avatar = moodEmojis.get(mood.getFeeling());
 
                     Log.d(TAG, "MapActivity: flag (helpingAddMapMarker) = "+flag);
                     if(flag==1){
@@ -252,17 +247,17 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     public void initEmoji() {
         //initializes emoji array
         moodEmojis = new HashMap<>();
-        moodEmojis.put("happy", 0x1F601);
-        moodEmojis.put("excited", 0x1F606);
-        moodEmojis.put("hopeful", 0x1F60A);
-        moodEmojis.put("satisfied", 0x1F60C);
-        moodEmojis.put("sad", 0x1F61E);
-        moodEmojis.put("angry", 0x1F621);
-        moodEmojis.put("frustrated", 0x1F623);
-        moodEmojis.put("confused", 0x1F635);
-        moodEmojis.put("annoyed", 0x1F620);
-        moodEmojis.put("hopeless",0x1F625);
-        moodEmojis.put("lonely", 0x1F614);
+        moodEmojis.put("happy", R.drawable.happy);
+        moodEmojis.put("excited", R.drawable.excited);
+        moodEmojis.put("hopeful", R.drawable.hopeful);
+        moodEmojis.put("satisfied", R.drawable.satisfied);
+        moodEmojis.put("sad", R.drawable.sad);
+        moodEmojis.put("angry", R.drawable.angry);
+        moodEmojis.put("frustrated", R.drawable.frustrated);
+        moodEmojis.put("confused", R.drawable.confused);
+        moodEmojis.put("annoyed", R.drawable.annoyed);
+        moodEmojis.put("hopeless", R.drawable.hopeless);
+        moodEmojis.put("lonely", R.drawable.lonely);
     }
 
     /**
