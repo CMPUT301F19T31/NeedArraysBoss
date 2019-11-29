@@ -47,7 +47,7 @@ import java.util.ArrayList;
 
 public class SignUpActivity extends AppCompatActivity {
 
-    EditText username, password, repassword, email, phone;
+    EditText username, password, repassword, email;
     String uname, emailID, pwd, imageUri;
     Button SignUp;
     SignInButton GoogleSign;
@@ -61,7 +61,6 @@ public class SignUpActivity extends AppCompatActivity {
 
     String TAG = "";
 
-    private FirebaseAuth.AuthStateListener mAuthStateListener;
     private ArrayList<User> users;
 
 
