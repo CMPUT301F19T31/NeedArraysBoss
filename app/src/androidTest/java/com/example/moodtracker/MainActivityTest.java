@@ -76,7 +76,7 @@ public class MainActivityTest {
 
     @Test
     public void checkAddMood(){
-        // Asserts that the current activity is the MainActivity. Otherwise, show “Wrong Activity”
+
         solo.assertCurrentActivity("Wrong Activity", MainActivity.class);
         solo.clickOnActionBarHomeButton();
         View addMood = solo.getView(R.id.addMoodEvent);
@@ -93,7 +93,7 @@ public class MainActivityTest {
 
     @Test
     public void checkAddMoodWithoutReason(){
-        // Asserts that the current activity is the MainActivity. Otherwise, show “Wrong Activity”
+
         solo.assertCurrentActivity("Wrong Activity", MainActivity.class);
         solo.clickOnActionBarHomeButton();
         View addMood = solo.getView(R.id.addMoodEvent);
@@ -113,7 +113,7 @@ public class MainActivityTest {
 
     @Test
     public void checkEditMood(){
-        // Asserts that the current activity is the MainActivity. Otherwise, show “Wrong Activity”
+
         solo.assertCurrentActivity("Wrong Activity", MainActivity.class);
         // Initialize test element
         solo.clickOnActionBarHomeButton();
@@ -146,7 +146,7 @@ public class MainActivityTest {
 
     @Test
     public void checkDeleteMood(){
-        // Asserts that the current activity is the MainActivity. Otherwise, show “Wrong Activity”
+
         solo.assertCurrentActivity("Wrong Activity", MainActivity.class);
         // Initialize test element
         solo.clickOnActionBarHomeButton();
@@ -166,7 +166,7 @@ public class MainActivityTest {
 
     @Test
     public void checkNavigation(){
-        // Asserts that the current activity is the MainActivity. Otherwise, show “Wrong Activity”
+        
         solo.assertCurrentActivity("Wrong Activity", MainActivity.class);
         // Initialize test element
         solo.clickOnActionBarHomeButton();
