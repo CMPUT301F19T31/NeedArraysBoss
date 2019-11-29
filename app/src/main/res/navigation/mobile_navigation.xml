@@ -10,6 +10,7 @@
         android:name="com.example.moodtracker.HomeFragment"
         android:label="@string/title_home"
         tools:layout="@layout/fragment_home" />
+
     <fragment
         android:id="@+id/navigation_search"
         android:name="com.example.moodtracker.SearchFragment"

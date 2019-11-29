@@ -4,8 +4,10 @@ import java.util.ArrayList;
 
 public class User {
 
+
     private String userID, email, password, profilePic;
     private int numFollwers=0;
+
 
 
     private ArrayList<Mood> moodHistory = new ArrayList<>();
@@ -27,6 +29,7 @@ public class User {
         this.moodHistory = moodHistory;
     }
 
+
     public User(String userID, String email, String password, String profilePic) {
         this.userID = userID;
         this.profilePic = profilePic;
@@ -37,6 +40,7 @@ public class User {
         this.userID = userID;
         this.email = email;
         this.password = password;
+
     }
     public User() {
         //do nothing
@@ -45,6 +49,7 @@ public class User {
     public String getUserID() {
         return userID;
     }
+
     public void setUserID(String userID) { this.userID = userID; }
     public String getEmail() {
         return email;

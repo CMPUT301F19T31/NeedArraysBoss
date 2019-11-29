@@ -68,6 +68,7 @@ public class UserMoods extends Fragment implements AdapterView.OnItemSelectedLis
 
     private RecyclerView rv;
     private ArrayList<Mood> moodHistory;
+    private ArrayList<Mood> filterMoodHistory;
     private MoodListAdapter moodHistoryAdapter;
     private RecyclerView.LayoutManager moodHistoryLM;
     private DocumentReference userRef;
@@ -112,6 +113,14 @@ public class UserMoods extends Fragment implements AdapterView.OnItemSelectedLis
                 createMoodEvent(v);
             }
         });
+
+
+        //initialise the mood filter spinner
+        Spinner moodFilterSpinner = root.findViewById(R.id.filterSpinner);
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(getContext(), R.array.feelings, R.layout.spinner_item);
+        adapter.setDropDownViewResource(android.R.layout.simple_list_item_1);
+        moodFilterSpinner.setAdapter(adapter);
+        moodFilterSpinner.setOnItemSelectedListener(this);
 
         btnMap = root.findViewById(R.id.btnMap);
         btnMap.setOnClickListener(new View.OnClickListener() {
@@ -210,6 +219,20 @@ public class UserMoods extends Fragment implements AdapterView.OnItemSelectedLis
         moodHistoryAdapter.notifyDataSetChanged();
     }
 
+    public void filterMoodList(String feeling) {
+        filterMoodHistory = new ArrayList<>();
+        if(feeling.equals("")) {
+            moodHistoryAdapter.setList(moodHistory);
+            moodHistoryAdapter.notifyDataSetChanged();
+        } else {
+            for(int i = 0; i < moodHistory.size(); i++) {
+                if(moodHistory.get(i).getFeeling().equals(feeling))
+                    filterMoodHistory.add(moodHistory.get(i));
+            }
+            moodHistoryAdapter.setList(filterMoodHistory);
+            moodHistoryAdapter.notifyDataSetChanged();
+        }
+    }
 
     @Override
     public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
@@ -217,6 +240,8 @@ public class UserMoods extends Fragment implements AdapterView.OnItemSelectedLis
             feeling = adapterView.getItemAtPosition(i).toString();
         else if (adapterView.getId() == R.id.socialStateSpinner)
             socialState = adapterView.getItemAtPosition(i).toString();
+        else if (adapterView.getId() == R.id.filterSpinner)
+            filterMoodList(adapterView.getItemAtPosition(i).toString());
 
     }
 
@@ -226,13 +251,13 @@ public class UserMoods extends Fragment implements AdapterView.OnItemSelectedLis
     public void createMoodEvent(View view) {
         dialog.setContentView(R.layout.add_mood_event);
 
-        Spinner feelingSpinner = (Spinner) dialog.findViewById(R.id.feelingSpinner);
+        Spinner feelingSpinner = dialog.findViewById(R.id.feelingSpinner);
         ArrayAdapter<CharSequence> adapter1 = ArrayAdapter.createFromResource(getContext(), R.array.feelings, R.layout.spinner_item);
         adapter1.setDropDownViewResource(android.R.layout.simple_list_item_1);
         feelingSpinner.setAdapter(adapter1);
         feelingSpinner.setOnItemSelectedListener(this);
 
-        Spinner socialStateSpinner = (Spinner) dialog.findViewById(R.id.socialStateSpinner);
+        Spinner socialStateSpinner = dialog.findViewById(R.id.socialStateSpinner);
         ArrayAdapter<CharSequence> adapter2 = ArrayAdapter.createFromResource(getContext(), R.array.socialStates, R.layout.spinner_item);
         adapter2.setDropDownViewResource(android.R.layout.simple_list_item_1);
         socialStateSpinner.setAdapter(adapter2);

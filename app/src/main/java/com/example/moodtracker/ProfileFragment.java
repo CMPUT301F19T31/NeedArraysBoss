@@ -268,8 +268,13 @@ public class ProfileFragment extends Fragment {
             }
         });
 
+
+
+
+
         return root;
     }
+
 
     /**
      * loadDataFromDB
@@ -445,3 +450,4 @@ public class ProfileFragment extends Fragment {
 
     }
 }
+
