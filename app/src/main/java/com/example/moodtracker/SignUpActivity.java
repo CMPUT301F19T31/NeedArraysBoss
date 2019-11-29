@@ -51,14 +51,10 @@ public class SignUpActivity extends AppCompatActivity {
     SignInButton GoogleSign;
     TextView TextSignUp;
     FirebaseAuth mFirebaseAuth;
-    String TAG = "";
     GoogleSignInClient mGoogleSignInClient;
-    private int permissions = 0;
     ImageView picture;
 
-    private FirebaseAuth.AuthStateListener mAuthStateListener;
     private ArrayList<User> users;
-    private boolean done = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
