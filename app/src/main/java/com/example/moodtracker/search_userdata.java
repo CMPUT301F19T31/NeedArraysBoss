@@ -45,6 +45,8 @@ public class search_userdata extends AppCompatActivity {
         final Button testButton = (Button) findViewById(R.id.button1);
         testButton.setTag(1);
 
+        final Button unfollow = (Button) findViewById(R.id.button2);
+
         imageView = findViewById(R.id.imgUser);
         tv=findViewById(R.id.emailaddress);
         tv.setText(getIntent().getStringExtra("email"));
@@ -116,17 +118,44 @@ public class search_userdata extends AppCompatActivity {
                             }
                         });
 
+                    }
+                });
+            }
+        });
 
+        unfollow.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                final Notification notification = new Notification(4, mAuth.getCurrentUser().getEmail(),getIntent().getStringExtra("email"));
 
-                        /*
-                        if(flag==1) {
-                            user.getNotification().add(notification);
-                            documentReference.set(user);
-                            Toast.makeText(getApplicationContext(), "Follow request sent!", Toast.LENGTH_SHORT).show();
-                        }
-                         */
+                documentReference.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                    @Override
+                    public void onSuccess(DocumentSnapshot documentSnapshot) {
+                        user = documentSnapshot.toObject(User.class);
+                        flag=0;
+                        documentReference2.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                            @Override
+                            public void onSuccess(DocumentSnapshot documentSnapshot) {
+                                user2=documentSnapshot.toObject(User.class);
+                                for(int i=0; i<user2.getFollowingList().size();i++)
+                                {
+                                    if(user2.getFollowingList().get(i).getUser().compareTo(user.getEmail())==0)
+                                    {
+                                        flag=1;
+                                        Toast.makeText(getApplicationContext(), "User unfollowed!", Toast.LENGTH_SHORT).show();
+                                        user.getNotification().add(notification);
+                                        user.setNumFollwers(user.getNumFollwers()-1);
+                                        documentReference.set(user);
+                                        user2.getFollowingList().remove(i);
+                                        documentReference2.set(user2);
 
-
+                                    }
+                                }
+                                if(flag==0) {
+                                    Toast.makeText(getApplicationContext(), "Not currently following user!", Toast.LENGTH_SHORT).show();
+                                }
+                            }
+                        });
 
                     }
                 });
