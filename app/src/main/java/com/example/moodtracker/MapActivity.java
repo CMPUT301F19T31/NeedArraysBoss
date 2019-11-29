@@ -131,9 +131,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             mMap.setOnMarkerClickListener(mClusterManager);
 
             mAuth = FirebaseAuth.getInstance();
-            userRef = FirebaseFirestore.getInstance().collection("users");
-
-            docRef = userRef.document("user" + mAuth.getCurrentUser().getEmail());
+            docRef = FirebaseFirestore.getInstance().collection("users").document("user" + mAuth.getCurrentUser().getEmail());
             docRef.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
                 @Override
                 public void onSuccess(DocumentSnapshot documentSnapshot) {
@@ -195,6 +193,10 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         mClusterManager.cluster();
     }
 
+    /**
+     * Helper function to addMapMarkers. It connects to the database and retrieves the list
+     * of users present in the database that the current user is friends with.
+     */
     public void getFriendList() {
         for(int i=0; i<currentUser.getFollowingList().size(); i++)
             friends.add(currentUser.getFollowingList().get(i).getUser());

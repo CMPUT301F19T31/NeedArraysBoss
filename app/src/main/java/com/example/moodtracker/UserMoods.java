@@ -86,7 +86,7 @@ public class UserMoods extends Fragment implements AdapterView.OnItemSelectedLis
     public static final int PERMISSIONS_REQUEST_ENABLE_GPS = 9003;
     private FusedLocationProviderClient mFusedLocationClient;
     private boolean getmap = false;
-    GeoPoint geoPoint;
+    private GeoPoint geoPoint;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {

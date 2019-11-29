@@ -1,14 +1,12 @@
 package com.example.moodtracker;
 
 
-import android.Manifest;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.util.Log;
@@ -32,10 +30,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
-import com.google.android.gms.location.FusedLocationProviderClient;
-import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
@@ -43,7 +37,6 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
-import com.google.firebase.firestore.GeoPoint;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
@@ -73,9 +66,7 @@ public class FollowingMoods extends Fragment implements AdapterView.OnItemSelect
     public static final int ERROR_DIALOG_REQUEST = 9001;
     public static final int PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 9002;
     public static final int PERMISSIONS_REQUEST_ENABLE_GPS = 9003;
-    private FusedLocationProviderClient mFusedLocationClient;
     private boolean getmap = false;
-    GeoPoint geoPoint;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -217,30 +208,6 @@ public class FollowingMoods extends Fragment implements AdapterView.OnItemSelect
     }
 
     /**
-     * getDeviceLocation
-     * gets the current device location
-     */
-    private void getDeviceLocation() {
-        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(getActivity());
-
-        Log.d(TAG, "getLastKnownLocation: called.");
-        if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            return;
-        }
-        mFusedLocationClient.getLastLocation().addOnCompleteListener(new OnCompleteListener<Location>() {
-            @Override
-            public void onComplete(@NonNull Task<Location> task) {
-                if (task.isSuccessful()) {
-                    Location location = task.getResult();
-                    geoPoint = new GeoPoint(location.getLatitude(), location.getLongitude());
-                    Log.d(TAG, "onComplete: latitude: " + geoPoint.getLatitude());
-                    Log.d(TAG, "onComplete: longitude: " + geoPoint.getLongitude());
-                }
-            }
-        });
-    }
-
-    /**
      * checkMapServices
      * checks if isMapsEnabled and isMapsEnabled true
      * @return true if the google services are up-to-date and the gps is enabled
@@ -289,14 +256,11 @@ public class FollowingMoods extends Fragment implements AdapterView.OnItemSelect
 
     /**
      * getLocationPermission
-     * gets Location permission from the user
+     * Request location permission, so that we can get the location of the
+     * device. The result of the permission request is handled by a callback,
+     * onRequestPermissionsResult.
      */
     private void getLocationPermission() {
-        /*
-         * Request location permission, so that we can get the location of the
-         * device. The result of the permission request is handled by a callback,
-         * onRequestPermissionsResult.
-         */
         if (ContextCompat.checkSelfPermission(getContext(),
                 android.Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED) {
@@ -304,7 +268,6 @@ public class FollowingMoods extends Fragment implements AdapterView.OnItemSelect
             if(getmap){
                 init();
             }
-            getDeviceLocation();
         } else {
             ActivityCompat.requestPermissions(getActivity(), new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},
                     PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
@@ -346,7 +309,7 @@ public class FollowingMoods extends Fragment implements AdapterView.OnItemSelect
      */
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String permissions[], @NonNull int[] grantResults) {
-        mLocationPermissionGranted = false;
+        //mLocationPermissionGranted = false;
         switch (requestCode) {
             case PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION: {
                 // If request is cancelled, the result arrays are empty.
@@ -365,11 +328,9 @@ public class FollowingMoods extends Fragment implements AdapterView.OnItemSelect
         switch (requestCode) {
             case PERMISSIONS_REQUEST_ENABLE_GPS: {
                 if(mLocationPermissionGranted){
-                    //getChatrooms();
                     if(getmap){
                         init();
                     }
-                    getDeviceLocation();
                 }
                 else{
                     getLocationPermission();
@@ -379,5 +340,3 @@ public class FollowingMoods extends Fragment implements AdapterView.OnItemSelect
 
     }
 }
-
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
