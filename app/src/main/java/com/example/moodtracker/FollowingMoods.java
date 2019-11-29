@@ -343,6 +343,13 @@ public class FollowingMoods extends Fragment implements AdapterView.OnItemSelect
         return false;
     }
 
+    /**
+     * onRequestPermissionsResult
+     * it looks at the result of the request to access location and makes changes accordingly
+     * @param requestCode
+     * @param permissions
+     * @param grantResults
+     */
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String permissions[], @NonNull int[] grantResults) {
         mLocationPermissionGranted = false;
