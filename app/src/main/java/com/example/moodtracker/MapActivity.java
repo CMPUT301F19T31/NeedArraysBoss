@@ -29,6 +29,7 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.GeoPoint;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.maps.android.clustering.ClusterManager;
 
@@ -142,8 +143,10 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                         userId =currentUser.getUserID();
                         moods = userMoods;
                         helpingAddMapMarker();
-                    }else{
+                    }else if (flag==1){
                         getFriendList();
+                    }else{
+                        helpingAddMapMarker();
                     }
                 }
             });
@@ -156,6 +159,28 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
      */
     void helpingAddMapMarker(){
         Log.d(TAG, "MapActivity: helpingAddMapMarker started");
+
+        if(flag==3){
+            userId = getIntent().getStringExtra("username");
+            String feeling = getIntent().getStringExtra("feeling");
+            String reason = getIntent().getStringExtra("reason");
+            int lat = getIntent().getIntExtra("lat", 0);
+            int lng = getIntent().getIntExtra("long", 0);
+            GeoPoint geoPoint = new GeoPoint(lat, lng);
+
+            Mood newMood;
+            newMood = new Mood(feeling, "", System.currentTimeMillis());
+            if (reason != null) {
+                newMood.setReason(reason);
+            }
+            if (geoPoint!=null) {
+                newMood.setGeo_point(geoPoint);
+            }
+
+            moveCamera(new LatLng(geoPoint.getLatitude(), geoPoint.getLongitude()), DEFAULT_ZOOM);
+            
+            moods.add(newMood);
+        }
 
         for (Mood mood : moods) {
             if(mood.getGeo_point()!= null) {
@@ -267,8 +292,9 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                             Log.d(TAG, "onComplete: found location!");
                             Location currentLocation = (Location) task.getResult();
 
-                            moveCamera(new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude()),
-                                    DEFAULT_ZOOM);
+                            if(flag!=3) {
+                                moveCamera(new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude()), DEFAULT_ZOOM);
+                            }
 
                         } else {
                             Log.d(TAG, "onComplete: current location is null");
