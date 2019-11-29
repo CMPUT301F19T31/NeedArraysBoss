@@ -513,6 +513,13 @@ public class UserMoods extends Fragment implements AdapterView.OnItemSelectedLis
         }
     }
 
+    /**
+     * This function is called when an intent is created that has to interact with another API
+     * directly.
+     * @param requestCode Indicates which action the function must take
+     * @param resultCode Indicates if the action is safe to carry out
+     * @param data Gives the data that the Activity returned
+     */
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);

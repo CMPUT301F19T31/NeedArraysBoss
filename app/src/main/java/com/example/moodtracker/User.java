@@ -2,6 +2,9 @@ package com.example.moodtracker;
 
 import java.util.ArrayList;
 
+/**
+ * Its an object that contains all the information and functions needed by a user
+ */
 public class User {
 
     private String userID, email, profilePic;
