@@ -8,6 +8,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.LocationManager;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -15,6 +16,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.FrameLayout;
 import android.widget.Spinner;
 import android.widget.Toast;
 
@@ -25,6 +27,7 @@ import androidx.core.content.ContextCompat;
 import androidx.emoji.bundled.BundledEmojiCompatConfig;
 import androidx.emoji.text.EmojiCompat;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -53,6 +56,7 @@ public class FollowingMoods extends Fragment implements AdapterView.OnItemSelect
     private FirebaseAuth mAuth;
     private CollectionReference userRef;
     private User currentUser;
+    private ArrayList<User> allUsers;
     private ArrayList<String> friends;
     private FloatingActionButton btnMap;
 
@@ -77,6 +81,8 @@ public class FollowingMoods extends Fragment implements AdapterView.OnItemSelect
         EmojiCompat.Config config = new BundledEmojiCompatConfig(getContext());
         EmojiCompat.init(config);
 
+        FrameLayout frame = root.findViewById(R.id.socialStateSpinner2);
+
         // initialise variables
         mAuth = FirebaseAuth.getInstance();
         if(mAuth.getCurrentUser() == null)
@@ -94,6 +100,7 @@ public class FollowingMoods extends Fragment implements AdapterView.OnItemSelect
 
         friends = new ArrayList<>();
         rv = root.findViewById(R.id.moodList);
+        allUsers = new ArrayList<>();
         friendMoodHistory = new ArrayList<>();
         friendMoodHistoryAdapter = new MoodListAdapter(friendMoodHistory);
         rvLM = new LinearLayoutManager(getContext());
@@ -106,6 +113,33 @@ public class FollowingMoods extends Fragment implements AdapterView.OnItemSelect
         adapter.setDropDownViewResource(android.R.layout.simple_list_item_1);
         moodFilterSpinner.setAdapter(adapter);
         moodFilterSpinner.setOnItemSelectedListener(this);
+
+        //start view mood fragment
+        friendMoodHistoryAdapter.setOnClickListener(new MoodListAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(int index) {
+                String friendUsername = friendMoodHistory.get(index).getFriend();
+                String email = null;
+                int i = -1;
+                for(User user: allUsers) {
+                    if(user.getUserID().equals(friendUsername)) {
+                        email = user.getEmail();
+                        i = user.getMoodHistory().indexOf(friendMoodHistory.get(index));
+                    }
+                }
+
+                //Start fragment
+                Bundle args = new Bundle();
+                args.putString("email", email);
+                args.putInt("index", i);
+                Fragment fragment = new ViewMood();
+                fragment.setArguments(args);
+                FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
+                transaction.replace(R.id.container, fragment).addToBackStack(null);
+                transaction.commit();
+            }
+        });
+
 
         getFriendList();
 
@@ -134,9 +168,11 @@ public class FollowingMoods extends Fragment implements AdapterView.OnItemSelect
             public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
                 List<DocumentSnapshot> data = queryDocumentSnapshots.getDocuments();
                 friendMoodHistory.clear();
+                allUsers.clear();
                 for(DocumentSnapshot doc: data) {
                     User user = doc.toObject(User.class);
                     if(friends.contains(user.getEmail())) {
+                        allUsers.add(user);
                         for(int i=0; i<user.getMoodHistory().size(); i++) {
                             Mood mood = user.getMoodHistory().get(i);
                             mood.setFriend(user.getUserID());
