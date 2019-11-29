@@ -1,35 +1,27 @@
 package com.example.moodtracker;
 
-import android.content.Context;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.emoji.widget.EmojiTextView;
+import androidx.fragment.app.FragmentTransaction;
+
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.net.Uri;
 import android.os.Bundle;
-
-import androidx.emoji.widget.EmojiTextView;
-import androidx.fragment.app.Fragment;
-
 import android.util.Base64;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QuerySnapshot;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.util.HashMap;
-import java.util.List;
 
-
-public class ViewMood extends Fragment {
+public class ViewFriendMood extends AppCompatActivity {
 
     private String email;
     private int index;
@@ -42,29 +34,29 @@ public class ViewMood extends Fragment {
     private HashMap<String, String> moodEmojis;
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        View root = inflater.inflate(R.layout.fragment_view_mood, container, false);
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_view_friend_mood);
 
         //initialise the widgets
-        header = root.findViewById(R.id.editMoodTitle);
-        feeling = root.findViewById(R.id.feelingTV2);
-        reason = root.findViewById(R.id.reasonTV2);
-        socialState = root.findViewById(R.id.socialStateSpinner2);
-        image = root.findViewById(R.id.moodImage);
-        location = root.findViewById(R.id.location);
+        header = findViewById(R.id.editMoodTitle);
+        feeling = findViewById(R.id.feelingTV2);
+        reason = findViewById(R.id.reasonTV2);
+        socialState = findViewById(R.id.socialStateSpinner2);
+        image = findViewById(R.id.moodImage);
+        location = findViewById(R.id.location);
 
         initArrays();
 
-        email = getArguments().getString("email");
-        index = getArguments().getInt("index");
+        email = getIntent().getExtras().getString("email");
+        index = getIntent().getExtras().getInt("index");
 
         FirebaseFirestore.getInstance().collection("users").document("user"+email).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
             @Override
             public void onSuccess(DocumentSnapshot documentSnapshot) {
-                mood = documentSnapshot.toObject(User.class).getMoodHistory().get(index);
-                mood.setFriend(documentSnapshot.toObject(User.class).getUserID());
+                User user = documentSnapshot.toObject(User.class);
+                mood = user.getMoodHistory().get(index);
+                mood.setFriend(user.getUserID());
 
                 //load data into layout
                 header.setText(mood.getFriend() + "'s mood...");
@@ -78,7 +70,7 @@ public class ViewMood extends Fragment {
                     location.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                            Intent intent = new Intent(getActivity().getApplicationContext(), MapActivity.class);
+                            Intent intent = new Intent(getApplicationContext(), MapActivity.class);
                             intent.putExtra("username", mood.getFriend());
                             intent.putExtra("feeling", mood.getFeeling());
                             intent.putExtra("reason", mood.getReason());
@@ -93,14 +85,12 @@ public class ViewMood extends Fragment {
             }
         });
 
-        root.findViewById(R.id.cancel).setOnClickListener(new View.OnClickListener() {
+        findViewById(R.id.cancel).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                getActivity().onBackPressed();
+                finish();
             }
         });
-
-        return root;
     }
 
     /**

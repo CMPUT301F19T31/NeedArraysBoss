@@ -96,15 +96,10 @@ public class FollowingMoods extends Fragment implements AdapterView.OnItemSelect
                     }
                 }
 
-                //Start fragment
-                Bundle args = new Bundle();
-                args.putString("email", email);
-                args.putInt("index", i);
-                Fragment fragment = new ViewMood();
-                fragment.setArguments(args);
-                FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
-                transaction.replace(R.id.container, fragment).addToBackStack(null);
-                transaction.commit();
+                Intent intent = new Intent(getActivity().getApplicationContext(), ViewFriendMood.class);
+                intent.putExtra("email", email);
+                intent.putExtra("index", i);
+                startActivity(intent);
             }
         });
 
@@ -143,13 +138,26 @@ public class FollowingMoods extends Fragment implements AdapterView.OnItemSelect
                 allUsers.clear();
                 for(DocumentSnapshot doc: data) {
                     User user = doc.toObject(User.class);
-                    
-                    if(friends.contains(user.getEmail())) {
+                    if(friends.contains(user.getEmail())) { //if user is a friend
                         allUsers.add(user);
-                        for(int i=0; i<user.getMoodHistory().size(); i++) {
-                            Mood mood = user.getMoodHistory().get(i);
+                        int permission = -1;
+                        for(int i=0; i<currentUser.getFollowingList().size(); i++) {
+                            if(currentUser.getFollowingList().get(i).getUser().equals(user.getEmail())) {
+                                permission = currentUser.getFollowingList().get(i).getType();
+                                break;
+                            }
+                        }
+                        if(permission == 2) {    // if only most recent mood is allowed
+                            Mood mood = user.getMoodHistory().get(0);
                             mood.setFriend(user.getUserID());
                             friendMoodHistory.add(mood);
+                        }
+                        else {                  // if all moods are allowed
+                            for (int i = 0; i < user.getMoodHistory().size(); i++) {
+                                Mood mood = user.getMoodHistory().get(i);
+                                mood.setFriend(user.getUserID());
+                                friendMoodHistory.add(mood);
+                            }
                         }
                     }
                 }
