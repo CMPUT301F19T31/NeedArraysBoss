@@ -36,7 +36,7 @@
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "160821997145-dhq5opf0nfn16qlq1s90fsr6ajd68mm7.apps.googleusercontent.com",
+              "client_id": "160821997145-ismqf2pshi9gkm44e1rno149ql94otne.apps.googleusercontent.com",
               "client_type": 3
             }
           ]
@@ -51,6 +51,14 @@
         }
       },
       "oauth_client": [
+        {
+          "client_id": "160821997145-jji0hvm3cmnon10dp2rvoncgnjga8sgf.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.moodtracker",
+            "certificate_hash": "bf7ac18a79b26a0ced7f391ee5cfdc4357203e64"
+          }
+        },
         {
           "client_id": "160821997145-kirplnkrfl45kms9qmc7m6asqrms7sgb.apps.googleusercontent.com",
           "client_type": 1,
@@ -81,7 +89,7 @@
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "160821997145-dhq5opf0nfn16qlq1s90fsr6ajd68mm7.apps.googleusercontent.com",
+              "client_id": "160821997145-ismqf2pshi9gkm44e1rno149ql94otne.apps.googleusercontent.com",
               "client_type": 3
             }
           ]

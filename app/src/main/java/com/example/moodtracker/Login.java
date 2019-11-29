@@ -11,14 +11,11 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.FirebaseFirestore;
 
 public class Login extends AppCompatActivity {
     EditText email, password;
@@ -26,7 +23,6 @@ public class Login extends AppCompatActivity {
     TextView TextSignIn;
     FirebaseAuth mFirebaseAuth;
     DocumentReference userRef;
-    String TAG = "Login";
 
 
     @Override
@@ -40,6 +36,9 @@ public class Login extends AppCompatActivity {
         password = findViewById(R.id.password);
         SignIn = findViewById(R.id.loginBtn);
         TextSignIn = findViewById(R.id.textView);
+
+        if(mFirebaseAuth.getCurrentUser() != null)
+            mFirebaseAuth.signOut();
 
     }
 

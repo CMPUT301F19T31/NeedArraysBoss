@@ -1,5 +1,6 @@
 package com.example.moodtracker;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
 
@@ -9,6 +10,8 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.firebase.auth.FirebaseAuth;
+
 
 public class MainActivity extends AppCompatActivity {
 
@@ -16,6 +19,17 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        if(FirebaseAuth.getInstance().getCurrentUser() == null) {
+            //start login activity
+            Intent intent = new Intent(this, Login.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(intent);
+            finish();
+        }
+
         BottomNavigationView navigation = findViewById(R.id.nav_view);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
     }
@@ -44,6 +58,10 @@ public class MainActivity extends AppCompatActivity {
         }
     };
 
+    /**
+     * Helper function to MainActivity. MainActivity uses it to manage the fragments
+     * @param fragment is a fragment object that the function will inflate
+     */
     private void loadFragment(Fragment fragment) {
         // load fragment
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
@@ -52,209 +70,3 @@ public class MainActivity extends AppCompatActivity {
         transaction.commit();
     }
 }
-
-    /*
-    private void getUserDetails(){
-        if(mUserLocation == null){
-            mUserLocation = new UserLocation();
-            DocumentReference userRef = db.collection("Users")
-                    .document(FirebaseAuth.getInstance().getUid());
-
-            userRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                @Override
-                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                    if(task.isSuccessful()){
-                        Log.d(TAG, "onComplete: successfully set the user client.");
-                        User user = task.getResult().toObject(User.class);
-                        mUserLocation.setUser(user);
-                        getLastKnownLocation();
-                    }
-                }
-            });
-        }
-        else{
-            getLastKnownLocation();
-        }
-    }
-
-
-    private void getLastKnownLocation() {
-        Log.d(TAG, "getLastKnownLocation: called.");
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            return;
-        }
-        mFusedLocationClient.getLastLocation().addOnCompleteListener(new OnCompleteListener<Location>() {
-            @Override
-            public void onComplete(@NonNull Task<Location> task) {
-                if (task.isSuccessful()) {
-                    Location location = task.getResult();
-                    GeoPoint geoPoint = new GeoPoint(location.getLatitude(), location.getLongitude());
-                    Log.d(TAG, "onComplete: latitude: " + geoPoint.getLatitude());
-                    Log.d(TAG, "onComplete: longitude: " + geoPoint.getLongitude());
-
-                    mUserLocation.setGeo_point(geoPoint);
-                    //mUserLocation.setTimestamp(null);
-                    saveUserLocation();
-                }
-            }
-        });
-
-    }
-
-    private void saveUserLocation(){
-
-        if(mUserLocation != null){
-            DocumentReference locationRef = db
-                    .collection("UserLocation")
-                    .document(FirebaseAuth.getInstance().getUid());
-
-            locationRef.set(mUserLocation).addOnCompleteListener(new OnCompleteListener<Void>() {
-                @Override
-                public void onComplete(@NonNull Task<Void> task) {
-                    if(task.isSuccessful()){
-                        Log.d(TAG, "saveUserLocation: \ninserted user location into database." +
-                                "\n latitude: " + mUserLocation.getGeo_point().getLatitude() +
-                                "\n longitude: " + mUserLocation.getGeo_point().getLongitude());
-                    }
-                }
-            });
-        }
-    }
-*/
-
-/*
-    private void init(){
-        FloatingActionButton btnMap = (FloatingActionButton) findViewById(R.id.btnMap);
-        btnMap.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(MainActivity.this, MapActivity.class);
-                startActivity(intent);
-            }
-        });
-    }
-
-    private boolean checkMapServices(){
-        if(isServicesOK()){
-            if(isMapsEnabled()){
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private void buildAlertMessageNoGps() {
-        final AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setMessage("This application requires GPS to work properly, do you want to enable it?")
-                .setCancelable(false)
-                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                    public void onClick(@SuppressWarnings("unused") final DialogInterface dialog, @SuppressWarnings("unused") final int id) {
-                        Intent enableGpsIntent = new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-                        startActivityForResult(enableGpsIntent, PERMISSIONS_REQUEST_ENABLE_GPS);
-                    }
-                });
-        final AlertDialog alert = builder.create();
-        alert.show();
-    }
-
-    public boolean isMapsEnabled(){
-        final LocationManager manager = (LocationManager) getSystemService( Context.LOCATION_SERVICE );
-
-        if ( !manager.isProviderEnabled( LocationManager.GPS_PROVIDER ) ) {
-            buildAlertMessageNoGps();
-            return false;
-        }
-        return true;
-    }
-
-    private void getLocationPermission() {
-
-        if (ContextCompat.checkSelfPermission(this.getApplicationContext(),
-                android.Manifest.permission.ACCESS_FINE_LOCATION)
-                == PackageManager.PERMISSION_GRANTED) {
-            mLocationPermissionGranted = true;
-            //getChatrooms(); HEREEEEEEEEEEEEEEEEEEEEEEEEEEEE
-            init();
-            //getLastKnownLocation();
-            //getUserDetails();
-        } else {
-            ActivityCompat.requestPermissions(this,
-                    new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},
-                    PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
-        }
-    }
-
-    public boolean isServicesOK(){
-        Log.d(TAG, "isServicesOK: checking google services version");
-
-        int available = GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(MainActivity.this);
-
-        if(available == ConnectionResult.SUCCESS){
-            //everything is fine and the user can make map requests
-            Log.d(TAG, "isServicesOK: Google Play Services is working");
-            return true;
-        }
-        else if(GoogleApiAvailability.getInstance().isUserResolvableError(available)){
-            //an error occured but we can resolve it
-            Log.d(TAG, "isServicesOK: an error occured but we can fix it");
-            Dialog dialog = GoogleApiAvailability.getInstance().getErrorDialog(MainActivity.this, available, ERROR_DIALOG_REQUEST);
-            dialog.show();
-        }else{
-            Toast.makeText(this, "You can't make map requests", Toast.LENGTH_SHORT).show();
-        }
-        return false;
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode,
-                                           @NonNull String permissions[],
-                                           @NonNull int[] grantResults) {
-        mLocationPermissionGranted = false;
-        switch (requestCode) {
-            case PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION: {
-                // If request is cancelled, the result arrays are empty.
-                if (grantResults.length > 0
-                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    mLocationPermissionGranted = true;
-                }
-            }
-        }
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        Log.d(TAG, "onActivityResult: called.");
-        switch (requestCode) {
-            case PERMISSIONS_REQUEST_ENABLE_GPS: {
-                if(mLocationPermissionGranted){
-                    //getChatrooms(); HEREEEEEEEEEEEEEEEEEEE
-                    init();
-                    //getLastKnownLocation();
-                    //getUserDetails();
-                }
-                else{
-                    getLocationPermission();
-                }
-            }
-        }
-
-    }
-
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        if(checkMapServices()){
-            if(mLocationPermissionGranted){
-                //getChatrooms(); HEREEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE
-                init();
-                //getLastKnownLocation();
-                //getUserDetails();
-            }
-            else{
-                getLocationPermission();
-            }
-        }
-    }
-*/

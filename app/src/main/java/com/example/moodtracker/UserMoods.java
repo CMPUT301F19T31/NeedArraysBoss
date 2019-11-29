@@ -68,6 +68,7 @@ public class UserMoods extends Fragment implements AdapterView.OnItemSelectedLis
 
     private RecyclerView rv;
     private ArrayList<Mood> moodHistory;
+    private ArrayList<Mood> filterMoodHistory;
     private MoodListAdapter moodHistoryAdapter;
     private RecyclerView.LayoutManager moodHistoryLM;
     private DocumentReference userRef;
@@ -80,11 +81,9 @@ public class UserMoods extends Fragment implements AdapterView.OnItemSelectedLis
     private FloatingActionButton button_search;
     private String image;
 
-    //private static final String TAG = "HomeFragment";
     private static final String FINE_LOCATION = Manifest.permission.ACCESS_FINE_LOCATION;
     private static final String COURSE_LOCATION = Manifest.permission.ACCESS_COARSE_LOCATION;
-    //private static final int LOCATION_PERMISSION_REQUEST_CODE = 1234;
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
     private boolean mLocationPermissionGranted = false;
     public static final int ERROR_DIALOG_REQUEST = 9001;
     public static final int PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 9002;
@@ -92,6 +91,7 @@ public class UserMoods extends Fragment implements AdapterView.OnItemSelectedLis
     private FusedLocationProviderClient mFusedLocationClient;
     private boolean getmap = false;
     GeoPoint geoPoint;
+
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -112,28 +112,13 @@ public class UserMoods extends Fragment implements AdapterView.OnItemSelectedLis
             }
         });
 
-        /*
-        btnMap = root.findViewById(R.id.btnMap);
-        btnMap.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if(checkMapServices()){
-                    if(mLocationPermissionGranted){
-                        //getChatrooms(); HEREEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE
-                        Intent intent = new Intent(getActivity(), MapActivity.class);
-                        startActivity(intent);
-                        //getLastKnownLocation();
-                        //getUserDetails();
-                    }
-                    else{
-                        getLocationPermission();
-                    }
-                }
-                //Intent intent = new Intent(getActivity(), MapActivity.class);
-                //startActivity(intent);
-            }
-        });
-         */
+        //initialise the mood filter spinner
+        Spinner moodFilterSpinner = root.findViewById(R.id.filterSpinner);
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(getContext(), R.array.feelings, R.layout.spinner_item);
+        adapter.setDropDownViewResource(android.R.layout.simple_list_item_1);
+        moodFilterSpinner.setAdapter(adapter);
+        moodFilterSpinner.setOnItemSelectedListener(this);
+
         btnMap = root.findViewById(R.id.btnMap);
         btnMap.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -142,33 +127,6 @@ public class UserMoods extends Fragment implements AdapterView.OnItemSelectedLis
                 init();
             }
         });
-        //init();
-        /*
-        if(checkMapServices()){
-            init();
-            /*
-            btnMap = root.findViewById(R.id.btnMap);
-            btnMap.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    /*if(checkMapServices()){
-                        if(mLocationPermissionGranted){
-                            //getChatrooms(); HEREEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE
-                            Intent intent = new Intent(getActivity(), MapActivity.class);
-                            startActivity(intent);
-                            //getLastKnownLocation();
-                            //getUserDetails();
-                        }
-                        else{
-                            getLocationPermission();
-                        }
-                    }
-                    Intent intent = new Intent(getActivity(), MapActivity.class);
-                    startActivity(intent);
-                }
-            });
-        }
-         */
 
         //initialize recyclerview
         rv = root.findViewById(R.id.moodList);
@@ -177,7 +135,7 @@ public class UserMoods extends Fragment implements AdapterView.OnItemSelectedLis
         rv.setLayoutManager(moodHistoryLM);
         rv.setAdapter(moodHistoryAdapter);
 
-        //start login activity
+        //start edit mood activity
         moodHistoryAdapter.setOnClickListener(new MoodListAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(int index) {
@@ -194,6 +152,21 @@ public class UserMoods extends Fragment implements AdapterView.OnItemSelectedLis
         return root;
     }
 
+    public void filterMoodList(String feeling) {
+        filterMoodHistory = new ArrayList<>();
+        if(feeling.equals("")) {
+            moodHistoryAdapter.setList(moodHistory);
+            moodHistoryAdapter.notifyDataSetChanged();
+        } else {
+            for(int i = 0; i < moodHistory.size(); i++) {
+                if(moodHistory.get(i).getFeeling().equals(feeling))
+                    filterMoodHistory.add(moodHistory.get(i));
+            }
+            moodHistoryAdapter.setList(filterMoodHistory);
+            moodHistoryAdapter.notifyDataSetChanged();
+        }
+    }
+
 
     @Override
     public void onStart() {
@@ -201,22 +174,24 @@ public class UserMoods extends Fragment implements AdapterView.OnItemSelectedLis
         // Check if user is signed in (non-null) and update UI accordingly.
         currentUser = mAuth.getCurrentUser();
 
-        if(currentUser == null) { // not signed in
-            //start login activity
-            Intent intent = new Intent(getActivity().getApplicationContext(), Login.class);
-            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
-            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            startActivity(intent);
-
-        } else {
+        if(currentUser != null)// not signed in
             onResume();
-        }
     }
 
     @Override
     public void onResume() {
         super.onResume();
+        if(checkMapServices()) {
+            if(mLocationPermissionGranted) {
+                if (getmap) {
+                    init();
+                }
+                getDeviceLocation();
+            }
+        }else{
+            getLocationPermission();
+        }
+
         currentUser = mAuth.getCurrentUser();
 
         if (currentUser != null) {
@@ -248,6 +223,20 @@ public class UserMoods extends Fragment implements AdapterView.OnItemSelectedLis
     }
 
 
+    @Override
+    public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+        if (adapterView.getId() == R.id.feelingSpinner)
+            feeling = adapterView.getItemAtPosition(i).toString();
+        else if (adapterView.getId() == R.id.socialStateSpinner)
+            socialState = adapterView.getItemAtPosition(i).toString();
+        else if (adapterView.getId() == R.id.filterSpinner)
+            filterMoodList(adapterView.getItemAtPosition(i).toString());
+
+    }
+
+    @Override
+    public void onNothingSelected(AdapterView<?> adapterView) { }
+
     public void createMoodEvent(View view) {
         dialog.setContentView(R.layout.add_mood_event);
 
@@ -264,66 +253,15 @@ public class UserMoods extends Fragment implements AdapterView.OnItemSelectedLis
         socialStateSpinner.setOnItemSelectedListener(this);
 
         final CheckBox enableMap = dialog.findViewById(R.id.enableMap);
-        /*
-        enableMap.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if(checkMapServices()){
-                    Log.d(TAG, "creatMoodEvent: " + mLocationPermissionGranted);
-                    if(mLocationPermissionGranted){
-                        //getLastKnownLocation();
-                        getDeviceLocation();
-                    }
-                    else{
-                        getLocationPermission();
-                    }
-                }
-            }
-        });
-         */
-        //final boolean mapon=enableMap.isChecked();
-        //Toast.makeText(getContext(),"asdasdas",Toast.LENGTH_SHORT).show();
-        //Log.d(TAG, "checked "+mapon);
-
 
         Button addEventBtn = dialog.findViewById(R.id.addMoodEvent);
+
         addEventBtn.setOnClickListener(new View.OnClickListener() {
-
-            /*@Override
-            public void onClick(View view) {
-                EmojiEditText et = dialog.findViewById(R.id.reasonET);
-                String reason = et.getText().toString();
-
-                if(!feeling.equals("")) {
-                    Mood newMood;
-
-                    if (reason == null && image == null && geo) {
-                        newMood = new Mood(feeling, socialState, System.currentTimeMillis());
-                    } else if(image == null) {
-                        newMood = new Mood(feeling, socialState, System.currentTimeMillis(), reason);
-                    } else {
-                        newMood = new Mood(feeling, socialState, System.currentTimeMillis(), reason, image);
-                    }
-                    moodHistory.add(0, newMood); //inserts new mood at the beginning of list
-                    moodHistoryAdapter.notifyDataSetChanged();
-                    user.setMoodHistory(moodHistory);
-                    userRef.set(user);  // save to db
-
-                    feeling = "";
-                    socialState = "";
-                    image = null;
-                    dialog.dismiss();   //closes the pop up window
-
-                } else if (feeling.equals("")) {
-                    Toast.makeText(dialog.getContext(), "Please select how you feel", Toast.LENGTH_LONG).show();
-                }
-            }
-        });*/
-
             @Override
             public void onClick(View view) {
-                //boolean mapon = enableMap.isChecked();
+
                 Log.d(TAG, "createMoodEvent: mLocationPermissionGranted " + mLocationPermissionGranted);
+
                 if (enableMap.isChecked() && !mLocationPermissionGranted) {
                     Toast.makeText(getContext(), "Permission not Granted", Toast.LENGTH_SHORT).show();
                     enableMap.setChecked(false);
@@ -334,40 +272,19 @@ public class UserMoods extends Fragment implements AdapterView.OnItemSelectedLis
                     EmojiEditText et = dialog.findViewById(R.id.reasonET);
                     String reason = et.getText().toString();
 
-                    /*
-                    if (checkMapServices()) {
-                        Log.d(TAG, "createMoodEvent: mLocationPermission" + mLocationPermissionGranted);
-                        if (mLocationPermissionGranted) {
-                            //getLastKnownLocation();
-                            getDeviceLocation();
-                        } else {
-                            getLocationPermission();
-                        }
-                    }
-                    */
                     if (!feeling.equals("")) {
                         Mood newMood;
-
-                        /*if (reason == null && image == null) {
-                            newMood = new Mood(feeling, socialState, System.currentTimeMillis());
-                        } else if (image == null) {
-                            newMood = new Mood(feeling, socialState, System.currentTimeMillis(), reason);
-                        } else {
-                            newMood = new Mood(feeling, socialState, System.currentTimeMillis(), reason, image);
-                        }*/
-                        //boolean mapon = enableMap.isChecked();
-                        //Log.d(TAG, "createMoodEvent: mapon" + mapon);
                         newMood = new Mood(feeling, socialState, System.currentTimeMillis());
                         if (reason != null) {
                             newMood.setReason(reason);
                         }
                         Log.d(TAG, "createMoodEvent: enableMap" + enableMap.isChecked());
                         if (enableMap.isChecked()) {
-                            //getDeviceLocation();
+                            getDeviceLocation();
                             Log.d(TAG, "mapon: latitude: " + geoPoint.getLatitude());
                             Log.d(TAG, "mapon: longitude: " + geoPoint.getLongitude());
                             newMood.setGeo_point(geoPoint);
-                            //geoPoint=null;
+                            geoPoint=null;
                         }
                         if (image != null) {
                             newMood.setImg(image);
@@ -413,112 +330,20 @@ public class UserMoods extends Fragment implements AdapterView.OnItemSelectedLis
     }
 
 
-    @Override
-    public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-        if (adapterView.getId() == R.id.feelingSpinner)
-            feeling = adapterView.getItemAtPosition(i).toString();
-        else if (adapterView.getId() == R.id.socialStateSpinner)
-            socialState = adapterView.getItemAtPosition(i).toString();
-
-    }
-
-    @Override
-    public void onNothingSelected(AdapterView<?> adapterView) {
-
-    }
-
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    /*
-    private void getUserDetails(){
-        if(mUserLocation == null){
-            mUserLocation = new UserLocation();
-            DocumentReference userRef = db.collection("Users")
-                    .document(FirebaseAuth.getInstance().getUid());
-            userRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                @Override
-                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                    if(task.isSuccessful()){
-                        Log.d(TAG, "onComplete: successfully set the user client.");
-                        User user = task.getResult().toObject(User.class);
-                        mUserLocation.setUser(user);
-                        getLastKnownLocation();
-                    }
-                }
-            });
-        }
-        else{
-            getLastKnownLocation();
-        }
-    }
-    private void getLastKnownLocation() {
-        Log.d(TAG, "getLastKnownLocation: called.");
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            return;
-        }
-        mFusedLocationClient.getLastLocation().addOnCompleteListener(new OnCompleteListener<Location>() {
-            @Override
-            public void onComplete(@NonNull Task<Location> task) {
-                if (task.isSuccessful()) {
-                    Location location = task.getResult();
-                    GeoPoint geoPoint = new GeoPoint(location.getLatitude(), location.getLongitude());
-                    Log.d(TAG, "onComplete: latitude: " + geoPoint.getLatitude());
-                    Log.d(TAG, "onComplete: longitude: " + geoPoint.getLongitude());
-                    mUserLocation.setGeo_point(geoPoint);
-                    //mUserLocation.setTimestamp(null);
-                    saveUserLocation();
-                }
-            }
-        });
-    }
-    private void saveUserLocation(){
-        if(mUserLocation != null){
-            DocumentReference locationRef = db
-                    .collection("UserLocation")
-                    .document(FirebaseAuth.getInstance().getUid());
-            locationRef.set(mUserLocation).addOnCompleteListener(new OnCompleteListener<Void>() {
-                @Override
-                public void onComplete(@NonNull Task<Void> task) {
-                    if(task.isSuccessful()){
-                        Log.d(TAG, "saveUserLocation: \ninserted user location into database." +
-                                "\n latitude: " + mUserLocation.getGeo_point().getLatitude() +
-                                "\n longitude: " + mUserLocation.getGeo_point().getLongitude());
-                    }
-                }
-            });
-        }
-    }
-*/
-
-
+    /**
+     * init
+     * Initializes the map if map services are working, and location permission is granted.
+     */
     private void init() {
-        /*btnMap.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                //initMap();
-                if(checkMapServices()) {
-                    if (mLocationPermissionGranted) {
-                        Intent intent = new Intent(getActivity(), MapActivity.class);
-                        startActivity(intent);
-                        //getLastKnownLocation();
-                        //getUserDetails();
-                    } else {
-                        getLocationPermission();
-                    }
-                }
-                //Intent intent = new Intent(getActivity(), MapActivity.class);
-                //startActivity(intent);
-            }
-        });*/
-
         Log.d(TAG, "init: mLocationPermissionGranted " + mLocationPermissionGranted);
         if (checkMapServices()) {
             if (mLocationPermissionGranted) {
                 Intent intent = new Intent(getActivity(), MapActivity.class);
+                intent.putExtra("flag","0");
                 startActivity(intent);
                 getmap = false;
-                //getLastKnownLocation();
-                //getUserDetails();
             } else {
                 getLocationPermission();
             }
@@ -526,37 +351,50 @@ public class UserMoods extends Fragment implements AdapterView.OnItemSelectedLis
 
     }
 
-    public boolean isServicesOK() {
-        Log.d(TAG, "isServicesOK: checking google services version");
+    /**
+     * getDeviceLocation
+     * gets the current device location
+     */
+    private void getDeviceLocation() {
+        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(getActivity());
 
-        int available = GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(getActivity());
-
-        if (available == ConnectionResult.SUCCESS) {
-            //everything is fine and the user can make map requests
-            Log.d(TAG, "isServicesOK: Google Play Services is working");
-            return true;
-        } else if (GoogleApiAvailability.getInstance().isUserResolvableError(available)) {
-            //an error occured but we can resolve it
-            Log.d(TAG, "isServicesOK: an error occured but we can fix it");
-            Dialog dialog = GoogleApiAvailability.getInstance().getErrorDialog(getActivity(), available, ERROR_DIALOG_REQUEST);
-            dialog.show();
-        } else {
-            Toast.makeText(getActivity(), "You can't make map requests", Toast.LENGTH_SHORT).show();
+        Log.d(TAG, "getLastKnownLocation: called.");
+        if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            return;
         }
-        return false;
+        mFusedLocationClient.getLastLocation().addOnCompleteListener(new OnCompleteListener<Location>() {
+            @Override
+            public void onComplete(@NonNull Task<Location> task) {
+                if (task.isSuccessful()) {
+                    Location location = task.getResult();
+                    geoPoint = new GeoPoint(location.getLatitude(), location.getLongitude());
+                    Log.d(TAG, "onComplete: latitude: " + geoPoint.getLatitude());
+                    Log.d(TAG, "onComplete: longitude: " + geoPoint.getLongitude());
+                }
+            }
+        });
     }
 
-    private boolean checkMapServices() {
-        if (isServicesOK()) {
-            if (isMapsEnabled()) {
+    /**
+     * checkMapServices
+     * checks if isMapsEnabled and isMapsEnabled true
+     * @return true if the google services are up-to-date and the gps is enabled
+     */
+    private boolean checkMapServices(){
+        if(isServicesOK()){
+            if(isMapsEnabled()){
                 return true;
             }
         }
         return false;
     }
 
+    /**
+     * buildAlertMessageNoGps
+     * gives an alert message that the gps is not enabled and gives the user option to go and enable it in the phone setting
+     */
     private void buildAlertMessageNoGps() {
-        final AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        final AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         builder.setMessage("This application requires GPS to work properly, do you want to enable it?")
                 .setCancelable(false)
                 .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
@@ -569,107 +407,55 @@ public class UserMoods extends Fragment implements AdapterView.OnItemSelectedLis
         alert.show();
     }
 
-    public boolean isMapsEnabled() {
-        final LocationManager manager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
+    /**
+     * isMapsEnabled
+     * Checks if GPS is enabled on the phone
+     * @return true if GPS is enabled otherwise buildAlertMessageNoGps function is called
+     */
+    public boolean isMapsEnabled(){
+        final LocationManager manager = (LocationManager) getActivity().getSystemService( Context.LOCATION_SERVICE );
 
-        if (!manager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+        if ( !manager.isProviderEnabled( LocationManager.GPS_PROVIDER ) ) {
             buildAlertMessageNoGps();
             return false;
         }
         return true;
     }
 
-    /*private void getLocationPermission() {
-        if (ContextCompat.checkSelfPermission(getActivity().getApplicationContext(), android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+    /**
+     * getLocationPermission
+     * gets Location permission from the user
+     */
+    private void getLocationPermission() {
+        /*
+         * Request location permission, so that we can get the location of the
+         * device. The result of the permission request is handled by a callback,
+         * onRequestPermissionsResult.
+         */
+        if (ContextCompat.checkSelfPermission(getContext(),
+                android.Manifest.permission.ACCESS_FINE_LOCATION)
+                == PackageManager.PERMISSION_GRANTED) {
             mLocationPermissionGranted = true;
-            //getChatrooms(); HEREEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE
-            //init();
-            //getLastKnownLocation();
-            //getUserDetails();
-            //Intent intent = new Intent(getActivity(), MapActivity.class);
-            //startActivity(intent);
-            Log.d(TAG, "getLocationPermission: " + mLocationPermissionGranted);
-            init();
+            if(getmap){
+                init();
+            }
             getDeviceLocation();
         } else {
-            Log.d(TAG, "getLocationPermission: NOTTTTTTTTTT getting the devices current location");
-            ActivityCompat.requestPermissions(getActivity(),new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
+            ActivityCompat.requestPermissions(getActivity(), new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},
+                    PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
         }
     }
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String permissions[], @NonNull int[] grantResults) {
-        mLocationPermissionGranted = false;
-        switch (requestCode) {
-            case PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION: {
-                // If request is cancelled, the result arrays are empty.
-                if (grantResults.length > 0
-                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    mLocationPermissionGranted = true;
-                }
-            }
-        }
-    }
+
+    /**
+     * isServicesOk
+     * Checks if google services are installed/up-to-date.
+     * @return true if up-to-date
      */
-
-    private void getLocationPermission() {
-        Log.d(TAG, "getLocationPermission: getting location permissions");
-        String[] permissions = {Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION};
-
-        if (ContextCompat.checkSelfPermission(this.getContext(), FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-            if (ContextCompat.checkSelfPermission(this.getContext(), COURSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-                mLocationPermissionGranted = true;
-                if (getmap) {
-                    init();
-                }
-                getDeviceLocation();
-            } else {
-                ActivityCompat.requestPermissions(getActivity(), permissions, PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
-            }
-        } else {
-            ActivityCompat.requestPermissions(getActivity(), permissions, PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
-        }
-    }
-
-    private void getDeviceLocation() {
-        Log.d(TAG, "getDeviceLocation: getting the devices current location");
-
-        //mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
-        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(getActivity());
-
-        try {
-            Log.d(TAG, "getDeviceLocation: " + mLocationPermissionGranted);
-            if (mLocationPermissionGranted) {
-                final Task location = mFusedLocationClient.getLastLocation(); //mFusedLocationProviderClient.getLastLocation();
-                location.addOnCompleteListener(new OnCompleteListener() {
-                    @Override
-                    public void onComplete(@NonNull Task task) {
-                        if (task.isSuccessful()) {
-                            Log.d(TAG, "getDeviceLocation: found location!");
-                            Location currentLocation = (Location) task.getResult();
-                            geoPoint = new GeoPoint(currentLocation.getLatitude(), currentLocation.getLongitude());
-                            Log.d(TAG, "getDeviceLocation: latitude: " + geoPoint.getLatitude());
-                            Log.d(TAG, "getDeviceLocation: longitude: " + geoPoint.getLongitude());
-
-                            //moveCamera(new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude()),
-                              //      DEFAULT_ZOOM);
-
-                        } else {
-                            Log.d(TAG, "getDeviceLocation: current location is null");
-                            Toast.makeText(getActivity(), "unable to get current location", Toast.LENGTH_SHORT).show();
-                        }
-                    }
-                });
-            }
-        } catch (SecurityException e) {
-            Log.e(TAG, "getDeviceLocation: SecurityException: " + e.getMessage());
-        }
-    }
-
-
-    /*
     public boolean isServicesOK(){
         Log.d(TAG, "isServicesOK: checking google services version");
-        int available = GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(getActivity());
+
+        int available = GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(getContext());
+
         if(available == ConnectionResult.SUCCESS){
             //everything is fine and the user can make map requests
             Log.d(TAG, "isServicesOK: Google Play Services is working");
@@ -684,24 +470,16 @@ public class UserMoods extends Fragment implements AdapterView.OnItemSelectedLis
             Toast.makeText(getActivity(), "You can't make map requests", Toast.LENGTH_SHORT).show();
         }
         return false;
-    }*/
+    }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        Log.d(TAG, "onRequestPermissionsResult: called.");
+    public void onRequestPermissionsResult(int requestCode, @NonNull String permissions[], @NonNull int[] grantResults) {
         mLocationPermissionGranted = false;
-
         switch (requestCode) {
             case PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION: {
-                if (grantResults.length > 0) {
-                    for (int i = 0; i < grantResults.length; i++) {
-                        if (grantResults[i] != PackageManager.PERMISSION_GRANTED) {
-                            mLocationPermissionGranted = false;
-                            Log.d(TAG, "onRequestPermissionsResult: permission failed");
-                            return;
-                        }
-                    }
-                    Log.d(TAG, "onRequestPermissionsResult: permission granted");
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     mLocationPermissionGranted = true;
                 }
             }
@@ -712,15 +490,16 @@ public class UserMoods extends Fragment implements AdapterView.OnItemSelectedLis
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         Log.d(TAG, "onActivityResult: called.");
-
         switch (requestCode) {
             case PERMISSIONS_REQUEST_ENABLE_GPS: {
-                if (mLocationPermissionGranted) {
-                    init();
+                if(mLocationPermissionGranted){
+                    //getChatrooms();
+                    if(getmap){
+                        init();
+                    }
                     getDeviceLocation();
-                    //getLastKnownLocation();
-                    //getUserDetails();
-                } else {
+                }
+                else{
                     getLocationPermission();
                 }
             }
@@ -731,12 +510,17 @@ public class UserMoods extends Fragment implements AdapterView.OnItemSelectedLis
                         Bitmap temp = MediaStore.Images.Media.getBitmap(getActivity().getContentResolver(), image);
                         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
                         temp.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream);
+                        byte[] byteArray = byteArrayOutputStream.toByteArray();
                         int num = 50;
-                        while (byteArrayOutputStream.toByteArray().length > 10000 && num != 0) {
+                        while (byteArray.length > 10000 && num > 0) {   // compress image to not more than 10 kb
+                            byteArrayOutputStream.flush();
+                            byteArrayOutputStream.reset();
+
                             temp.compress(Bitmap.CompressFormat.JPEG, num, byteArrayOutputStream);
                             num = num / 2;
+                            byteArray = byteArrayOutputStream.toByteArray();
                         }
-                        this.image = Base64.encodeToString(byteArrayOutputStream.toByteArray(), Base64.DEFAULT);
+                        this.image = Base64.encodeToString(byteArray, Base64.DEFAULT);
                         Toast.makeText(dialog.getContext(), "Image Uploaded", Toast.LENGTH_SHORT).show();
 
                     } catch (FileNotFoundException e) {
@@ -750,6 +534,8 @@ public class UserMoods extends Fragment implements AdapterView.OnItemSelectedLis
 
     }
 }
+
+
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
