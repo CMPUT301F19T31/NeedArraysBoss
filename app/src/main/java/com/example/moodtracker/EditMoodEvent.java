@@ -40,6 +40,7 @@ import java.util.ArrayList;
  */
 public class EditMoodEvent extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
 
+    private TextView location;
     private EmojiEditText et;
     private Spinner feelingSpinner, socialStateSpinner;
     private ImageView imageView;
@@ -65,6 +66,20 @@ public class EditMoodEvent extends AppCompatActivity implements AdapterView.OnIt
 
         et = findViewById(R.id.reasonET2);
         imageView = findViewById(R.id.moodImage);
+
+        location = findViewById(R.id.locationTV2);
+        location.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(EditMoodEvent.this, MapActivity.class);
+                intent.putExtra("username", mood.getFriend());
+                intent.putExtra("feeling", mood.getFeeling());
+                intent.putExtra("reason", mood.getReason());
+                intent.putExtra("lat", mood.getGeo_point().getLatitude());
+                intent.putExtra("long", mood.getGeo_point().getLongitude());
+                startActivity(intent);
+            }
+        });
 
         feelingSpinner = findViewById(R.id.editMoodFeelingSpinner);
         ArrayAdapter<CharSequence> adapter1 = ArrayAdapter.createFromResource(this, R.array.feelings, R.layout.spinner_item);
@@ -117,7 +132,8 @@ public class EditMoodEvent extends AppCompatActivity implements AdapterView.OnIt
                 decodeImage(mood.getImg(), imageView);
                 feelingSpinner.setSelection(moods.indexOf(mood.getFeeling())+1);
                 socialStateSpinner.setSelection(socialStates.indexOf(mood.getSocialState())+1);
-
+                if(mood.getGeo_point() == null)
+                    location.setText("");
             }
         });
     }
