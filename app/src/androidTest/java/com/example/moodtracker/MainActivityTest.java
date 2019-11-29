@@ -91,6 +91,22 @@ public class MainActivityTest {
         solo.clickOnButton("Delete Event"); //Click DELETE EVENT Button
     }
 
+    @Test
+    public void checkAddMoodWithoutReason(){
+        // Asserts that the current activity is the MainActivity. Otherwise, show “Wrong Activity”
+        solo.assertCurrentActivity("Wrong Activity", MainActivity.class);
+        solo.clickOnActionBarHomeButton();
+        View addMood = solo.getView(R.id.addMoodEvent);
+        solo.clickOnView(addMood); //Click Floating Action Button that adds a new mood event
+        solo.pressSpinnerItem(2,4);
+        solo.pressSpinnerItem(3,2);
+        solo.clickOnButton("Add Event"); //Click ADD EVENT Button
+        assertTrue(solo.waitForText("UITest1", 1, 2000));
+        //Cleanup
+        solo.clickInRecyclerView(0);
+        solo.clickOnButton("Delete Event"); //Click DELETE EVENT Button
+    }
+
     /**
      * Edit mood event and check thoughts using assertTrue
      */
