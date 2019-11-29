@@ -141,7 +141,7 @@ public class SignUpActivity extends AppCompatActivity {
                 picture.setImageBitmap(temp);
                 ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
                 temp.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream);
-                this.imageUri = Base64.encodeToString(byteArrayOutputStream.toByteArray(), Base64.DEFAULT);
+                this.image = Base64.encodeToString(byteArrayOutputStream.toByteArray(), Base64.DEFAULT);
                 Toast.makeText(this, "Image Uploaded", Toast.LENGTH_SHORT).show();
             } catch (FileNotFoundException e) {
                 e.printStackTrace();

@@ -171,53 +171,6 @@ public class ProfileFragment extends Fragment {
             }
         });
 
-        profile_name = root.findViewById(R.id.tv_name);
-        profile_image = root.findViewById(R.id.image_profile);
-        edit_profile_name = root.findViewById(R.id.tv_name_edit);
-        edit_profile_name.setVisibility(View.INVISIBLE);
-        address = root.findViewById(R.id.tv_address);
-        save = root.findViewById(R.id.save);
-        save.setVisibility(View.INVISIBLE);
-
-        FirebaseUser currentFirebaseUser = FirebaseAuth.getInstance().getCurrentUser() ;
-        email = currentFirebaseUser.getEmail();
-
-
-        docRef = FirebaseFirestore.getInstance().collection("users")
-                .document("user"+email);
-        docRef.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-            @Override
-            public void onSuccess(DocumentSnapshot documentSnapshot) {
-                user = documentSnapshot.toObject(User.class);
-
-                profile_name.setText(user.getUserID());
-                address.setText(user.getEmail());
-                temporary = user.getUserID();
-                String imageDataBytes = user.getImageurl().substring(user.getImageurl().indexOf(",")+1);
-                InputStream stream = new ByteArrayInputStream(Base64.decode(imageDataBytes.getBytes(), Base64.DEFAULT));
-                Bitmap bitmap = BitmapFactory.decodeStream(stream);
-                profile_image.setImageBitmap(bitmap);
-
-            }
-        });
-
-        ImageView edit = root.findViewById(R.id.edit);
-        edit.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                edit_profile_name.setText(temporary);
-                profile_name.setVisibility(View.INVISIBLE);
-                edit_profile_name.setVisibility(View.VISIBLE);
-                save.setVisibility(View.VISIBLE);
-                save.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        user.setUserID(edit_profile_name.getText().toString());
-                        getFragmentManager().beginTransaction().detach(ProfileFragment.this).attach(ProfileFragment.this).commit();
-                    }
-                });
-            }
-        });
 
 
 
