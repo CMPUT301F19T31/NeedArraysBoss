@@ -130,6 +130,8 @@ public class UserMoods extends Fragment implements AdapterView.OnItemSelectedLis
             }
         });
 
+        if(checkMapServices()){ getLocationPermission(); }
+
         //initialize recyclerview
         rv = root.findViewById(R.id.moodList);
         moodHistoryLM = new LinearLayoutManager(getContext());
@@ -169,7 +171,6 @@ public class UserMoods extends Fragment implements AdapterView.OnItemSelectedLis
         }
     }
 
-
     @Override
     public void onStart() {
         super.onStart();
@@ -183,7 +184,6 @@ public class UserMoods extends Fragment implements AdapterView.OnItemSelectedLis
             intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(intent);
-
         } else {
             onResume();
         }
@@ -192,17 +192,6 @@ public class UserMoods extends Fragment implements AdapterView.OnItemSelectedLis
     @Override
     public void onResume() {
         super.onResume();
-        if(checkMapServices()) {
-            if(mLocationPermissionGranted) {
-                if (getmap) {
-                    init();
-                }
-                getDeviceLocation();
-            }
-        }else{
-            getLocationPermission();
-        }
-
         currentUser = mAuth.getCurrentUser();
 
         if (currentUser != null) {
@@ -220,7 +209,6 @@ public class UserMoods extends Fragment implements AdapterView.OnItemSelectedLis
         }
     }
 
-
     public void loadDataFromDB() {
         if(user == null || user.getMoodHistory() == null) { return; }
         int size=user.getMoodHistory().size();
@@ -232,7 +220,6 @@ public class UserMoods extends Fragment implements AdapterView.OnItemSelectedLis
         }
         moodHistoryAdapter.notifyDataSetChanged();
     }
-
 
     @Override
     public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
@@ -266,6 +253,8 @@ public class UserMoods extends Fragment implements AdapterView.OnItemSelectedLis
         final CheckBox enableMap = dialog.findViewById(R.id.enableMap);
 
         Button addEventBtn = dialog.findViewById(R.id.addMoodEvent);
+
+        if(checkMapServices()){ getLocationPermission(); }
 
         addEventBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -483,6 +472,13 @@ public class UserMoods extends Fragment implements AdapterView.OnItemSelectedLis
         return false;
     }
 
+    /**
+     * onRequestPermissionsResult
+     * it looks at the result of the request to access location and makes changes accordingly
+     * @param requestCode
+     * @param permissions
+     * @param grantResults
+     */
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String permissions[], @NonNull int[] grantResults) {
         mLocationPermissionGranted = false;
@@ -493,6 +489,7 @@ public class UserMoods extends Fragment implements AdapterView.OnItemSelectedLis
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     mLocationPermissionGranted = true;
                 }
+                //getLocationPermission();
             }
         }
     }
@@ -504,7 +501,6 @@ public class UserMoods extends Fragment implements AdapterView.OnItemSelectedLis
         switch (requestCode) {
             case PERMISSIONS_REQUEST_ENABLE_GPS: {
                 if(mLocationPermissionGranted){
-                    //getChatrooms();
                     if(getmap){
                         init();
                     }

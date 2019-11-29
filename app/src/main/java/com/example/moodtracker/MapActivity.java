@@ -38,6 +38,10 @@ import java.util.List;
 
 public class MapActivity extends AppCompatActivity implements OnMapReadyCallback {
 
+    /**
+     * onMapReady
+     * @param googleMap gets this as parameter and creates the map
+     */
     @Override
     public void onMapReady(GoogleMap googleMap) {
         Toast.makeText(this, "Map is Ready", Toast.LENGTH_SHORT).show();
@@ -111,6 +115,10 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         friends = new ArrayList<>();
     }
 
+    /**
+     * initMap
+     * initializes the map
+     */
     private void initMap() {
         Log.d(TAG, "initMap: initializing map");
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
@@ -118,6 +126,10 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         mapFragment.getMapAsync(MapActivity.this);
     }
 
+    /**
+     * addMapMarkers
+     * adds markers from the current users mood or the people the user follows, depending upon which tab the user is in
+     */
     private void addMapMarkers() {
 
         if (mMap != null) {
@@ -185,8 +197,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                             new LatLng(mood.getGeo_point().getLatitude(), mood.getGeo_point().getLongitude()),
                             userId,
                             snippet,
-                            avatar,
-                            currentUser
+                            avatar
                     );
                     mClusterManager.addItem(newClusterMarker);
                     mClusterMarkers.add(newClusterMarker);

@@ -9,52 +9,42 @@ public class ClusterMarker implements ClusterItem {
     private String title; // required field
     private String snippet; // required field
     private int iconPicture;
-    private User user;
+    //private User user;
 
-    public ClusterMarker(LatLng position, String title, String snippet, int iconPicture, User user) {
+    public ClusterMarker(LatLng position, String title, String snippet, int iconPicture) {
         this.position = position;
         this.title = title;
         this.snippet = snippet;
         this.iconPicture = iconPicture;
-        this.user = user;
+        //this.user = user;
     }
 
-    public int getIconPicture() {
-        return iconPicture;
-    }
-
+    //setters
     public void setIconPicture(int iconPicture) {
         this.iconPicture = iconPicture;
     }
-
-    public User getUser() {
-        return user;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
-    }
-
+    //public void setUser(User user) { this.user = user; }
     public void setPosition(LatLng position) {
         this.position = position;
     }
-
     public void setTitle(String title) {
         this.title = title;
     }
-
     public void setSnippet(String snippet) {
         this.snippet = snippet;
     }
 
+    //getters
+    //public User getUser() { return user; }
+    public int getIconPicture() {
+        return iconPicture;
+    }
     public LatLng getPosition() {
         return position;
     }
-
     public String getTitle() {
         return title;
     }
-
     public String getSnippet() {
         return snippet;
     }
