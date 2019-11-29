@@ -1,9 +1,9 @@
 package com.example.moodtracker;
 
-import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.Dialog;
 import android.content.DialogInterface;
+import android.app.Activity;
+import android.app.Dialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -11,6 +11,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Base64;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -32,6 +33,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -89,11 +91,8 @@ public class ProfileFragment extends Fragment {
         docRef.addSnapshotListener(new EventListener<DocumentSnapshot>() {
             @Override
             public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
-                if(mAuth.getCurrentUser()==null)
-                    return;
                 user = documentSnapshot.toObject(User.class);
                 loadDataFromDB();
-                adapter.notifyDataSetChanged();
             }
         });
 
@@ -124,7 +123,6 @@ public class ProfileFragment extends Fragment {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 final Notification notification = user.getNotification().get((int) id);
-                final int fid = (int) id;
                 if(notification.getType()==1)
                 {
                     AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
@@ -133,127 +131,32 @@ public class ProfileFragment extends Fragment {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
 
-
-                            AlertDialog.Builder builder1 = new AlertDialog.Builder(getContext());
-                            builder1.setMessage("Allow user to follow all moods?");
-                            builder1.setPositiveButton("Yes", new DialogInterface.OnClickListener(){
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    docRef2 = FirebaseFirestore.getInstance().collection("users").document("user"+notification.getUser1());
-                                    docRef2.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-                                        @Override
-                                        public void onSuccess(DocumentSnapshot documentSnapshot) {
-                                            following = new Following(1, user.getEmail());
-                                            user2 = documentSnapshot.toObject(User.class);
-                                            user2.getFollowingList().add(following);
-                                            Notification notification2 = new Notification(2, user.getEmail(), user2.getEmail());
-                                            user2.getNotification().add(notification2);
-                                            docRef2.set(user2);
-                                            user.setNumFollwers(user.getNumFollwers()+1);
-                                            user.getNotification().remove(fid);
-                                            docRef.set(user);
-
-                                        }
-                                    });
-                                }
-                            });
-                            builder1.setNeutralButton("Only Recent Moods", new DialogInterface.OnClickListener(){
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    docRef2 = FirebaseFirestore.getInstance().collection("users").document("user"+notification.getUser1());
-                                    docRef2.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-                                        @Override
-                                        public void onSuccess(DocumentSnapshot documentSnapshot) {
-                                            following = new Following(2, user.getEmail());
-                                            user2 = documentSnapshot.toObject(User.class);
-                                            user2.getFollowingList().add(following);
-                                            Notification notification2 = new Notification(2, user.getEmail(), user2.getEmail());
-                                            user2.getNotification().add(notification2);
-                                            docRef2.set(user2);
-                                            user.setNumFollwers(user.getNumFollwers()+1);
-                                            user.getNotification().remove(fid);
-                                            docRef.set(user);
-
-                                        }
-                                    });
-                                }
-                            });
-                            AlertDialog dialog1 = builder1.create();
-                            dialog1.show();
-
-                        }
-                    });
-                    builder.setNeutralButton("No", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
                             docRef2 = FirebaseFirestore.getInstance().collection("users").document("user"+notification.getUser1());
                             docRef2.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
                                 @Override
                                 public void onSuccess(DocumentSnapshot documentSnapshot) {
+                                    following = new Following(1, user.getEmail());
                                     user2 = documentSnapshot.toObject(User.class);
-                                    Notification notification2 = new Notification(3, user.getEmail(), user2.getEmail());
-                                    user2.getNotification().add(notification2);
+                                    user2.getFollowingList().add(following);
                                     docRef2.set(user2);
-                                    user.getNotification().remove(fid);
-                                    docRef.set(user);
 
                                 }
                             });
                         }
                     });
-
-                    AlertDialog dialog = builder.create();
-                    dialog.show();
-
-                }
-                else if(notification.getType()==2)
-                {
-                    AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-                    builder.setMessage("Clearing Notification");
-                    builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
-                            user.getNotification().remove(fid);
-                            docRef.set(user);
-
+                            //no
                         }
                     });
+
                     AlertDialog dialog = builder.create();
                     dialog.show();
-
                 }
-                else if(notification.getType()==3)
-                {
-                    AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-                    builder.setMessage("Clearing Notification");
-                    builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            user.getNotification().remove(fid);
-                            docRef.set(user);
-
-                        }
-                    });
-                    AlertDialog dialog = builder.create();
-                    dialog.show();
-
-                }
-                else if(notification.getType()==4)
-                {
-                    AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-                    builder.setMessage("Clearing Notification");
-                    builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            user.getNotification().remove(fid);
-                            docRef.set(user);
-
-                        }
-                    });
-                    AlertDialog dialog = builder.create();
-                    dialog.show();
-
-                }
+                user.getNotification().remove((int)id);
+                user.setNumFollwers(user.getNumFollwers()+1);
+                docRef.set(user);
                 list.remove((int)id);
                 adapter.notifyDataSetChanged();
             }
@@ -289,7 +192,6 @@ public class ProfileFragment extends Fragment {
         emailTV.setText(user.getEmail());
         followingTV.setText(Integer.toString(user.getFollowingList().size()));
         followerTV.setText(Integer.toString(user.getNumFollwers()));
-        list.clear();
         for (int i = 0; i < user.getNotification().size(); i++) {
             list.add(user.getNotification().get(i).getString());
         }

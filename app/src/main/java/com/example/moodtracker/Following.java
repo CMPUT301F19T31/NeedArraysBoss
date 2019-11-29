@@ -4,7 +4,7 @@ public class Following {
 
     private int type;
     // 1 = Following
-    // 2 = Following only recent
+    // 2 = Following with location
     private String user;
 
     public Following()
