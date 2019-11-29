@@ -101,7 +101,7 @@ public class MainActivityTest {
         solo.pressSpinnerItem(2,4);
         solo.pressSpinnerItem(3,2);
         solo.clickOnButton("Add Event"); //Click ADD EVENT Button
-        assertTrue(solo.waitForText("UITest1", 1, 2000));
+        assertTrue(solo.waitForText("happy", 1, 2000));
         //Cleanup
         solo.clickInRecyclerView(0);
         solo.clickOnButton("Delete Event"); //Click DELETE EVENT Button
@@ -162,6 +162,16 @@ public class MainActivityTest {
         solo.clickOnButton("Delete Event"); //Click DELETE EVENT Button
         solo.sleep(1000);
         assertFalse(solo.waitForText("UITest2", 1, 2000));
+    }
+
+    @Test
+    public void checkNavigation(){
+        // Asserts that the current activity is the MainActivity. Otherwise, show “Wrong Activity”
+        solo.assertCurrentActivity("Wrong Activity", MainActivity.class);
+        // Initialize test element
+        solo.clickOnActionBarHomeButton();
+        solo.clickOnActionBarItem(1);
+        solo.clickOnActionBarItem(2);
     }
 
     /**
