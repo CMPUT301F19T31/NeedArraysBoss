@@ -60,7 +60,9 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 
-
+/**
+ * A fragment that displays a list of mood events created by the user
+ */
 public class UserMoods extends Fragment implements AdapterView.OnItemSelectedListener {
 
     private Dialog dialog;
@@ -103,7 +105,7 @@ public class UserMoods extends Fragment implements AdapterView.OnItemSelectedLis
         actn_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                createMoodEvent(v);
+                createMoodEvent();
             }
         });
 
@@ -149,6 +151,10 @@ public class UserMoods extends Fragment implements AdapterView.OnItemSelectedLis
         return root;
     }
 
+    /**
+     * Called by the onItemSelected function when the filter spinner is used.
+     * @param feeling is a string that contains the value of the spinner item selected by the user
+     */
     public void filterMoodList(String feeling) {
         filterMoodHistory = new ArrayList<>();
         if(feeling.equals("")) {
@@ -164,6 +170,9 @@ public class UserMoods extends Fragment implements AdapterView.OnItemSelectedLis
         }
     }
 
+    /**
+     * Checks if the app is logged in, then calls onResume.
+     */
     @Override
     public void onStart() {
         super.onStart();
@@ -182,6 +191,9 @@ public class UserMoods extends Fragment implements AdapterView.OnItemSelectedLis
         }
     }
 
+    /**
+     * Refreshes the data from the database
+     */
     @Override
     public void onResume() {
         super.onResume();
@@ -202,6 +214,10 @@ public class UserMoods extends Fragment implements AdapterView.OnItemSelectedLis
         }
     }
 
+    /**
+     * This is a helper function to onResume. It uses the global user variable and fills UI
+     * with the appropriate information
+     */
     public void loadDataFromDB() {
         if(user == null || user.getMoodHistory() == null) { return; }
         int size=user.getMoodHistory().size();
@@ -214,6 +230,15 @@ public class UserMoods extends Fragment implements AdapterView.OnItemSelectedLis
         moodHistoryAdapter.notifyDataSetChanged();
     }
 
+    /**
+     * This is a required method for implementing AdapterView.OnItemClickListener. This function
+     * recieves the item that was selected by the user, and chooses the appropriate action to save
+     * the result.
+     * @param adapterView is the object that notifies the progrom which spinner widget was used
+     * @param view returns the view object
+     * @param i is the index of the spinner item that was selected
+     * @param l returns a long number
+     */
     @Override
     public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
         if (adapterView.getId() == R.id.feelingSpinner)
@@ -225,10 +250,19 @@ public class UserMoods extends Fragment implements AdapterView.OnItemSelectedLis
 
     }
 
+    /**
+     * This is a required method for implementing AdapterView.OnItemClickListener. This function
+     * empty and has no function
+     * @param adapterView
+     */
     @Override
     public void onNothingSelected(AdapterView<?> adapterView) { }
 
-    public void createMoodEvent(View view) {
+    /**
+     * Is called when the user wants to create a mood event. It infaltes a dialog window in which
+     * the user enters the details they want.
+     */
+    public void createMoodEvent() {
         dialog.setContentView(R.layout.add_mood_event);
 
         Spinner feelingSpinner = (Spinner) dialog.findViewById(R.id.feelingSpinner);

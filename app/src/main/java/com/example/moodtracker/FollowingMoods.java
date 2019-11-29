@@ -49,7 +49,7 @@ import static androidx.constraintlayout.widget.Constraints.TAG;
 
 
 /**
- * A simple {@link Fragment} subclass.
+ * A fragment that displays a list of mood events created by the user's following list
  */
 public class FollowingMoods extends Fragment implements AdapterView.OnItemSelectedListener {
 
@@ -162,6 +162,10 @@ public class FollowingMoods extends Fragment implements AdapterView.OnItemSelect
         });
     }
 
+    /**
+     * This is a helper function to getFriendList. It uses the global user variable and fills UI
+     * with the appropriate information
+     */
     public void refreshList() {
         userRef.addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
@@ -171,6 +175,7 @@ public class FollowingMoods extends Fragment implements AdapterView.OnItemSelect
                 allUsers.clear();
                 for(DocumentSnapshot doc: data) {
                     User user = doc.toObject(User.class);
+                    
                     if(friends.contains(user.getEmail())) {
                         allUsers.add(user);
                         for(int i=0; i<user.getMoodHistory().size(); i++) {
@@ -195,6 +200,10 @@ public class FollowingMoods extends Fragment implements AdapterView.OnItemSelect
 
     }
 
+    /**
+     * Called by the onItemSelected function when the filter spinner is used.
+     * @param feeling is a string that contains the value of the spinner item selected by the user
+     */
     public void filterMoodList(String feeling) {
         filterFriendMoodHistory = new ArrayList<>();
         if(feeling.equals("")) {
@@ -210,12 +219,26 @@ public class FollowingMoods extends Fragment implements AdapterView.OnItemSelect
         }
     }
 
+    /**
+     * This is a required method for implementing AdapterView.OnItemClickListener. This function
+     * recieves the item that was selected by the user, and chooses the appropriate action to save
+     * the result.
+     * @param parent is the object that notifies the progrom which spinner widget was used
+     * @param view returns the view object
+     * @param position is the index of the spinner item that was selected
+     * @param id returns a long number
+     */
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
         if (parent.getId() == R.id.filterSpinner)
             filterMoodList(parent.getItemAtPosition(position).toString());
     }
 
+    /**
+     * This is a required method for implementing AdapterView.OnItemClickListener. This function
+     * empty and has no function
+     * @param parent
+     */
     @Override
     public void onNothingSelected(AdapterView<?> parent) {
 
