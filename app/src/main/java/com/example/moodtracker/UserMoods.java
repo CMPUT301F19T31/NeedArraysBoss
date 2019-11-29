@@ -68,6 +68,7 @@ public class UserMoods extends Fragment implements AdapterView.OnItemSelectedLis
 
     private RecyclerView rv;
     private ArrayList<Mood> moodHistory;
+    private ArrayList<Mood> filterMoodHistory;
     private MoodListAdapter moodHistoryAdapter;
     private RecyclerView.LayoutManager moodHistoryLM;
     private DocumentReference userRef;
@@ -113,6 +114,13 @@ public class UserMoods extends Fragment implements AdapterView.OnItemSelectedLis
             }
         });
 
+        //initialise the mood filter spinner
+        Spinner moodFilterSpinner = root.findViewById(R.id.filterSpinner);
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(getContext(), R.array.feelings, R.layout.spinner_item);
+        adapter.setDropDownViewResource(android.R.layout.simple_list_item_1);
+        moodFilterSpinner.setAdapter(adapter);
+        moodFilterSpinner.setOnItemSelectedListener(this);
+
         btnMap = root.findViewById(R.id.btnMap);
         btnMap.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -144,6 +152,21 @@ public class UserMoods extends Fragment implements AdapterView.OnItemSelectedLis
         userRef = null;
 
         return root;
+    }
+
+    public void filterMoodList(String feeling) {
+        filterMoodHistory = new ArrayList<>();
+        if(feeling.equals("")) {
+            moodHistoryAdapter.setList(moodHistory);
+            moodHistoryAdapter.notifyDataSetChanged();
+        } else {
+            for(int i = 0; i < moodHistory.size(); i++) {
+                if(moodHistory.get(i).getFeeling().equals(feeling))
+                    filterMoodHistory.add(moodHistory.get(i));
+            }
+            moodHistoryAdapter.setList(filterMoodHistory);
+            moodHistoryAdapter.notifyDataSetChanged();
+        }
     }
 
 
@@ -217,6 +240,8 @@ public class UserMoods extends Fragment implements AdapterView.OnItemSelectedLis
             feeling = adapterView.getItemAtPosition(i).toString();
         else if (adapterView.getId() == R.id.socialStateSpinner)
             socialState = adapterView.getItemAtPosition(i).toString();
+        else if (adapterView.getId() == R.id.filterSpinner)
+            filterMoodList(adapterView.getItemAtPosition(i).toString());
 
     }
 

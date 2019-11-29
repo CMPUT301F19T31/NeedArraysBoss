@@ -5,6 +5,9 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.Spinner;
 
 import androidx.annotation.Nullable;
 import androidx.emoji.bundled.BundledEmojiCompatConfig;
@@ -28,7 +31,7 @@ import java.util.List;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class FollowingMoods extends Fragment {
+public class FollowingMoods extends Fragment implements AdapterView.OnItemSelectedListener {
 
     private FirebaseAuth mAuth;
     private CollectionReference userRef;
@@ -37,6 +40,7 @@ public class FollowingMoods extends Fragment {
 
     private RecyclerView rv;
     private ArrayList<Mood> friendMoodHistory;
+    private ArrayList<Mood> filterFriendMoodHistory;
     private MoodListAdapter friendMoodHistoryAdapter;
     private RecyclerView.LayoutManager rvLM;
 
@@ -64,6 +68,13 @@ public class FollowingMoods extends Fragment {
         rv.setAdapter(friendMoodHistoryAdapter);
         rv.setLayoutManager(rvLM);
 
+        //initialise the mood filter spinner
+        Spinner moodFilterSpinner = root.findViewById(R.id.filterSpinner);
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(getContext(), R.array.feelings, R.layout.spinner_item);
+        adapter.setDropDownViewResource(android.R.layout.simple_list_item_1);
+        moodFilterSpinner.setAdapter(adapter);
+        moodFilterSpinner.setOnItemSelectedListener(this);
+
         getFriendList();
 
         return root;
@@ -77,8 +88,6 @@ public class FollowingMoods extends Fragment {
         userRef.document("user"+mAuth.getCurrentUser().getEmail()).addSnapshotListener(new EventListener<DocumentSnapshot>() {
             @Override
             public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
-                if (mAuth.getCurrentUser() == null)
-                    return;
                 currentUser = documentSnapshot.toObject(User.class);
                 for(int i=0; i<currentUser.getFollowingList().size(); i++)
                     friends.add(currentUser.getFollowingList().get(i).getUser());
@@ -91,8 +100,6 @@ public class FollowingMoods extends Fragment {
         userRef.addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
             public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
-                if(mAuth.getCurrentUser()==null)
-                    return;
                 List<DocumentSnapshot> data = queryDocumentSnapshots.getDocuments();
                 friendMoodHistory.clear();
                 for(DocumentSnapshot doc: data) {
@@ -117,6 +124,32 @@ public class FollowingMoods extends Fragment {
      * when all the moods of the a user is provided.
      */
     public void sortFriendList() {
+
+    }
+
+    public void filterMoodList(String feeling) {
+        filterFriendMoodHistory = new ArrayList<>();
+        if(feeling.equals("")) {
+            friendMoodHistoryAdapter.setList(friendMoodHistory);
+            friendMoodHistoryAdapter.notifyDataSetChanged();
+        } else {
+            for(int i = 0; i < friendMoodHistory.size(); i++) {
+                if(friendMoodHistory.get(i).getFeeling().equals(feeling))
+                    filterFriendMoodHistory.add(friendMoodHistory.get(i));
+            }
+            friendMoodHistoryAdapter.setList(filterFriendMoodHistory);
+            friendMoodHistoryAdapter.notifyDataSetChanged();
+        }
+    }
+
+    @Override
+    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+        if (parent.getId() == R.id.filterSpinner)
+            filterMoodList(parent.getItemAtPosition(position).toString());
+    }
+
+    @Override
+    public void onNothingSelected(AdapterView<?> parent) {
 
     }
 }
