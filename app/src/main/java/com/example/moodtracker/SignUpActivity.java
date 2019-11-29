@@ -34,16 +34,13 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 public class SignUpActivity extends AppCompatActivity {
-    EditText username, password, repassword, email, phone;
+    EditText username, password, repassword, email;
     String uname, emailID, pwd, image;
     Button SignUp;
     TextView TextSignUp;
     FirebaseAuth mFirebaseAuth;
-    String TAG = "";
 
-    private FirebaseAuth.AuthStateListener mAuthStateListener;
     private ArrayList<User> users;
-    private boolean done = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -167,9 +164,9 @@ public class SignUpActivity extends AppCompatActivity {
         DocumentReference userRef = FirebaseFirestore.getInstance().collection("users").document("user"+mFirebaseAuth.getCurrentUser().getEmail());
         User user;
         if(image == null) {
-            user = new User(uname, emailID, pwd);
+            user = new User(uname, emailID);
         } else {
-            user = new User(uname, emailID, pwd, image);
+            user = new User(uname, emailID,image);
         }
 
         userRef.set(user).addOnCompleteListener(new OnCompleteListener<Void>() {

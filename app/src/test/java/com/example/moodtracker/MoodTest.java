@@ -9,11 +9,24 @@ class MoodTest {
         return mood;
     }
 
+    private Mood mockMoodCurrentTime() {
+        Mood mood = new Mood("happy", "alone", System.currentTimeMillis(), "Weekend");
+        return mood;
+    }
+
     @Test
     void testToString() {
         Mood mood = mockMood();
         assertEquals("feeling happy\nbecause Weekend\nwas alone on 1", mood.toString());
     }
+
+    @Test
+    void testGetTimeAgo() {
+        Mood mood = mockMoodCurrentTime();
+        assertEquals("just now", mood.getTimeAgo());
+
+    }
+
 
 }
 

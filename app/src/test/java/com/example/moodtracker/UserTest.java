@@ -9,10 +9,24 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 class UserTest {
 
-    private User mockUser() {
-        ArrayList<Mood> moodList = new ArrayList<Mood>();
-        User user = new User("1", "user@mymail.com", "abc123", moodList, "http://imgsvr.com/images/portrait.jpg", "0000000000");
-        return user;
+    private Notification followRequestNotification() {
+        Notification notification = new Notification(1, "ridwan@mood.com", "andalib@mood.com");
+        return notification;
+    }
+
+    private Notification acceptedNotification() {
+        Notification notification = new Notification(2, "ridwan@mood.com", "andalib@mood.com");
+        return notification;
+    }
+
+    private Notification deniedNotification() {
+        Notification notification = new Notification(3, "ridwan@mood.com", "andalib@mood.com");
+        return notification;
+    }
+
+    private Notification unfollowedNotification() {
+        Notification notification = new Notification(4, "ridwan@mood.com", "andalib@mood.com");
+        return notification;
     }
 
     private Mood mockMood() {
@@ -20,77 +34,46 @@ class UserTest {
         return mood;
     }
 
-    @Test
-    void testGetMoodHistory() {
-        User user = mockUser();
-        ArrayList<Mood> moodHistory = user.getMoodHistory();
-        assertNotEquals(null, moodHistory);
-        assertEquals(0, moodHistory.size());
+    private Following mockFollowing() {
+        Following following = new Following(1, "ridwan@mood.com");
+        return following;
+    }
+
+    private User mockUser() {
+        User user = new User("test", "test@mood.com");
+        user.getFollowingList().add(mockFollowing());
+        user.getMoodHistory().add(mockMood());
+        user.getNotification().add(followRequestNotification());
+        user.getNotification().add(acceptedNotification());
+        user.getNotification().add(deniedNotification());
+        user.getNotification().add(unfollowedNotification());
+        user.setNumFollwers(1);
+        return user;
     }
 
     @Test
-    void testSetMoodHistory() {
+    void testMoodHistory() {
         User user = mockUser();
-        ArrayList<Mood> moodHistory = user.getMoodHistory();
-        assertNotEquals(null, moodHistory);
-        user.setMoodHistory(null);
-        // Replace empty ArrayList with null
-        assertEquals(null, user.getMoodHistory());
-    }
-
-
-    // Removed Functions
-    /*
-
-    @Test
-    void testAddMood() {
-        User user = mockUser();
-        ArrayList<Mood> moodHistory = user.getMoodHistory();
-        // Assert MoodHistory is empty
-        assertEquals(0, moodHistory.size());
-        user.addMood(mockMood());
-        // Assert MoodHistory has a new Mood added
-        assertEquals(1, moodHistory.size());
-        // Check added Mood
-        assertEquals("feeling happy\nbecause Weekend\nwas alone on 05/29/2015 05:50", moodHistory.get(0).toString());
+        assertEquals(1, user.getMoodHistory().size());
+        assertEquals("feeling happy\nbecause Weekend\nwas alone on 1", user.getMoodHistory().get(0).toString());
     }
 
     @Test
-    void testDeleteMood() {
+    void testNotification() {
         User user = mockUser();
-        ArrayList<Mood> moodHistory = user.getMoodHistory();
-        // Assert MoodHistory is empty
-        assertEquals(0, moodHistory.size());
-        user.addMood(mockMood());
-        // Assert MoodHistory has a new Mood added
-        assertEquals(1, moodHistory.size());
-        // Check added Mood
-        assertEquals("feeling happy\nbecause Weekend\nwas alone on 05/29/2015 05:50", moodHistory.get(0).toString());
-        // Delete Mood at index 0
-        user.deleteMood(0);
-        // Check Mood Deleted
-        assertEquals(0, moodHistory.size());
+        assertEquals(4, user.getNotification().size());
+        assertEquals("ridwan@mood.com has requested to follow your moods", user.getNotification().get(0).getString());
+        assertEquals("ridwan@mood.com has accepted your follow request", user.getNotification().get(1).getString());
+        assertEquals("ridwan@mood.com has denied your follow request", user.getNotification().get(2).getString());
+        assertEquals("ridwan@mood.com is no longer following you", user.getNotification().get(3).getString());
     }
 
     @Test
-    void testEditMood() {
+    void testFollowing() {
         User user = mockUser();
-        ArrayList<Mood> moodHistory = user.getMoodHistory();
-        // Assert MoodHistory is empty
-        assertEquals(0, moodHistory.size());
-        user.addMood(mockMood());
-        // Assert MoodHistory has a new Mood added
-        assertEquals(1, moodHistory.size());
-        // Check added Mood
-        assertEquals("feeling happy\nbecause Weekend\nwas alone on 05/29/2015 05:50", moodHistory.get(0).toString());
-        Mood newMood = new Mood("sad", "alone", "05/31/2015 05:50", "Monday");
-        // Replace mood element with new mood
-        user.editMood(0, newMood);
-        // Check edited Mood
-        assertEquals(1, moodHistory.size());
-        assertEquals("feeling sad\nbecause Monday\nwas alone on 05/31/2015 05:50", moodHistory.get(0).toString());
+        assertEquals(1, user.getFollowingList().size());
+        assertEquals("ridwan@mood.com", user.getFollowingList().get(0).getUser());
+        assertEquals(1, user.getFollowingList().get(0).getType());
     }
 
-
-     */
 }

@@ -22,13 +22,11 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 
 public class search_userdata extends AppCompatActivity {
-    private TextView textView1, tv, tv_uid;
-    private DocumentReference docRef;
+    private TextView tv, tv_uid;
     private FirebaseAuth mAuth;
     private String text;
     private User user;
     private User user2;
-    private ImageView editImage;
     private DocumentReference documentReference;
     private DocumentReference documentReference2;
     private ImageView imageView;
@@ -42,10 +40,10 @@ public class search_userdata extends AppCompatActivity {
         setContentView(R.layout.activity_search_userdata);
         mAuth = FirebaseAuth.getInstance();
 
-        final Button testButton = (Button) findViewById(R.id.button1);
+        final Button testButton = findViewById(R.id.button1);
         testButton.setTag(1);
 
-        final Button unfollow = (Button) findViewById(R.id.button2);
+        final Button unfollow = findViewById(R.id.button2);
 
         imageView = findViewById(R.id.imgUser);
         tv=findViewById(R.id.emailaddress);
@@ -105,14 +103,11 @@ public class search_userdata extends AppCompatActivity {
                                     }
                                 }
 
-
-
                                 if(flag==1) {
                                     user.getNotification().add(notification);
                                     documentReference.set(user);
                                     Toast.makeText(getApplicationContext(), "Follow request sent!", Toast.LENGTH_SHORT).show();
                                 }
-
 
 
                             }
@@ -161,36 +156,6 @@ public class search_userdata extends AppCompatActivity {
                 });
             }
         });
-
-    /*@Override
-    public void onResume() {
-        super.onResume();
-        if (mAuth.getCurrentUser() != null) {
-
-     */
-    /*
-    docRef = FirebaseFirestore.getInstance().collection("users").document("user"+text);
-    docRef.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-        @Override
-        public void onSuccess(DocumentSnapshot documentSnapshot) {
-            user = documentSnapshot.toObject(User.class);
-            textView1=findViewById(R.id.following_no);
-
-            if(user.getFollowingList()==null || user.getFollowingList().isEmpty()) {
-
-                textView1.setText("0");
-            }
-            else {
-                textView1.setText(Integer.toString(user.getFollowingList().size()));
-            }
-            tv_uid=findViewById(R.id.tv_name);
-            tv_uid.setText(user.getUserID());
-        }
-    });
-
-     */
-
-
 
     }
     public void decodeImage(String completeImageData, ImageView imageView) {

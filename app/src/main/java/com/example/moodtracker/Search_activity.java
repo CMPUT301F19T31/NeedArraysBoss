@@ -37,17 +37,13 @@ public class Search_activity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.search_users);
 
-        mySearchView = (SearchView) findViewById(R.id.searchView);
-        myList = (ListView) findViewById((R.id.myList));
-        list = new ArrayList<String>();
-        list1=new ArrayList<String>();
+        mySearchView = findViewById(R.id.searchView);
+        myList = findViewById((R.id.myList));
+        list = new ArrayList<>();
+        list1=new ArrayList<>();
 
         mAuth = FirebaseAuth.getInstance();
         collectionReference = null;
-
-
-        //list.add("hello");
-        //list.add("good morning");
 
     }
 
@@ -61,20 +57,12 @@ public class Search_activity extends AppCompatActivity {
                     @Override
                     public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
                         List<DocumentSnapshot> data = queryDocumentSnapshots.getDocuments();
-                        //Toast.makeText(getApplicationContext(),mAuth.getCurrentUser().getEmail(), Toast.LENGTH_SHORT).show();
                         for (int i = 0; i < data.size(); i++) {
-
-                            //list.addAll(data);
                             if(mAuth.getCurrentUser().getEmail().compareTo(data.get(i).toObject(User.class).getEmail())!=0) {
                                 list.add(data.get(i).toObject(User.class).getUserID());
                                 list1.add(data.get(i).toObject(User.class).getEmail());
-                                //list.add(data.get(i).toObject(User.class));
-                                //Toast.makeText(getActivity(), "", Toast.LENGTH_SHORT).show();
                             }
                         }
-
-                        //Toast.makeText(getActivity(), myList.get(0).getEmail(), Toast.LENGTH_SHORT).show();
-                        //userAdapter.notifyDataSetChanged();
                     }
                 });
             }
@@ -95,20 +83,15 @@ public class Search_activity extends AppCompatActivity {
                 }
 
             });
-            EditText editText;
             myList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
                     String email= list1.get(position);
-                    //String email=username.getE
                     Intent intent= new Intent(Search_activity.this, search_userdata.class);
                     intent.putExtra("email",email);
                     startActivity(intent);
                 }
             });
         }
-
-
-
 }

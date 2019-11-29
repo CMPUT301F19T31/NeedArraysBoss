@@ -80,7 +80,7 @@ public class ProfileFragment extends Fragment {
         emailTV = root.findViewById(R.id.tv_address);
         followerTV = root.findViewById(R.id.pfollower);
         followingTV = root.findViewById(R.id.pfollowing);
-        list = new ArrayList<String>();
+        list = new ArrayList<>();
         final ListView notificationLV = root.findViewById(R.id.notificationsLV);
         adapter=new ArrayAdapter<>(getContext(), android.R.layout.simple_list_item_1,list);
         notificationLV.setAdapter(adapter);
