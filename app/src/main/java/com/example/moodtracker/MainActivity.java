@@ -31,6 +31,7 @@ public class MainActivity extends AppCompatActivity {
                     fragment = new HomeFragment();
                     loadFragment(fragment);
                     return true;
+
                 case R.id.navigation_search:
                     fragment = new SearchFragment();
                     loadFragment(fragment);
@@ -257,4 +258,6 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
+
 */
+//}
