@@ -23,14 +23,18 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.google.maps.android.clustering.ClusterManager;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 public class MapActivity extends AppCompatActivity implements OnMapReadyCallback {
 
@@ -76,13 +80,17 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     //vars
     //private Boolean mLocationPermissionsGranted = false;
     private GoogleMap mMap;
-    private User user;
-    private FirebaseUser currentUser;
-    private ArrayList<Mood> moodHistory;
+    private ArrayList<String> friends;
+    private User currentUser;
+    private ArrayList<Mood> friendMoodHistory;
+    private ArrayList<Mood> userMoods;
     private FirebaseAuth mAuth;
+    private CollectionReference userRef;
     private DocumentReference docRef;
     private ArrayList<Mood> moods;
     private HashMap<String, Integer> moodEmojis;
+    private int flag;
+    private String userId;
     //private Map<String,String> moodEmojis=new HashMap<String, String>();
     //HashMap<String, String> moodEmojis = new HashMap<String, String>();
 
@@ -95,6 +103,11 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         //isMapsEnabled();
         initMap();
         initEmoji();
+        String str = getIntent().getStringExtra("flag");
+        //flag = Integer.parseInt(str); //1 is for friends mood and 0 is for the users mood
+        flag=0;
+        friendMoodHistory = new ArrayList<>();
+        friends = new ArrayList<>();
     }
 
     private void initMap() {
@@ -118,12 +131,13 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             mMap.setOnCameraIdleListener(mClusterManager);
             mMap.setOnMarkerClickListener(mClusterManager);
             mAuth = FirebaseAuth.getInstance();
-            currentUser = mAuth.getCurrentUser();
-            docRef = FirebaseFirestore.getInstance().collection("users").document("user" + mAuth.getCurrentUser().getEmail());
+            userRef = FirebaseFirestore.getInstance().collection("users");
+
+            docRef = userRef.document("user" + mAuth.getCurrentUser().getEmail());
             docRef.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
                 @Override
                 public void onSuccess(DocumentSnapshot documentSnapshot) {
-                    user = documentSnapshot.toObject(User.class);
+                    currentUser = documentSnapshot.toObject(User.class);
                     helpingAddMapMarker();
                 }
             });
@@ -138,7 +152,14 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
      * Helper function called when the firebase returns the userdata. It
      */
     void helpingAddMapMarker(){
-        moods = user.getMoodHistory();
+        if(flag==0) {
+            userMoods = currentUser.getMoodHistory();
+            userId =currentUser.getUserID();
+            moods = userMoods;
+        }else{
+            getFriendList();
+            moods = friendMoodHistory;
+        }
 
         for (Mood mood : moods) {
 
@@ -152,14 +173,20 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                         snippet = snippet + "no reason";
                     }
 
-                    int avatar = moodEmojis.get(mood.getFeeling());
+                    //int avatar = moodEmojis.get(mood.getFeeling());
+                    int avatar = R.drawable.ogre;
+
+                    if(flag==1){
+                        userId=mood.getFriend();
+                    }
+
 
                     ClusterMarker newClusterMarker = new ClusterMarker(
                             new LatLng(mood.getGeo_point().getLatitude(), mood.getGeo_point().getLongitude()),
-                            user.getUserID(),
+                            userId,
                             snippet,
                             avatar,
-                            user
+                            currentUser
                     );
                     mClusterManager.addItem(newClusterMarker);
                     mClusterMarkers.add(newClusterMarker);
@@ -172,6 +199,41 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         }
 
         mClusterManager.cluster();
+    }
+
+    public void getFriendList() {
+        /*userRef.document("user"+mAuth.getCurrentUser().getEmail()).addSnapshotListener(new EventListener<DocumentSnapshot>() {
+            @Override
+            public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
+                currentUser = documentSnapshot.toObject(User.class);
+                for(int i=0; i<currentUser.getFollowingList().size(); i++)
+                    friends.add(currentUser.getFollowingList().get(i).getUser());
+                refreshList();
+            }
+        });*/
+        for(int i=0; i<currentUser.getFollowingList().size(); i++)
+            friends.add(currentUser.getFollowingList().get(i).getUser());
+        refreshList();
+    }
+
+    public void refreshList() {
+        userRef.addSnapshotListener(new EventListener<QuerySnapshot>() {
+            @Override
+            public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
+                List<DocumentSnapshot> data = queryDocumentSnapshots.getDocuments();
+                friendMoodHistory.clear();
+                for(DocumentSnapshot doc: data) {
+                    User user = doc.toObject(User.class);
+                    if(friends.contains(user.getEmail())) {
+                        for(int i=0; i<user.getMoodHistory().size(); i++) {
+                            Mood mood = user.getMoodHistory().get(i);
+                            mood.setFriend(user.getUserID());
+                            friendMoodHistory.add(mood);
+                        }
+                    }
+                }
+            }
+        });
     }
 
     /**
