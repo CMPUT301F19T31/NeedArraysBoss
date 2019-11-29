@@ -130,7 +130,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             mMap.setOnCameraIdleListener(mClusterManager);
             mMap.setOnMarkerClickListener(mClusterManager);
 
-
             mAuth = FirebaseAuth.getInstance();
             userRef = FirebaseFirestore.getInstance().collection("users");
 
