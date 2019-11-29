@@ -77,6 +77,8 @@ public class FollowingMoods extends Fragment {
         userRef.document("user"+mAuth.getCurrentUser().getEmail()).addSnapshotListener(new EventListener<DocumentSnapshot>() {
             @Override
             public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
+                if (mAuth.getCurrentUser() == null)
+                    return;
                 currentUser = documentSnapshot.toObject(User.class);
                 for(int i=0; i<currentUser.getFollowingList().size(); i++)
                     friends.add(currentUser.getFollowingList().get(i).getUser());
@@ -89,6 +91,8 @@ public class FollowingMoods extends Fragment {
         userRef.addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
             public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
+                if(mAuth.getCurrentUser()==null)
+                    return;
                 List<DocumentSnapshot> data = queryDocumentSnapshots.getDocuments();
                 friendMoodHistory.clear();
                 for(DocumentSnapshot doc: data) {
