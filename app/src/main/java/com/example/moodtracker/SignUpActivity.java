@@ -113,7 +113,7 @@ public class SignUpActivity extends AppCompatActivity {
                     Uri image = data.getData();
                     try {
                         Bitmap temp = MediaStore.Images.Media.getBitmap(getContentResolver(), image);
-                        //picture.setImageBitmap(temp);
+                        picture.setImageBitmap(temp);
                         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
                         temp.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream);
                         this.image = Base64.encodeToString(byteArrayOutputStream.toByteArray(), Base64.DEFAULT);
@@ -154,6 +154,7 @@ public class SignUpActivity extends AppCompatActivity {
         emailID = acct.getEmail();
         uname = acct.getDisplayName();
         pwd = acct.getId();
+        image = acct.getPhotoUrl().toString();
 
         mFirebaseAuth.signInWithCredential(credential)
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
@@ -180,20 +181,37 @@ public class SignUpActivity extends AppCompatActivity {
         String repwd = repassword.getText().toString();
 
         if (uname.isEmpty()) {
-            password.setError("Please enter your username");
-            password.requestFocus();
+            username.setError("Please enter your username");
+            username.requestFocus();
+        }
+        else if (checkUsername() == false) {
+            username.setError("Username not unique");
+            username.requestFocus();
         }
         else if(emailID.isEmpty()){
             email.setError("Please enter email");
+            email.requestFocus();
+        }
+        else if (checkEmail() == false) {
+            email.setError("Username not unique");
             email.requestFocus();
         }
         else if (pwd.isEmpty()) {
             password.setError("Please enter your password");
             password.requestFocus();
         }
-        else if (repwd.isEmpty()) {
-            password.setError("Please re-enter your password ");
+        else if (pwd.length() < 6) {
+            password.setError("Password must be at least 6 characters");
             password.requestFocus();
+        }
+
+        else if (repwd.isEmpty()) {
+            repassword.setError("Please re-enter your password ");
+            repassword.requestFocus();
+        }
+        else if (!(pwd.equals(repwd))) {
+            repassword.setError("Password doesn't match");
+            repassword.requestFocus();
         }
         else if (emailID.isEmpty() && pwd.isEmpty() && uname.isEmpty() && repwd.isEmpty()){
             Toast.makeText(SignUpActivity.this, "Fields Are Empty!", Toast.LENGTH_LONG);
@@ -309,4 +327,13 @@ public class SignUpActivity extends AppCompatActivity {
     }
 
     public void cancel(View v) { finish(); }
+
+    public boolean checkEmail() {
+        for(int i=0; i<users.size(); i++) {
+            if(users.get(i).getEmail().compareTo(emailID)==0)
+                return false;
+        }
+        return true;
+    }
+
 }
