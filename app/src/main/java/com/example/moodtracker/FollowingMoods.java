@@ -1,6 +1,7 @@
 package com.example.moodtracker;
 
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -36,6 +37,7 @@ public class FollowingMoods extends Fragment implements AdapterView.OnItemSelect
     private FirebaseAuth mAuth;
     private CollectionReference userRef;
     private User currentUser;
+    private ArrayList<User> allUsers;
     private ArrayList<String> friends;
 
     private RecyclerView rv;
@@ -62,6 +64,7 @@ public class FollowingMoods extends Fragment implements AdapterView.OnItemSelect
 
         friends = new ArrayList<>();
         rv = root.findViewById(R.id.moodList);
+        allUsers = new ArrayList<>();
         friendMoodHistory = new ArrayList<>();
         friendMoodHistoryAdapter = new MoodListAdapter(friendMoodHistory);
         rvLM = new LinearLayoutManager(getContext());
@@ -74,6 +77,30 @@ public class FollowingMoods extends Fragment implements AdapterView.OnItemSelect
         adapter.setDropDownViewResource(android.R.layout.simple_list_item_1);
         moodFilterSpinner.setAdapter(adapter);
         moodFilterSpinner.setOnItemSelectedListener(this);
+
+        //start view mood fragment
+        friendMoodHistoryAdapter.setOnClickListener(new MoodListAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(int index) {
+                String friendEmail = friendMoodHistory.get(index).getFriend();
+                User friend = null;
+                for(User user: allUsers) {
+                    if(user.getEmail().equals(friendEmail)) {
+                        friend = user;
+                        break;
+                    }
+                }
+                if(friend == null)
+                    return;
+                int i = friend.getMoodHistory().indexOf(friend);
+
+                Intent intent = new Intent(getActivity().getApplicationContext(), EditMoodEvent.class);
+                intent.putExtra("friend", friendEmail);
+                intent.putExtra("index", i);
+                startActivity(intent);
+            }
+        });
+
 
         getFriendList();
 
@@ -102,9 +129,11 @@ public class FollowingMoods extends Fragment implements AdapterView.OnItemSelect
             public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
                 List<DocumentSnapshot> data = queryDocumentSnapshots.getDocuments();
                 friendMoodHistory.clear();
+                allUsers.clear();
                 for(DocumentSnapshot doc: data) {
                     User user = doc.toObject(User.class);
                     if(friends.contains(user.getEmail())) {
+                        allUsers.add(user);
                         for(int i=0; i<user.getMoodHistory().size(); i++) {
                             Mood mood = user.getMoodHistory().get(i);
                             mood.setFriend(user.getUserID());
