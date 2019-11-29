@@ -73,6 +73,10 @@ public class ViewMood extends Fragment {
                         @Override
                         public void onClick(View v) {
                             Intent intent = new Intent(getActivity().getApplicationContext(), MapActivity.class);
+                            intent.putExtra("username", mood.getFriend());
+                            intent.putExtra("feeling", mood.getFeeling());
+                            intent.putExtra("reason", mood.getReason());
+                            //intent.putExtra("socialstate", mood.getSocialState);
                             intent.putExtra("lat", mood.getGeo_point().getLatitude());
                             intent.putExtra("long", mood.getGeo_point().getLongitude());
                             startActivity(intent);
