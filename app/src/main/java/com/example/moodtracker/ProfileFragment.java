@@ -80,7 +80,7 @@ public class ProfileFragment extends Fragment {
         emailTV = root.findViewById(R.id.tv_address);
         followerTV = root.findViewById(R.id.pfollower);
         followingTV = root.findViewById(R.id.pfollowing);
-        list = new ArrayList<String>();
+        list = new ArrayList<>();
         final ListView notificationLV = root.findViewById(R.id.notificationsLV);
         adapter=new ArrayAdapter<>(getContext(), android.R.layout.simple_list_item_1,list);
         notificationLV.setAdapter(adapter);
@@ -97,25 +97,16 @@ public class ProfileFragment extends Fragment {
             }
         });
 
-        mAuth.addAuthStateListener(new FirebaseAuth.AuthStateListener() {
-            @Override
-            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-                if(mAuth.getCurrentUser() == null) {
-                    Intent intent = new Intent(getActivity().getApplicationContext(), Login.class);
-                    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                    startActivity(intent);
-                    getActivity().finish();
-                }
-            }
-        });
-
         Button logout = root.findViewById(R.id.logout);
         logout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mAuth.signOut();
+                Intent intent = new Intent(getActivity().getApplicationContext(), Login.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(intent);
+                getActivity().finish();
             }
         });
       

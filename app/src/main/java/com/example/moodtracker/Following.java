@@ -21,10 +21,6 @@ public class Following {
         return type;
     }
 
-    public void setType(int type) {
-        this.type = type;
-    }
-
     public String getUser() {
         return user;
     }

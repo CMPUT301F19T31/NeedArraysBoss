@@ -1,8 +1,5 @@
 package com.example.moodtracker;
 
-import android.graphics.Bitmap;
-import android.net.Uri;
-
 import com.google.firebase.firestore.GeoPoint;
 
 /**
@@ -17,28 +14,12 @@ public class Mood {
     private GeoPoint geo_point;
     private String friend = null;
 
-    public Mood (String feeling, String socialState, long date_time, String reason, String image) {
-        this.feeling = feeling;
-        this.socialState = socialState;
-        this.date_time = date_time;
-        this.reason = reason;
-        this.img = image;
-    }
-
     public Mood (String feeling, String socialState, long date_time, String reason) {
         this.feeling = feeling;
         this.socialState = socialState;
         this.date_time = date_time;
         this.reason = reason;
         this.geo_point=null;
-    }
-
-    public Mood (String feeling, String socialState, long date_time, String reason, GeoPoint geo_point) {
-        this.feeling = feeling;
-        this.socialState = socialState;
-        this.date_time = date_time;
-        this.reason = reason;
-        this.geo_point=geo_point;
     }
 
     public Mood (String feeling, String socialState, long date_time) {

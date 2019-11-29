@@ -81,10 +81,8 @@ public class UserMoods extends Fragment implements AdapterView.OnItemSelectedLis
     private FloatingActionButton button_search;
     private String image;
 
-    //private static final String TAG = "HomeFragment";
     private static final String FINE_LOCATION = Manifest.permission.ACCESS_FINE_LOCATION;
     private static final String COURSE_LOCATION = Manifest.permission.ACCESS_COARSE_LOCATION;
-    //private static final int LOCATION_PERMISSION_REQUEST_CODE = 1234;
 
     private boolean mLocationPermissionGranted = false;
     public static final int ERROR_DIALOG_REQUEST = 9001;
@@ -93,7 +91,7 @@ public class UserMoods extends Fragment implements AdapterView.OnItemSelectedLis
     private FusedLocationProviderClient mFusedLocationClient;
     private boolean getmap = false;
     GeoPoint geoPoint;
-    //boolean gotRecentLocation=false;
+
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -137,7 +135,7 @@ public class UserMoods extends Fragment implements AdapterView.OnItemSelectedLis
         rv.setLayoutManager(moodHistoryLM);
         rv.setAdapter(moodHistoryAdapter);
 
-        //start login activity
+        //start edit mood activity
         moodHistoryAdapter.setOnClickListener(new MoodListAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(int index) {
@@ -176,17 +174,8 @@ public class UserMoods extends Fragment implements AdapterView.OnItemSelectedLis
         // Check if user is signed in (non-null) and update UI accordingly.
         currentUser = mAuth.getCurrentUser();
 
-        if(currentUser == null) { // not signed in
-            //start login activity
-            Intent intent = new Intent(getActivity().getApplicationContext(), Login.class);
-            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
-            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            startActivity(intent);
-
-        } else {
+        if(currentUser != null)// not signed in
             onResume();
-        }
     }
 
     @Override
@@ -352,6 +341,7 @@ public class UserMoods extends Fragment implements AdapterView.OnItemSelectedLis
         if (checkMapServices()) {
             if (mLocationPermissionGranted) {
                 Intent intent = new Intent(getActivity(), MapActivity.class);
+                intent.putExtra("flag","0");
                 startActivity(intent);
                 getmap = false;
             } else {

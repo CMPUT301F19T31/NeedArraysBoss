@@ -13,7 +13,6 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.Spinner;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
@@ -161,7 +160,7 @@ public class EditMoodEvent extends AppCompatActivity implements AdapterView.OnIt
                 change = true;
                 mood.setSocialState(socialState);
             }
-            if(!image.equals(mood.getImg())) {
+            if(image != null && !image.equals(mood.getImg())) {
                 change = true;
                 mood.setImg(image);
             }
