@@ -131,7 +131,7 @@ public class SignUpActivity extends AppCompatActivity {
                     GoogleSignInAccount account = task.getResult(ApiException.class);
                     if (account != null) {
 
-                        //firebaseAuthWithGoogle(account);
+                        firebaseAuthWithGoogle(account);
                     } else{
                         Log.w("AUTH", "Account is NULL");
                         Toast.makeText(this, "Sign-in failed, try again later.", Toast.LENGTH_LONG).show();
@@ -162,23 +162,11 @@ public class SignUpActivity extends AppCompatActivity {
                         if (task.isSuccessful()) {
                             Log.d("AUTH", "signInWithCredential:success");
                             FirebaseUser you = mFirebaseAuth.getCurrentUser();
-                            if(you != null) {
-
-                                commitUser();
-                            }
-                            mFirebaseAuth.createUserWithEmailAndPassword(emailID,pwd ).addOnCompleteListener(SignUpActivity.this, new OnCompleteListener<AuthResult>() {
-                                @Override
-                                public void onComplete(@NonNull Task<AuthResult> task) {
-                                    if(!task.isSuccessful()){
-                                        Toast.makeText(SignUpActivity.this, "SignUp Unsuccessful.\n Please change your email try again!", Toast.LENGTH_LONG).show();
-                                    } else {
-                                        signInUser();
-                                    }
-                                }
-                            });
+                            if(you != null)
+                                getUsers();
                             //startActivity(new Intent(SignUpActivity.this, MainActivity.class));
                         } else {
-                            Log.w("AUTH", "signInWithCredential:failure", task.getException());
+                            commitUser();
 
                         }
                     }
@@ -211,7 +199,7 @@ public class SignUpActivity extends AppCompatActivity {
             Toast.makeText(SignUpActivity.this, "Fields Are Empty!", Toast.LENGTH_LONG);
         }
         else if(!(emailID.isEmpty() && pwd.isEmpty() && uname.isEmpty() && repwd.isEmpty())){
-            if(mFirebaseAuth.getCurrentUser() != null) {
+            if(mFirebaseAuth.getCurrentUser() != null && users != null) {
                 commitUser();
             }
 
@@ -292,7 +280,7 @@ public class SignUpActivity extends AppCompatActivity {
      */
     public void getUsers() {
         CollectionReference ref = FirebaseFirestore.getInstance().collection("users");
-        users = new ArrayList<>();
+            users = new ArrayList<>();
 
         ref.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
