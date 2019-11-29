@@ -178,7 +178,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             }
 
             moveCamera(new LatLng(geoPoint.getLatitude(), geoPoint.getLongitude()), DEFAULT_ZOOM);
-            
+
             moods.add(newMood);
         }
 
