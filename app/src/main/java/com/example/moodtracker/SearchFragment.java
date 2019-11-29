@@ -11,17 +11,16 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.SearchView;
 
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentPagerAdapter;
-import androidx.viewpager.widget.ViewPager;
 
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.material.tabs.TabLayout;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
@@ -58,6 +57,9 @@ public class SearchFragment extends Fragment {
         mAuth = FirebaseAuth.getInstance();
         collectionReference = null;
 
+        adapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_1, list);
+        myList.setAdapter(adapter);
+
 
         //list.add("hello");
         //list.add("good morning");
@@ -72,14 +74,14 @@ public class SearchFragment extends Fragment {
         super.onStart();
         if (mAuth.getCurrentUser() != null) {
             collectionReference = FirebaseFirestore.getInstance().collection("users");
-            collectionReference.get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+            collectionReference.addSnapshotListener(new EventListener<QuerySnapshot>() {
                 @Override
-                public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
                     List<DocumentSnapshot> data = queryDocumentSnapshots.getDocuments();
                     //Toast.makeText(getApplicationContext(),mAuth.getCurrentUser().getEmail(), Toast.LENGTH_SHORT).show();
+                    list.clear();
+                    list1.clear();
                     for (int i = 0; i < data.size(); i++) {
-
-                        //list.addAll(data);
                         if(mAuth.getCurrentUser().getEmail().compareTo(data.get(i).toObject(User.class).getEmail())!=0) {
                             list.add(data.get(i).toObject(User.class).getUserID());
                             list1.add(data.get(i).toObject(User.class).getEmail());
@@ -89,12 +91,11 @@ public class SearchFragment extends Fragment {
                     }
 
                     //Toast.makeText(getActivity(), myList.get(0).getEmail(), Toast.LENGTH_SHORT).show();
-                    //userAdapter.notifyDataSetChanged();
+                    adapter.notifyDataSetChanged();
                 }
             });
         }
-        final ArrayAdapter adapter=new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_1,list);
-        myList.setAdapter(adapter);
+
 
         mySearchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
@@ -124,4 +125,9 @@ public class SearchFragment extends Fragment {
         });
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        onStart();
+    }
 }
