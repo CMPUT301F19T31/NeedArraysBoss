@@ -51,7 +51,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
         if (mLocationPermissionGranted) {
             getDeviceLocation();
-            //getLastKnownLocation();
 
             if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
                     != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this,
@@ -91,10 +90,9 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_map);
 
-        //getLocationPermission();
-        //isMapsEnabled();
         initMap();
         initEmoji();
+
         String str = getIntent().getStringExtra("flag");
         flag = Integer.parseInt(str); //1 is for friends mood and 0 is for the users mood
         Log.d(TAG, "MapActivity: flag = "+flag);
@@ -151,9 +149,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                     }
                 }
             });
-            //helpingAddMapMarker();
-
-            //moveCamera();
         }
     }
 
@@ -201,15 +196,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     }
 
     public void getFriendList() {
-        /*userRef.document("user"+mAuth.getCurrentUser().getEmail()).addSnapshotListener(new EventListener<DocumentSnapshot>() {
-            @Override
-            public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
-                currentUser = documentSnapshot.toObject(User.class);
-                for(int i=0; i<currentUser.getFollowingList().size(); i++)
-                    friends.add(currentUser.getFollowingList().get(i).getUser());
-                refreshList();
-            }
-        });*/
         for(int i=0; i<currentUser.getFollowingList().size(); i++)
             friends.add(currentUser.getFollowingList().get(i).getUser());
         refreshList();
