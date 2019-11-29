@@ -11,16 +11,13 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.SearchView;
 
-import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
@@ -74,9 +71,9 @@ public class SearchFragment extends Fragment {
         super.onStart();
         if (mAuth.getCurrentUser() != null) {
             collectionReference = FirebaseFirestore.getInstance().collection("users");
-            collectionReference.addSnapshotListener(new EventListener<QuerySnapshot>() {
+            collectionReference.get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
                 @Override
-                public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
+                public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
                     List<DocumentSnapshot> data = queryDocumentSnapshots.getDocuments();
                     //Toast.makeText(getApplicationContext(),mAuth.getCurrentUser().getEmail(), Toast.LENGTH_SHORT).show();
                     list.clear();

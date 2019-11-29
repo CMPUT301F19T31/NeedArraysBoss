@@ -5,70 +5,41 @@
     android:layout_height="match_parent"
     android:layout_marginBottom="50dp"
     android:background="@color/appBackground"
+
     android:clickable="true">
 
     <RelativeLayout
+        android:id="@+id/relativeLayout2"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" >
+        android:layout_height="match_parent"/>
 
-        <TextView
-            android:id="@+id/filterTV"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Filter:"
-            android:textSize="17sp"
-            android:textColor="@color/white"
-            android:padding="5dp"
-            android:layout_marginLeft="16dp"/>
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/addMoodEvent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal|bottom"
+        android:layout_margin="16dp"
+        android:backgroundTint="@color/buttonColor"
+        android:src="@drawable/ic_add_black_24dp" />
 
-        <Spinner
-            android:id="@+id/filterSpinner"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_toRightOf="@id/filterTV"
-            android:layout_marginRight="16dp"
-            android:layout_marginTop="5dp"
-            android:layout_marginLeft="5dp"
-            android:layout_marginBottom="5dp"/>
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/btnMap"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end|bottom"
+        android:layout_margin="16dp"
+        android:clickable="true"
+        android:focusable="true"
+        android:src="@drawable/ic_map_black_24dp"
+        android:backgroundTint="@color/white"/>
 
-        <RelativeLayout
-            android:id="@+id/relativeLayout2"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_below="@id/filterSpinner"/>
-
-        <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/addMoodEvent"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerHorizontal="true"
-            android:layout_alignParentBottom="true"
-            android:layout_margin="16dp"
-            android:backgroundTint="@color/buttonColor"
-            android:src="@drawable/ic_add_black_24dp" />
-
-        <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/btnMap"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="16dp"
-            android:layout_alignParentRight="true"
-            android:layout_alignParentBottom="true"
-            android:clickable="true"
-            android:focusable="true"
-            android:src="@drawable/ic_map_black_24dp"
-            android:backgroundTint="@color/white"/>
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/moodList"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_below="@id/filterSpinner"
-            android:padding="16dp"
-            android:scrollbars="vertical"
-            app:layout_anchor="@+id/relativeLayout2"
-            app:layout_anchorGravity="center" />
-
-    </RelativeLayout>
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/moodList"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="10dp"
+        android:scrollbars="vertical"
+        app:layout_anchor="@+id/relativeLayout2"
+        app:layout_anchorGravity="center" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

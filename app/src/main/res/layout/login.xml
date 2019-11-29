@@ -42,7 +42,6 @@
         android:textColor="@color/white"
         android:textColorHint="@color/white"/>
 
-
     <TextView
         android:id="@+id/textView"
         android:layout_width="wrap_content"
