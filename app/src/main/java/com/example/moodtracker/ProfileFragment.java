@@ -215,8 +215,13 @@ public class ProfileFragment extends Fragment {
                 Toast.makeText(getContext(), "Email cannot be changed.", Toast.LENGTH_SHORT).show();
             }
         });
-
         decodeImage(user.getProfilePic(), editImage);
+        editImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivityForResult(new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.INTERNAL_CONTENT_URI), 3);
+            }
+        });
 
         TextView save = dialog.findViewById(R.id.save_edit);
         save.setOnClickListener(new View.OnClickListener() {    // save changes
@@ -238,13 +243,7 @@ public class ProfileFragment extends Fragment {
                 }
                 docRef.set(user);
                 dialog.dismiss();
-            }
-        });
-
-        editImage.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivityForResult(new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.INTERNAL_CONTENT_URI), 3);
+                loadDataFromDB();
             }
         });
 
@@ -322,9 +321,20 @@ public class ProfileFragment extends Fragment {
                         Bitmap temp = MediaStore.Images.Media.getBitmap(getActivity().getContentResolver(), image);
                         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
                         temp.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream);
+                        byte[] byteArray = byteArrayOutputStream.toByteArray();
+                        int num = 50;
+                        while (byteArray.length > 10000 && num > 0) {   // compress image to not more than 10 kb
+                            byteArrayOutputStream.flush();
+                            byteArrayOutputStream.reset();
+
+                            temp.compress(Bitmap.CompressFormat.JPEG, num, byteArrayOutputStream);
+                            num = num / 2;
+                            byteArray = byteArrayOutputStream.toByteArray();
+                        }
                         this.profilePic = Base64.encodeToString(byteArrayOutputStream.toByteArray(), Base64.DEFAULT);
                         profilePicChanged = true;
                         Toast.makeText(dialog.getContext(), "Image Uploaded", Toast.LENGTH_SHORT).show();
+                        decodeImage(profilePic, editImage);
 
                     } catch (FileNotFoundException e) {
                         e.printStackTrace();
