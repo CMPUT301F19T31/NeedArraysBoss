@@ -238,6 +238,22 @@ public class ProfileFragment extends Fragment {
                     dialog.show();
 
                 }
+                else if(notification.getType()==4)
+                {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+                    builder.setMessage("Clearing Notification");
+                    builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            user.getNotification().remove(fid);
+                            docRef.set(user);
+
+                        }
+                    });
+                    AlertDialog dialog = builder.create();
+                    dialog.show();
+
+                }
                 list.remove((int)id);
                 adapter.notifyDataSetChanged();
             }
