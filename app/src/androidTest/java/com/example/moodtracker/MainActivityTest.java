@@ -166,7 +166,7 @@ public class MainActivityTest {
 
     @Test
     public void checkNavigation(){
-        
+
         solo.assertCurrentActivity("Wrong Activity", MainActivity.class);
         // Initialize test element
         solo.clickOnActionBarHomeButton();

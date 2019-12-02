@@ -54,7 +54,6 @@ public class SignUpActivity extends AppCompatActivity {
 
     String TAG = "";
     GoogleSignInClient mGoogleSignInClient;
-    private int permissions = 0;
     ImageView picture;
 
 
@@ -113,7 +112,7 @@ public class SignUpActivity extends AppCompatActivity {
                     Uri image = data.getData();
                     try {
                         Bitmap temp = MediaStore.Images.Media.getBitmap(getContentResolver(), image);
-                        //picture.setImageBitmap(temp);
+                        picture.setImageBitmap(temp);
                         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
                         temp.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream);
                         this.image = Base64.encodeToString(byteArrayOutputStream.toByteArray(), Base64.DEFAULT);
@@ -124,6 +123,7 @@ public class SignUpActivity extends AppCompatActivity {
                         e.printStackTrace();
                     }
                 }
+                return;
             }
             case 0: {
                 Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
@@ -141,6 +141,7 @@ public class SignUpActivity extends AppCompatActivity {
                     Log.w("AUTH", "Google sign in failed", e);
                     Toast.makeText(this, "Sign-in failed, try again later.", Toast.LENGTH_LONG).show();
                 }
+                return;
             }
 
         }
@@ -191,8 +192,16 @@ public class SignUpActivity extends AppCompatActivity {
             password.setError("Please enter your password");
             password.requestFocus();
         }
+        else if(pwd.length() < 6) {
+            password.setError("Password must be atleast 6 characters.");
+            password.requestFocus();
+        }
         else if (repwd.isEmpty()) {
             password.setError("Please re-enter your password ");
+            password.requestFocus();
+        }
+        else if(!pwd.equals(repwd)) {
+            password.setError("Passwords dont match! ");
             password.requestFocus();
         }
         else if (emailID.isEmpty() && pwd.isEmpty() && uname.isEmpty() && repwd.isEmpty()){
@@ -200,40 +209,50 @@ public class SignUpActivity extends AppCompatActivity {
         }
         else if(!(emailID.isEmpty() && pwd.isEmpty() && uname.isEmpty() && repwd.isEmpty())){
             if(mFirebaseAuth.getCurrentUser() != null && users != null) {
-                commitUser();
+                signInUser();
             }
-
-            mFirebaseAuth.createUserWithEmailAndPassword(emailID, pwd).addOnCompleteListener(SignUpActivity.this, new OnCompleteListener<AuthResult>() {
-                @Override
-                public void onComplete(@NonNull Task<AuthResult> task) {
-                    if(!task.isSuccessful()){
-                        Toast.makeText(SignUpActivity.this, "SignUp Unsuccessful.\n Please change your email try again!", Toast.LENGTH_LONG);
-                    } else {
-                        signInUser();
-                    }
-                }
-            });
+            getUsers();
         }
         else {
-            Toast.makeText(SignUpActivity.this, "Error Ocurred!", Toast.LENGTH_SHORT);
+            Toast.makeText(SignUpActivity.this, "Error Occurred!", Toast.LENGTH_SHORT);
         }
     }
 
     public void signInUser() {
-        mFirebaseAuth.signInWithEmailAndPassword(emailID,pwd)
-                .addOnSuccessListener(SignUpActivity.this, new OnSuccessListener<AuthResult>() {
-                    @Override
-                    public void onSuccess(AuthResult authResult) {
-                        getUsers();
-                    }
-                }).addOnFailureListener(new OnFailureListener() {
+        //checks if username is unique
+        if(!checkUsername()) {
+            Toast.makeText(SignUpActivity.this, "Login unsuccessful! Username already exists.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        mFirebaseAuth.createUserWithEmailAndPassword(emailID, pwd).addOnCompleteListener(SignUpActivity.this, new OnCompleteListener<AuthResult>() {
             @Override
-            public void onFailure(@NonNull Exception e) {
-                Toast.makeText(SignUpActivity.this, "Login Unsuccessful. Please try again!", Toast.LENGTH_SHORT).show();
+            public void onComplete(@NonNull Task<AuthResult> task) {
+                if(!task.isSuccessful()){
+                    Toast.makeText(SignUpActivity.this, "SignUp Unsuccessful.\n Please change your email try again!", Toast.LENGTH_LONG);
+                } else {
+                    DocumentReference userRef = FirebaseFirestore.getInstance().collection("users").document("user"+emailID);
+                    User user;
+                    if(image == null) {
+                        user = new User(uname, emailID);
+                    } else {
+                        user = new User(uname, emailID,image);
+                    }
+
+                    userRef.set(user).addOnCompleteListener(new OnCompleteListener<Void>() {
+                        @Override
+                        public void onComplete(@NonNull Task<Void> task) {
+                            if(task.isSuccessful()) {
+                                commitUser();
+                            } else {
+                                image = null;
+                            }
+                        }
+                    });
+                }
             }
         });
     }
-
 
     /**
      * commitUser
@@ -241,35 +260,22 @@ public class SignUpActivity extends AppCompatActivity {
      * mainactivity if successful.
      */
     public void commitUser() {
-        //checks if username is unique
-        if(!checkUsername()) {
-            Toast.makeText(SignUpActivity.this, "Login unsuccessful! Username already exists.", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
-        DocumentReference userRef = FirebaseFirestore.getInstance().collection("users").document("user"+mFirebaseAuth.getCurrentUser().getEmail());
-        User user;
-        if(image == null) {
-            user = new User(uname, emailID);
-        } else {
-            user = new User(uname, emailID,image);
-        }
-
-        userRef.set(user).addOnCompleteListener(new OnCompleteListener<Void>() {
+        Toast.makeText(SignUpActivity.this, "Login successful!", Toast.LENGTH_SHORT).show();
+        mFirebaseAuth.signInWithEmailAndPassword(emailID,pwd)
+                .addOnSuccessListener(SignUpActivity.this, new OnSuccessListener<AuthResult>() {
+                    @Override
+                    public void onSuccess(AuthResult authResult) {
+                        Intent intent = new Intent(SignUpActivity.this, MainActivity.class);
+                        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        startActivity(intent);
+                        finish();
+                    }
+                }).addOnFailureListener(new OnFailureListener() {
             @Override
-            public void onComplete(@NonNull Task<Void> task) {
-                if(task.isSuccessful()) {
-                    Toast.makeText(SignUpActivity.this, "Login successful!", Toast.LENGTH_SHORT).show();
-
-                    Intent intent = new Intent(SignUpActivity.this, MainActivity.class);
-                    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                    startActivity(intent);
-                    finish();
-                } else {
-                    image = null;
-                }
+            public void onFailure(@NonNull Exception e) {
+                Toast.makeText(SignUpActivity.this, "Login Unsuccessful. Please try again!", Toast.LENGTH_SHORT).show();
             }
         });
     }
